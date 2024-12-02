@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="rpi.local" id="d215257a-cdbd-4f53-99d8-73754a40b980" port="22" nameFormat="DESCRIPTIVE" username="lovro" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>
