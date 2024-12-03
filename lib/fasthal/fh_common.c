@@ -39,12 +39,12 @@ void fhPllInit()
 {
     fhPllDisable();
 
-    auto m = 25;
-    auto n = 192;
-    auto p = 2;
-    auto q = 4;
+    int m = 25;
+    int n = 192;
+    int p = 2;
+    int q = 4;
 
-    auto pllReg = RCC_PLLCFGR_PLLSRC_HSE;
+    u32 pllReg = RCC_PLLCFGR_PLLSRC_HSE;
     pllReg |= m << RCC_PLLCFGR_PLLM_Pos;
     pllReg |= n << RCC_PLLCFGR_PLLN_Pos;
     pllReg |= (p >> 1) - 1 << RCC_PLLCFGR_PLLP_Pos;
@@ -95,7 +95,7 @@ void fhInit()
 
 void fhDelayMs(int pMs)
 {
-    auto t0 = fhGetMillis();
+    u32 t0 = fhGetMillis();
     halt(fhGetMillis() < t0 + pMs);
 }
 

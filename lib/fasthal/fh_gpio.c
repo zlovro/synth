@@ -8,14 +8,14 @@
 
 void fhGpioPinSetup(u8* pBank, u16 pPinsMask, GpioMode pMode, GpioOtype pOtype, GpioSpeed pSpeed, GpioPull pPull)
 {
-    for (auto bitPos = 0; bitPos < 16; ++bitPos)
+    for (sz_t bitPos = 0; bitPos < 16; ++bitPos)
     {
         if (!(pPinsMask >> bitPos & 1))
         {
             continue;
         }
 
-        auto offset = bitPos << 1;
+        u32 offset = bitPos << 1;
 
         setBits(reg(pBank, MODER), 0b11 << offset, pMode << offset);
         setBits(reg(pBank, OTYPER), 0b1 << bitPos, pOtype << bitPos);

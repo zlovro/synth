@@ -81,14 +81,14 @@ inline void fhGpioPinWrite(u8* pBank, u16 pPin, u8 pState)
 
 inline void fhGpioPinToggle(u8* pBank, u16 pPin)
 {
-    auto odr = reg(pBank, ODR);
+    u32 odr = reg(pBank, ODR);
     reg(pBank, BSRR) = (odr & pPin) << 16 | ~odr & pPin;
 }
 
 // pPin must not be used as a mask.
 inline void fhGpioAlternateFunction(u8* pBank, u16 pPin, u8 pFunc)
 {
-    auto pinIdx = fhGetFirstSetBitIdx(pPin);
+    u8 pinIdx = fhGetFirstSetBitIdx(pPin);
 
     if (pinIdx < 8)
     {

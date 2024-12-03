@@ -10,9 +10,9 @@ void fhUartChkErr(u8* pBase)
 {
     u32 data = fhUsartReg(pBase, SR);
 
-    auto framingError = data >> USART_SR_FE_Pos & 1;
-    auto parityError = data >> USART_SR_PE_Pos & 1;
-    auto overrunError = data >> USART_SR_ORE_Pos & 1;
+    u8 framingError = data >> USART_SR_FE_Pos & 1;
+    u8 parityError  = data >> USART_SR_PE_Pos & 1;
+    u8 overrunError = data >> USART_SR_ORE_Pos & 1;
 
     if (framingError || parityError || overrunError)
     {
@@ -22,12 +22,12 @@ void fhUartChkErr(u8* pBase)
 
 void fhUartReset(u8* pBase)
 {
-    fhUsartReg(pBase, SR) = 0x00C0'0000;
-    fhUsartReg(pBase, DR) = 0;
-    fhUsartReg(pBase, BRR) = 0;
-    fhUsartReg(pBase, CR1) = 0;
-    fhUsartReg(pBase, CR2) = 0;
-    fhUsartReg(pBase, CR3) = 0;
+    fhUsartReg(pBase, SR)   = 0x00C0'0000;
+    fhUsartReg(pBase, DR)   = 0;
+    fhUsartReg(pBase, BRR)  = 0;
+    fhUsartReg(pBase, CR1)  = 0;
+    fhUsartReg(pBase, CR2)  = 0;
+    fhUsartReg(pBase, CR3)  = 0;
     fhUsartReg(pBase, GTPR) = 0;
 }
 
@@ -55,7 +55,7 @@ void fhUartInit1(u32 pBaud)
     fhGpioAlternateFunctionA(GPIO_PIN_09, 7);
     fhGpioAlternateFunctionA(GPIO_PIN_10, 7);
 
-    auto clk = SystemCoreClock >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE2) >> RCC_CFGR_PPRE2_Pos];
+    sz_t clk = SystemCoreClock >> APBPrescTable[(RCC->CFGR & RCC_CFGR_PPRE2) >> RCC_CFGR_PPRE2_Pos];
 
     fhUartCommonInit(MEM_USART1_START, clk, pBaud);
 }
@@ -74,7 +74,7 @@ u8 fhUartRead(u8* pBank)
 
 void fhUartWriteBulk(u8* pBank, u8* pBuf, u32 pSize)
 {
-    for (auto i = 0; i < pSize; ++i)
+    for (sz_t i = 0; i < pSize; ++i)
     {
         fhUartWrite(pBank, pBuf[i]);
     }
@@ -85,7 +85,7 @@ void fhUartWriteBulk(u8* pBank, u8* pBuf, u32 pSize)
 u8 fhUartRw(u8* pBank, u8 pVal)
 {
     halt(!(fhUsartReg(pBank, SR) & USART_SR_RXNE_Msk));
-    auto ret = fhUsartReg(pBank, DR);
+    u32 ret = fhUsartReg(pBank, DR);
 
     fhUsartReg(pBank, DR) = pVal;
     halt(!(fhUsartReg(pBank, SR) & USART_SR_TXE_Msk));

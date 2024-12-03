@@ -108,9 +108,9 @@ int fatReadSectors(uint32 pSector, uint8* pBuffer, uint32 pSectorCount)
 
     // printf("Read sectors 0x%x --> 0x%x\n", pSector, pSector + pSectorCount);
 
-    auto t0 = gSysTick;
+    u32 t0 = gSysTick;
 
-    auto ret = 1;
+    int ret = 1;
     for (u32 i = 0, sector = pSector; i < pSectorCount; ++i, sector++)
     {
         auto sdRet = SD_Read(&gSdDev, pBuffer + i * 0x200, sector, 0, 0x200);
