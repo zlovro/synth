@@ -94,7 +94,7 @@ typedef struct
     } rowColCoord;
 
 #define gpioSet(gpio, state) HAL_GPIO_WritePin((gpio)->bank, (gpio)->pin, state)
-#define gpioModeInput(gpio) ((gpio)->bank->MODER &= ~((3 << (2 * (gpio)->pin))))
+#define gpioModeInput(gpio) (gpio)->bank->MODER &= ~((3 << (2 * (gpio)->pin))); (gpio)->bank->PUPDR &= ~(2 << (2 * (gpio)->pin))
 #define gpioModeOutput(gpio) ((gpio)->bank->MODER |= ((1 << (2 * (gpio)->pin))))
 #define gpioGet(gpio) HAL_GPIO_ReadPin((gpio)->bank, (gpio)->pin)
 
@@ -104,9 +104,12 @@ bool muxRead(mux* pMux, u8 pChan);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define usage us timer
+#define usage5 us timer
+#define usage6 48khz dac
 #define LED0_Pin GPIO_PIN_1
 #define LED0_GPIO_Port GPIOA
+#define PITCHBEND_IN_Pin GPIO_PIN_6
+#define PITCHBEND_IN_GPIO_Port GPIOA
 #define MUX_EN_OG_KEY_ROW_Pin GPIO_PIN_8
 #define MUX_EN_OG_KEY_ROW_GPIO_Port GPIOD
 #define MUX_EN_OG_KEY_COL_Pin GPIO_PIN_9
@@ -139,6 +142,9 @@ bool muxRead(mux* pMux, u8 pChan);
 #define BTN_RUN_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
+
+#define TIM_DAC TIM6
+#define TIM_US TIM5
 
 extern const mux gMuxOgKeyRow;
 extern const mux gMuxOgKeyCol;
