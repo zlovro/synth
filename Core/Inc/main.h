@@ -77,14 +77,34 @@ typedef struct
     gpioPin pinsSelect[4];
 } muxMasterCfg;
 
+// typedef struct
+// {
+//     u8 muxId;
+//     u8 muxChan;
+// } muxedPin;
+//
+//     typedef struct
+//     {
+//         muxedPin row, col;
+//     } muxedPinRowCol;
+
+    typedef struct
+    {
+        u8 row, col;
+    } rowColCoord;
+
 #define gpioSet(gpio, state) HAL_GPIO_WritePin((gpio)->bank, (gpio)->pin, state)
+#define gpioModeInput(gpio) ((gpio)->bank->MODER &= ~((3 << (2 * (gpio)->pin))))
+#define gpioModeOutput(gpio) ((gpio)->bank->MODER |= ((1 << (2 * (gpio)->pin))))
 #define gpioGet(gpio) HAL_GPIO_ReadPin((gpio)->bank, (gpio)->pin)
 
 bool muxRead(mux* pMux, u8 pChan);
+    void muxWrite(mux* pMux, u8 pChan, bool pVal);
 
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define usage us timer
 #define LED0_Pin GPIO_PIN_1
 #define LED0_GPIO_Port GPIOA
 #define MUX_EN_OG_KEY_ROW_Pin GPIO_PIN_8
@@ -120,18 +140,20 @@ bool muxRead(mux* pMux, u8 pChan);
 
 /* USER CODE BEGIN Private defines */
 
-extern mux gMuxOgKeyRow;
-extern mux gMuxOgKeyCol;
-extern mux gMuxOgKbdRow;
-extern mux gMuxOgKbdCol;
-extern mux gMuxKbdvRow;
-extern mux gMuxKbdvCol;
-extern mux gMuxKeyRow;
-extern mux gMuxKeyCol;
+extern const mux gMuxOgKeyRow;
+extern const mux gMuxOgKeyCol;
+extern const mux gMuxOgKbdRow;
+extern const mux gMuxOgKbdCol;
+extern const mux gMuxKbdvRow;
+extern const mux gMuxKbdvCol;
+extern const mux gMuxKeyRow;
+extern const mux gMuxKeyCol;
 
-    extern mux gMuxList[];
+extern const mux gMuxList[];
 
-    extern muxMasterCfg gMuxMasterCfg;
+extern const muxMasterCfg gMuxMasterCfg;
+
+extern const rowColCoord gOgKeyMap[];
 
 /* USER CODE END Private defines */
 
