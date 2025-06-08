@@ -22,7 +22,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <types.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sfs.h>
+#include <glcd/glcd.h>
+#include <ssys/ssys.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,13 +52,19 @@ DMA_HandleTypeDef hdma_dac1_ch1;
 
 SD_HandleTypeDef hsd1;
 
-SPI_HandleTypeDef hspi1;
+SPI_HandleTypeDef hspi6;
 
 TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim3;
+TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim6;
 
-/* Definitions for defaultTask */
-osThreadId_t         defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {.name = "defaultTask", .stack_size = 128 * 4, .priority = (osPriority_t)osPriorityNormal,};
+/* Definitions for taskDefault */
+osThreadId_t         taskDefaultHandle;
+const osThreadAttr_t taskDefault_attributes = {.name = "taskDefault", .stack_size = 128 * 4, .priority = (osPriority_t)osPriorityRealtime6,};
+/* Definitions for taskGlcdRender */
+osThreadId_t         taskGlcdRenderHandle;
+const osThreadAttr_t taskGlcdRender_attributes = {.name = "taskGlcdRender", .stack_size = 128 * 4, .priority = (osPriority_t)osPriorityLow,};
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -66,8 +77,12 @@ static void MX_DMA_Init(void);
 static void MX_DAC1_Init(void);
 static void MX_SDMMC1_SD_Init(void);
 static void MX_TIM1_Init(void);
-static void MX_SPI1_Init(void);
-void        StartDefaultTask(void* argument);
+static void MX_TIM4_Init(void);
+static void MX_SPI6_Init(void);
+static void MX_TIM3_Init(void);
+static void MX_TIM6_Init(void);
+void        taskDefaultStart(void* argument);
+void        taskGlcdRenderStart(void* argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -75,6 +90,54 @@ void        StartDefaultTask(void* argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void delayUs(TIM_TypeDef* pTim, volatile s32 pUs)
+{
+    if (pUs <= 0)
+    {
+        return;
+    }
+
+    volatile u32 lim = pUs / 10;
+    volatile int i   = 0;
+    pTim->CNT        = 0;
+    while (pTim->CNT < lim)
+    {
+        i++;
+    }
+}
+
+muxMasterCfg gMuxMasterCfg = {{MUX_SIG_Pin, MUX_SIG_GPIO_Port}, {{MUX_S0_Pin, MUX_S0_GPIO_Port}, {MUX_S1_Pin, MUX_S1_GPIO_Port}, {MUX_S2_Pin, MUX_S2_GPIO_Port}, {MUX_S3_Pin, MUX_S3_GPIO_Port},}};
+
+mux gMuxOgKeyRow = {0, {MUX_EN_OG_KEY_ROW_Pin, MUX_EN_OG_KEY_ROW_GPIO_Port}};
+mux gMuxOgKeyCol = {1, {MUX_EN_OG_KEY_COL_Pin, MUX_EN_OG_KEY_COL_GPIO_Port}};
+mux gMuxOgKbdRow = {2, {MUX_EN_OG_KBD_ROW_Pin, MUX_EN_OG_KBD_ROW_GPIO_Port}};
+mux gMuxOgKbdCol = {3, {MUX_EN_OG_KBD_COL_Pin, MUX_EN_OG_KBD_COL_GPIO_Port}};
+mux gMuxKbdvRow  = {4, {MUX_EN_KBDV_ROW_Pin, MUX_EN_KBDV_ROW_GPIO_Port}};
+mux gMuxKbdvCol  = {5, {MUX_EN_KBDV_COL_Pin, MUX_EN_KBDV_COL_GPIO_Port}};
+mux gMuxKeyRow   = {6, {MUX_EN_KEY_ROW_Pin, MUX_EN_KEY_ROW_GPIO_Port}};
+mux gMuxKeyCol   = {7, {MUX_EN_KEY_COL_Pin, MUX_EN_KEY_COL_GPIO_Port}};
+
+mux gMuxList[] = {gMuxOgKeyRow, gMuxOgKeyCol, gMuxOgKbdRow, gMuxOgKbdCol, gMuxKbdvRow, gMuxKbdvCol, gMuxKeyRow, gMuxKeyCol};
+
+const size_t gMuxCount    = sizeof(gMuxList) / sizeof(gMuxList[0]);
+const size_t gMuxChannels = sizeof(gMuxMasterCfg.pinsSelect) / sizeof(gMuxMasterCfg.pinsSelect[0]);
+
+bool muxRead(mux* pMux, u8 pChan)
+{
+    for (int i = 0; i < gMuxCount; ++i)
+    {
+        gpioSet(&(gMuxList + i)->enable, 1);
+    }
+
+    for (int i = 0; i < gMuxChannels; ++i)
+    {
+        gpioSet(gMuxMasterCfg.pinsSelect + i, (pChan >> i) & 1);
+    }
+
+    gpioSet(&(gMuxList + pMux->id)->enable, 0);
+
+    return gpioGet(&gMuxMasterCfg.pinSig);
+}
 
 /* USER CODE END 0 */
 
@@ -113,8 +176,36 @@ int main(void)
     MX_DAC1_Init();
     MX_SDMMC1_SD_Init();
     MX_TIM1_Init();
-    MX_SPI1_Init();
+    MX_TIM4_Init();
+    MX_SPI6_Init();
+    MX_TIM3_Init();
+    MX_TIM6_Init();
     /* USER CODE BEGIN 2 */
+
+    // active low
+
+    bool btnRunLastState = false;
+    while (true)
+    {
+        HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
+
+        bool currentState = HAL_GPIO_ReadPin(BTN_RUN_GPIO_Port, BTN_RUN_Pin);
+        if (btnRunLastState && !currentState)
+        {
+            break;
+        }
+
+        btnRunLastState = currentState;
+
+        HAL_Delay(200);
+    }
+
+    HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+
+    HAL_TIM_Base_Start(&htim1);
+    HAL_TIM_Base_Start(&htim3);
+    HAL_TIM_Base_Start(&htim4);
+    HAL_TIM_Base_Start(&htim6);
 
     /* USER CODE END 2 */
 
@@ -138,8 +229,11 @@ int main(void)
     /* USER CODE END RTOS_QUEUES */
 
     /* Create the thread(s) */
-    /* creation of defaultTask */
-    defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+    /* creation of taskDefault */
+    taskDefaultHandle = osThreadNew(taskDefaultStart, NULL, &taskDefault_attributes);
+
+    /* creation of taskGlcdRender */
+    taskGlcdRenderHandle = osThreadNew(taskGlcdRenderStart, NULL, &taskGlcdRender_attributes);
 
     /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
@@ -189,18 +283,19 @@ void SystemClock_Config(void)
     /** Initializes the RCC Oscillators according to the specified parameters
     * in the RCC_OscInitTypeDef structure.
     */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-    RCC_OscInitStruct.HSEState       = RCC_HSE_ON;
-    RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLM       = 5;
-    RCC_OscInitStruct.PLL.PLLN       = 192;
-    RCC_OscInitStruct.PLL.PLLP       = 2;
-    RCC_OscInitStruct.PLL.PLLQ       = 4;
-    RCC_OscInitStruct.PLL.PLLR       = 2;
-    RCC_OscInitStruct.PLL.PLLRGE     = RCC_PLL1VCIRANGE_2;
-    RCC_OscInitStruct.PLL.PLLVCOSEL  = RCC_PLL1VCOWIDE;
-    RCC_OscInitStruct.PLL.PLLFRACN   = 0;
+    RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSI;
+    RCC_OscInitStruct.HSIState            = RCC_HSI_DIV1;
+    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+    RCC_OscInitStruct.PLL.PLLState        = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource       = RCC_PLLSOURCE_HSI;
+    RCC_OscInitStruct.PLL.PLLM            = 4;
+    RCC_OscInitStruct.PLL.PLLN            = 60;
+    RCC_OscInitStruct.PLL.PLLP            = 2;
+    RCC_OscInitStruct.PLL.PLLQ            = 128;
+    RCC_OscInitStruct.PLL.PLLR            = 2;
+    RCC_OscInitStruct.PLL.PLLRGE          = RCC_PLL1VCIRANGE_3;
+    RCC_OscInitStruct.PLL.PLLVCOSEL       = RCC_PLL1VCOWIDE;
+    RCC_OscInitStruct.PLL.PLLFRACN        = 0;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
         Error_Handler();
@@ -221,6 +316,7 @@ void SystemClock_Config(void)
     {
         Error_Handler();
     }
+    HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSI, RCC_MCODIV_1);
 }
 
 /**
@@ -251,7 +347,7 @@ static void MX_DAC1_Init(void)
     /** DAC channel OUT1 config
     */
     sConfig.DAC_SampleAndHold           = DAC_SAMPLEANDHOLD_DISABLE;
-    sConfig.DAC_Trigger                 = DAC_TRIGGER_T1_TRGO;
+    sConfig.DAC_Trigger                 = DAC_TRIGGER_T6_TRGO;
     sConfig.DAC_OutputBuffer            = DAC_OUTPUTBUFFER_ENABLE;
     sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
     sConfig.DAC_UserTrimming            = DAC_TRIMMING_FACTORY;
@@ -294,49 +390,49 @@ static void MX_SDMMC1_SD_Init(void)
 }
 
 /**
-  * @brief SPI1 Initialization Function
+  * @brief SPI6 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_SPI1_Init(void)
+static void MX_SPI6_Init(void)
 {
-    /* USER CODE BEGIN SPI1_Init 0 */
+    /* USER CODE BEGIN SPI6_Init 0 */
 
-    /* USER CODE END SPI1_Init 0 */
+    /* USER CODE END SPI6_Init 0 */
 
-    /* USER CODE BEGIN SPI1_Init 1 */
+    /* USER CODE BEGIN SPI6_Init 1 */
 
-    /* USER CODE END SPI1_Init 1 */
-    /* SPI1 parameter configuration*/
-    hspi1.Instance                        = SPI1;
-    hspi1.Init.Mode                       = SPI_MODE_MASTER;
-    hspi1.Init.Direction                  = SPI_DIRECTION_2LINES_TXONLY;
-    hspi1.Init.DataSize                   = SPI_DATASIZE_4BIT;
-    hspi1.Init.CLKPolarity                = SPI_POLARITY_LOW;
-    hspi1.Init.CLKPhase                   = SPI_PHASE_1EDGE;
-    hspi1.Init.NSS                        = SPI_NSS_HARD_OUTPUT;
-    hspi1.Init.BaudRatePrescaler          = SPI_BAUDRATEPRESCALER_2;
-    hspi1.Init.FirstBit                   = SPI_FIRSTBIT_MSB;
-    hspi1.Init.TIMode                     = SPI_TIMODE_DISABLE;
-    hspi1.Init.CRCCalculation             = SPI_CRCCALCULATION_DISABLE;
-    hspi1.Init.CRCPolynomial              = 0x0;
-    hspi1.Init.NSSPMode                   = SPI_NSS_PULSE_ENABLE;
-    hspi1.Init.NSSPolarity                = SPI_NSS_POLARITY_LOW;
-    hspi1.Init.FifoThreshold              = SPI_FIFO_THRESHOLD_01DATA;
-    hspi1.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
-    hspi1.Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
-    hspi1.Init.MasterSSIdleness           = SPI_MASTER_SS_IDLENESS_00CYCLE;
-    hspi1.Init.MasterInterDataIdleness    = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
-    hspi1.Init.MasterReceiverAutoSusp     = SPI_MASTER_RX_AUTOSUSP_DISABLE;
-    hspi1.Init.MasterKeepIOState          = SPI_MASTER_KEEP_IO_STATE_DISABLE;
-    hspi1.Init.IOSwap                     = SPI_IO_SWAP_DISABLE;
-    if (HAL_SPI_Init(&hspi1) != HAL_OK)
+    /* USER CODE END SPI6_Init 1 */
+    /* SPI6 parameter configuration*/
+    hspi6.Instance                        = SPI6;
+    hspi6.Init.Mode                       = SPI_MODE_MASTER;
+    hspi6.Init.Direction                  = SPI_DIRECTION_2LINES_TXONLY;
+    hspi6.Init.DataSize                   = SPI_DATASIZE_8BIT;
+    hspi6.Init.CLKPolarity                = SPI_POLARITY_HIGH;
+    hspi6.Init.CLKPhase                   = SPI_PHASE_2EDGE;
+    hspi6.Init.NSS                        = SPI_NSS_SOFT;
+    hspi6.Init.BaudRatePrescaler          = SPI_BAUDRATEPRESCALER_32;
+    hspi6.Init.FirstBit                   = SPI_FIRSTBIT_MSB;
+    hspi6.Init.TIMode                     = SPI_TIMODE_DISABLE;
+    hspi6.Init.CRCCalculation             = SPI_CRCCALCULATION_DISABLE;
+    hspi6.Init.CRCPolynomial              = 0x0;
+    hspi6.Init.NSSPMode                   = SPI_NSS_PULSE_ENABLE;
+    hspi6.Init.NSSPolarity                = SPI_NSS_POLARITY_LOW;
+    hspi6.Init.FifoThreshold              = SPI_FIFO_THRESHOLD_01DATA;
+    hspi6.Init.TxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+    hspi6.Init.RxCRCInitializationPattern = SPI_CRC_INITIALIZATION_ALL_ZERO_PATTERN;
+    hspi6.Init.MasterSSIdleness           = SPI_MASTER_SS_IDLENESS_00CYCLE;
+    hspi6.Init.MasterInterDataIdleness    = SPI_MASTER_INTERDATA_IDLENESS_00CYCLE;
+    hspi6.Init.MasterReceiverAutoSusp     = SPI_MASTER_RX_AUTOSUSP_DISABLE;
+    hspi6.Init.MasterKeepIOState          = SPI_MASTER_KEEP_IO_STATE_DISABLE;
+    hspi6.Init.IOSwap                     = SPI_IO_SWAP_DISABLE;
+    if (HAL_SPI_Init(&hspi6) != HAL_OK)
     {
         Error_Handler();
     }
-    /* USER CODE BEGIN SPI1_Init 2 */
+    /* USER CODE BEGIN SPI6_Init 2 */
 
-    /* USER CODE END SPI1_Init 2 */
+    /* USER CODE END SPI6_Init 2 */
 }
 
 /**
@@ -357,7 +453,7 @@ static void MX_TIM1_Init(void)
 
     /* USER CODE END TIM1_Init 1 */
     htim1.Instance               = TIM1;
-    htim1.Init.Prescaler         = 0;
+    htim1.Init.Prescaler         = 1999;
     htim1.Init.CounterMode       = TIM_COUNTERMODE_UP;
     htim1.Init.Period            = 65535;
     htim1.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
@@ -385,6 +481,128 @@ static void MX_TIM1_Init(void)
 }
 
 /**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+    /* USER CODE BEGIN TIM3_Init 0 */
+
+    /* USER CODE END TIM3_Init 0 */
+
+    TIM_ClockConfigTypeDef  sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig      = {0};
+
+    /* USER CODE BEGIN TIM3_Init 1 */
+
+    /* USER CODE END TIM3_Init 1 */
+    htim3.Instance               = TIM3;
+    htim3.Init.Prescaler         = 0;
+    htim3.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    htim3.Init.Period            = 1199;
+    htim3.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+    if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM3_Init 2 */
+
+    /* USER CODE END TIM3_Init 2 */
+}
+
+/**
+  * @brief TIM4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM4_Init(void)
+{
+    /* USER CODE BEGIN TIM4_Init 0 */
+
+    /* USER CODE END TIM4_Init 0 */
+
+    TIM_ClockConfigTypeDef  sClockSourceConfig = {0};
+    TIM_MasterConfigTypeDef sMasterConfig      = {0};
+
+    /* USER CODE BEGIN TIM4_Init 1 */
+
+    /* USER CODE END TIM4_Init 1 */
+    htim4.Instance               = TIM4;
+    htim4.Init.Prescaler         = 0;
+    htim4.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    htim4.Init.Period            = 1199;
+    htim4.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
+    htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+    if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+    sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM4_Init 2 */
+
+    /* USER CODE END TIM4_Init 2 */
+}
+
+/**
+  * @brief TIM6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM6_Init(void)
+{
+    /* USER CODE BEGIN TIM6_Init 0 */
+
+    /* USER CODE END TIM6_Init 0 */
+
+    TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+    /* USER CODE BEGIN TIM6_Init 1 */
+
+    /* USER CODE END TIM6_Init 1 */
+    htim6.Instance               = TIM6;
+    htim6.Init.Prescaler         = 0;
+    htim6.Init.CounterMode       = TIM_COUNTERMODE_UP;
+    htim6.Init.Period            = 2499;
+    htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+    sMasterConfig.MasterSlaveMode     = TIM_MASTERSLAVEMODE_DISABLE;
+    if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
+    {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM6_Init 2 */
+
+    /* USER CODE END TIM6_Init 2 */
+}
+
+/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -405,14 +623,71 @@ static void MX_DMA_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
     /* USER CODE BEGIN MX_GPIO_Init_1 */
     /* USER CODE END MX_GPIO_Init_1 */
 
     /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOH_CLK_ENABLE();
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOA, LED0_Pin | SPI6_CS_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pin Output Level */
+    HAL_GPIO_WritePin(GPIOD, MUX_EN_OG_KEY_ROW_Pin | MUX_EN_OG_KEY_COL_Pin | MUX_EN_OG_KBD_ROW_Pin | MUX_EN_OG_KBD_COL_Pin
+                             | MUX_EN_KBDV_ROW_Pin | MUX_EN_KBDV_COL_Pin | MUX_EN_KEY_ROW_Pin | MUX_EN_KEY_COL_Pin | MUX_S0_Pin | MUX_S1_Pin | MUX_S2_Pin | MUX_S3_Pin, GPIO_PIN_RESET);
+
+    /*Configure GPIO pins : LED0_Pin SPI6_CS_Pin */
+    GPIO_InitStruct.Pin   = LED0_Pin | SPI6_CS_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : MUX_EN_OG_KEY_ROW_Pin MUX_EN_OG_KEY_COL_Pin MUX_EN_OG_KBD_ROW_Pin */
+    GPIO_InitStruct.Pin   = MUX_EN_OG_KEY_ROW_Pin | MUX_EN_OG_KEY_COL_Pin | MUX_EN_OG_KBD_ROW_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_OD;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : MUX_EN_OG_KBD_COL_Pin MUX_EN_KBDV_ROW_Pin MUX_EN_KBDV_COL_Pin MUX_EN_KEY_ROW_Pin
+                             MUX_EN_KEY_COL_Pin */
+    GPIO_InitStruct.Pin   = MUX_EN_OG_KBD_COL_Pin | MUX_EN_KBDV_ROW_Pin | MUX_EN_KBDV_COL_Pin | MUX_EN_KEY_ROW_Pin | MUX_EN_KEY_COL_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : PA8 */
+    GPIO_InitStruct.Pin       = GPIO_PIN_8;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF0_MCO;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : MUX_SIG_Pin */
+    GPIO_InitStruct.Pin  = MUX_SIG_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    HAL_GPIO_Init(MUX_SIG_GPIO_Port, &GPIO_InitStruct);
+
+    /*Configure GPIO pins : MUX_S0_Pin MUX_S1_Pin MUX_S2_Pin MUX_S3_Pin */
+    GPIO_InitStruct.Pin   = MUX_S0_Pin | MUX_S1_Pin | MUX_S2_Pin | MUX_S3_Pin;
+    GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+    /*Configure GPIO pin : BTN_RUN_Pin */
+    GPIO_InitStruct.Pin  = BTN_RUN_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(BTN_RUN_GPIO_Port, &GPIO_InitStruct);
 
     /* USER CODE BEGIN MX_GPIO_Init_2 */
     /* USER CODE END MX_GPIO_Init_2 */
@@ -420,27 +695,64 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+synthErrno sfsReadBlocks(u8* pData, u32 pBlkIdx, u32 pBlkCnt)
+{
+    HAL_StatusTypeDef ret = HAL_SD_ReadBlocks(&hsd1, pData, pBlkIdx, pBlkCnt, 1000);
+    return ret == HAL_OK ? SERR_OK : SERR_SD_GENERIC_ERROR;
+}
+
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_taskDefaultStart */
 /**
-  * @brief  Function implementing the defaultTask thread.
+  * @brief  Function implementing the taskDefault thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void* argument)
+/* USER CODE END Header_taskDefaultStart */
+void taskDefaultStart(void* argument)
 {
     /* USER CODE BEGIN 5 */
 
-    SDMMC_CmdReadMultiBlock(hsd1.Instance, 0);
+    sfsInit();
+    glcdInit(&hsd1, &hspi6, SPI6_CS_GPIO_Port, SPI6_CS_Pin);
+
+    sysInit(&hdac1);
 
     /* Infinite loop */
     for (;;)
     {
-        osDelay(1);
+        auto t0 = osKernelGetTickCount();
+        sysPoll();
+        if (osKernelGetTickCount() - t0 >= SYS_POLL_PERIOD_TICKS)
+        {
+            continue;
+        }
+
+        osDelay(SYS_POLL_PERIOD_TICKS - (osKernelGetTickCount() - t0));
+        // delayUsMainThread(SYS_POLL_PERIOD_US - SYS_TIM->CNT);
     }
     /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_taskGlcdRenderStart */
+/**
+* @brief Function implementing the taskGlcdRender thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_taskGlcdRenderStart */
+void taskGlcdRenderStart(void* argument)
+{
+    /* USER CODE BEGIN taskGlcdRenderStart */
+    /* Infinite loop */
+    for (;;)
+    {
+        glcdRenderThread();
+
+        osDelay(1);
+    }
+    /* USER CODE END taskGlcdRenderStart */
 }
 
 /* MPU Configuration */
@@ -504,6 +816,14 @@ void Error_Handler(void)
     __disable_irq();
     while (1)
     {
+        HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
+        HAL_Delay(500);
+        HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
+        HAL_Delay(100);
+        HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
+        HAL_Delay(100);
+        HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
+        HAL_Delay(1000);
     }
     /* USER CODE END Error_Handler_Debug */
 }
