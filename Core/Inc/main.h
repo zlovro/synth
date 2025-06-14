@@ -88,18 +88,18 @@ typedef struct
 //         muxedPin row, col;
 //     } muxedPinRowCol;
 
-    typedef struct
-    {
-        u8 row, col;
-    } rowColCoord;
+typedef struct
+{
+    u8 row, col;
+} rowColCoord;
 
-#define gpioSet(gpio, state) HAL_GPIO_WritePin((gpio)->bank, (gpio)->pin, state)
+#define gpioSet(gpio, state) ((gpio)->bank->BSRR = (gpio)->pin << (state ? 0 : 16))
 #define gpioModeInput(gpio) (gpio)->bank->MODER &= ~((3 << (2 * (gpio)->pin))); (gpio)->bank->PUPDR &= ~(2 << (2 * (gpio)->pin))
 #define gpioModeOutput(gpio) ((gpio)->bank->MODER |= ((1 << (2 * (gpio)->pin))))
-#define gpioGet(gpio) HAL_GPIO_ReadPin((gpio)->bank, (gpio)->pin)
+#define gpioGet(gpio) ((gpio)->bank->IDR & (gpio)->pin)
 
 bool muxRead(mux* pMux, u8 pChan);
-    void muxWrite(mux* pMux, u8 pChan, bool pVal);
+void muxWrite(mux* pMux, u8 pChan, bool pVal);
 
 /* USER CODE END EFP */
 
