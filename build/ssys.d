@@ -39,7 +39,8 @@ build/ssys.o: Core/Inc/ssys/ssys.c Core/Inc/ssys/ssys.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
- Core/Inc/solfege/solfege.h Core/Inc/main.h Core/Inc/glcd/glcd.h
+ Core/Inc/solfege/solfege.h Core/Inc/main.h Core/Inc/glcd/glcd.h \
+ Core/Inc/sfs/sfs.h
 Core/Inc/ssys/ssys.h:
 Core/Inc/sinf/types.h:
 Core/Inc/sinf/serrno.h:
@@ -88,3 +89,4 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h:
 Core/Inc/solfege/solfege.h:
 Core/Inc/main.h:
 Core/Inc/glcd/glcd.h:
+Core/Inc/sfs/sfs.h:

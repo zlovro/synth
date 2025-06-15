@@ -1,0 +1,64 @@
+//
+// Created by Made on 08/03/2025.
+//
+
+#ifndef TYPES_H
+#define TYPES_H
+
+#include <assert.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#define roundUpTo(x, radix) (((x + radix - 1) / radix) * radix)
+
+typedef uint8_t  u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
+typedef uint64_t u64;
+
+typedef u8 byte;
+
+typedef int8_t  s8;
+typedef int16_t s16;
+typedef int32_t s32;
+typedef int64_t s64;
+
+typedef s8 sbyte;
+
+typedef float  f32;
+typedef double f64;
+
+typedef u32 sz;
+
+typedef char* str;
+
+#define assertSize(obj, sz) static_assert(sizeof(obj) == sz)
+#define assertSizeAlignedTo(obj, tgt) static_assert(tgt % sizeof(obj) == 0)
+#define assertAlignedTo(x, y) static_assert(x % y == 0)
+
+#ifdef __GNUC__
+#define pstruct struct __attribute__((packed))
+#else
+#define _ALLOW_KEYWORD_MACROS
+#define pstruct struct
+#endif
+
+#ifdef __cplusplus
+#define enumAsFlag(e) \
+    inline e operator|(e a, e b) {return (e) ((u64)a | (u64)b); } \
+    inline e operator|=(e& a, e b) {return a = (a | b);} \
+    inline e operator&(e a, e b) {return (e) ((u64)a & (u64)b); } \
+    inline e operator&=(e& a, e b) {return a = (a & b);}
+#else
+#define enumAsFlag(e)
+#define max(a, b) (a > b ? a : b)
+#define min(a, b) (a < b ? a : b)
+#endif
+
+#define magic(a, b, c, d) ((u32)((d << 24) | (c << 16) | (b << 8) | a))
+
+#define bswap16(n) (((n&0xFF00)>>8)|((n&0x00FF)<<8))
+#define bswap32(n) ((bswap16((n&0xFFFF0000)>>16))|((bswap16(n&0x0000FFFF))<<16))
+#define bswap64(n) ((bswap32((n&0xFFFFFFFF00000000)>>32))|((bswap32(n&0x00000000FFFFFFFF))<<32))
+
+#endif //TYPES_H
