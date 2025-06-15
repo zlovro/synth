@@ -1,0 +1,99 @@
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"serrno.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Inc/sinf/serrno.c"
+  19              		.section	.rodata.synthPanic.str1.4,"aMS",%progbits,1
+  20              		.align	2
+  21              	.LC0:
+  22 0000 53796E74 		.ascii	"Synth panic %x\012\000"
+  22      68207061 
+  22      6E696320 
+  22      25780A00 
+  23              		.section	.text.synthPanic,"ax",%progbits
+  24              		.align	1
+  25              		.global	synthPanic
+  26              		.syntax unified
+  27              		.thumb
+  28              		.thumb_func
+  30              	synthPanic:
+  31              	.LVL0:
+  32              	.LFB3:
+   1:Core/Inc/sinf/serrno.c **** //
+   2:Core/Inc/sinf/serrno.c **** // Created by Made on 07/05/2025.
+   3:Core/Inc/sinf/serrno.c **** //
+   4:Core/Inc/sinf/serrno.c **** 
+   5:Core/Inc/sinf/serrno.c **** #include "serrno.h"
+   6:Core/Inc/sinf/serrno.c **** #include <stdio.h>
+   7:Core/Inc/sinf/serrno.c **** #include <stdlib.h>
+   8:Core/Inc/sinf/serrno.c **** 
+   9:Core/Inc/sinf/serrno.c **** void synthPanic(synthErrno pCode)
+  10:Core/Inc/sinf/serrno.c **** {
+  33              		.loc 1 10 1 view -0
+  34              		.cfi_startproc
+  35              		@ Volatile: function does not return.
+  36              		@ args = 0, pretend = 0, frame = 0
+  37              		@ frame_needed = 0, uses_anonymous_args = 0
+  38              		.loc 1 10 1 is_stmt 0 view .LVU1
+  39 0000 08B5     		push	{r3, lr}
+  40              	.LCFI0:
+  41              		.cfi_def_cfa_offset 8
+  42              		.cfi_offset 3, -8
+  43              		.cfi_offset 14, -4
+  44 0002 0446     		mov	r4, r0
+  11:Core/Inc/sinf/serrno.c ****     printf("Synth panic %x\n", pCode);
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s 			page 2
+
+
+  45              		.loc 1 11 5 is_stmt 1 view .LVU2
+  46 0004 0146     		mov	r1, r0
+  47 0006 0348     		ldr	r0, .L3
+  48              	.LVL1:
+  49              		.loc 1 11 5 is_stmt 0 view .LVU3
+  50 0008 FFF7FEFF 		bl	printf
+  51              	.LVL2:
+  12:Core/Inc/sinf/serrno.c ****     exit(pCode);
+  52              		.loc 1 12 5 is_stmt 1 view .LVU4
+  53 000c 2046     		mov	r0, r4
+  54 000e FFF7FEFF 		bl	exit
+  55              	.LVL3:
+  56              	.L4:
+  57 0012 00BF     		.align	2
+  58              	.L3:
+  59 0014 00000000 		.word	.LC0
+  60              		.cfi_endproc
+  61              	.LFE3:
+  63              		.text
+  64              	.Letext0:
+  65              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/st
+  66              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/st
+  67              		.file 4 "Core/Inc/sinf/serrno.h"
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 serrno.c
+C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s:20     .rodata.synthPanic.str1.4:00000000 $d
+C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s:24     .text.synthPanic:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s:30     .text.synthPanic:00000000 synthPanic
+C:\Users\Made\AppData\Local\Temp\ccfn7kn6.s:59     .text.synthPanic:00000014 $d
+
+UNDEFINED SYMBOLS
+printf
+exit
