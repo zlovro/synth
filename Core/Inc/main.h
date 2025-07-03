@@ -57,22 +57,19 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-void delayUs(TIM_TypeDef* pTim, volatile s32 pUs);
+void delayUs(TIM_TypeDef *pTim, volatile s32 pUs);
 
-typedef pstruct
-{
+typedef pstruct {
     u16           pin;
-    GPIO_TypeDef* bank;
+    GPIO_TypeDef *bank;
 } gpioPin;
 
-typedef struct
-{
+typedef struct {
     u8      id;
     gpioPin enable;
 } mux;
 
-typedef struct
-{
+typedef struct {
     gpioPin pinSig;
     gpioPin pinsSelect[4];
 } muxMasterCfg;
@@ -88,8 +85,7 @@ typedef struct
 //         muxedPin row, col;
 //     } muxedPinRowCol;
 
-typedef struct
-{
+typedef struct {
     u8 row, col;
 } rowColCoord;
 
@@ -98,18 +94,40 @@ typedef struct
 #define gpioModeOutput(gpio) ((gpio)->bank->MODER |= ((1 << (2 * (gpio)->pin))))
 #define gpioGet(gpio) ((gpio)->bank->IDR & (gpio)->pin)
 
-bool muxRead(mux* pMux, u8 pChan);
-void muxWrite(mux* pMux, u8 pChan, bool pVal);
+bool muxRead(mux *pMux, u8 pChan);
+
+void muxWrite(mux *pMux, u8 pChan, bool pVal);
+
+void uartPrintf(const char *format, ...);
 
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define usage5 us timer
+#define dac1ch1 audio
+#define dac1ch2 triangle
+#define usage4 us delay timer
+#define usage3 poll timer
 #define usage6 48khz dac
+#define usage5 us timer
+#define usage7 10khz timer
+#define LCD_CS_Pin GPIO_PIN_3
+#define LCD_CS_GPIO_Port GPIOE
 #define LED0_Pin GPIO_PIN_1
 #define LED0_GPIO_Port GPIOA
+#define AUDIO_OUT_Pin GPIO_PIN_4
+#define AUDIO_OUT_GPIO_Port GPIOA
+#define TRI_Pin GPIO_PIN_5
+#define TRI_GPIO_Port GPIOA
 #define PITCHBEND_IN_Pin GPIO_PIN_6
 #define PITCHBEND_IN_GPIO_Port GPIOA
+#define BTN_RUN_Pin GPIO_PIN_5
+#define BTN_RUN_GPIO_Port GPIOC
+#define COMP_TRI_Pin GPIO_PIN_7
+#define COMP_TRI_GPIO_Port GPIOE
+#define COMP_OUT_Pin GPIO_PIN_8
+#define COMP_OUT_GPIO_Port GPIOE
+#define COMP_AUDIO_Pin GPIO_PIN_11
+#define COMP_AUDIO_GPIO_Port GPIOE
 #define MUX_EN_OG_KEY_ROW_Pin GPIO_PIN_8
 #define MUX_EN_OG_KEY_ROW_GPIO_Port GPIOD
 #define MUX_EN_OG_KEY_COL_Pin GPIO_PIN_9
@@ -126,8 +144,6 @@ void muxWrite(mux* pMux, u8 pChan, bool pVal);
 #define MUX_EN_KEY_ROW_GPIO_Port GPIOD
 #define MUX_EN_KEY_COL_Pin GPIO_PIN_15
 #define MUX_EN_KEY_COL_GPIO_Port GPIOD
-#define SPI6_CS_Pin GPIO_PIN_15
-#define SPI6_CS_GPIO_Port GPIOA
 #define MUX_SIG_Pin GPIO_PIN_3
 #define MUX_SIG_GPIO_Port GPIOD
 #define MUX_S0_Pin GPIO_PIN_4
@@ -138,13 +154,17 @@ void muxWrite(mux* pMux, u8 pChan, bool pVal);
 #define MUX_S2_GPIO_Port GPIOD
 #define MUX_S3_Pin GPIO_PIN_7
 #define MUX_S3_GPIO_Port GPIOD
-#define BTN_RUN_Pin GPIO_PIN_0
-#define BTN_RUN_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 
+#define TIM_KHZ_10 TIM7
 #define TIM_DAC TIM6
 #define TIM_US TIM5
+#define TIM_DELAY_US TIM4
+
+#define delayUsDefault(u) delayUs(TIM_DELAY_US, u)
+
+    extern char gPrintfBuf[];
 
 extern const mux gMuxOgKeyRow;
 extern const mux gMuxOgKeyCol;
@@ -160,7 +180,6 @@ extern const mux gMuxList[];
 extern const muxMasterCfg gMuxMasterCfg;
 
 extern const rowColCoord gOgKeyMap[];
-
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -21,6 +21,7 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h \
@@ -38,22 +39,11 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
- Core/Inc/sinf/types.h \
- Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
- Core/Inc/FreeRTOSConfig.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/portable.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h \
- Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/list.h \
- Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
- Middlewares/Third_Party/FreeRTOS/Source/include/task.h \
- Core/Inc/sfs/sfs.h Core/Inc/sinf/serrno.h Core/Inc/glcd/glcd.h \
- Core/Inc/ssys/ssys.h Core/Inc/solfege/solfege.h
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
+ Core/Inc/sinf/types.h Core/Inc/sfs/sfs.h Core/Inc/sinf/serrno.h \
+ Core/Inc/solfege/solfege.h Core/Inc/glcd/glcd.h Core/Inc/smidi/smidi.h \
+ Core/Inc/ssys/ssys.h
 Core/Inc/main.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 Core/Inc/stm32h7xx_hal_conf.h:
@@ -79,6 +69,7 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h:
@@ -96,22 +87,12 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h:
 Core/Inc/sinf/types.h:
-Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h:
-Core/Inc/FreeRTOSConfig.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/portable.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h:
-Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/list.h:
-Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/queue.h:
-Middlewares/Third_Party/FreeRTOS/Source/include/task.h:
 Core/Inc/sfs/sfs.h:
 Core/Inc/sinf/serrno.h:
-Core/Inc/glcd/glcd.h:
-Core/Inc/ssys/ssys.h:
 Core/Inc/solfege/solfege.h:
+Core/Inc/glcd/glcd.h:
+Core/Inc/smidi/smidi.h:
+Core/Inc/ssys/ssys.h:

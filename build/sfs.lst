@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccW7xIde.s 			page 1
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -36,12 +36,11 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccW7xIde.s 			page 1
    7:Core/Inc/sfs/sfs.c **** #include <serrno.h>
    8:Core/Inc/sfs/sfs.c **** #include <stdlib.h>
    9:Core/Inc/sfs/sfs.c **** 
-  10:Core/Inc/sfs/sfs.c **** u8*        gSfsFirstBlockData = NULL;
-  11:Core/Inc/sfs/sfs.c **** sfsHeader* gSfsHeader         = NULL;
-  12:Core/Inc/sfs/sfs.c **** 
-  13:Core/Inc/sfs/sfs.c **** synthErrno sfsInit()
-  14:Core/Inc/sfs/sfs.c **** {
-  28              		.loc 1 14 1 view -0
+  10:Core/Inc/sfs/sfs.c **** u8        gSfsFirstBlockData[BLOCK_SIZE];
+  11:Core/Inc/sfs/sfs.c **** 
+  12:Core/Inc/sfs/sfs.c **** synthErrno sfsInit()
+  13:Core/Inc/sfs/sfs.c **** {
+  28              		.loc 1 13 1 view -0
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -50,135 +49,85 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccW7xIde.s 			page 1
   34              		.cfi_def_cfa_offset 8
   35              		.cfi_offset 3, -8
   36              		.cfi_offset 14, -4
-  15:Core/Inc/sfs/sfs.c ****     gSfsFirstBlockData = malloc(BLOCK_SIZE);
-  37              		.loc 1 15 5 view .LVU1
-  38              		.loc 1 15 26 is_stmt 0 view .LVU2
-  39 0002 4FF40070 		mov	r0, #512
-  40 0006 FFF7FEFF 		bl	malloc
-  41              	.LVL0:
-  42              		.loc 1 15 24 discriminator 1 view .LVU3
-  43 000a 064B     		ldr	r3, .L4
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccW7xIde.s 			page 2
+  14:Core/Inc/sfs/sfs.c ****     synthErrno ret     = sfsReadBlocks(gSfsFirstBlockData, 0, 1);
+  37              		.loc 1 14 5 view .LVU1
+  38              		.loc 1 14 26 is_stmt 0 view .LVU2
+  39 0002 0122     		movs	r2, #1
+  40 0004 0021     		movs	r1, #0
+  41 0006 0248     		ldr	r0, .L3
+  42 0008 FFF7FEFF 		bl	sfsReadBlocks
+  43              	.LVL0:
+  15:Core/Inc/sfs/sfs.c ****     if (ret != SERR_OK)
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s 			page 2
 
 
-  44 000c 1860     		str	r0, [r3]
-  16:Core/Inc/sfs/sfs.c ****     synthErrno ret     = sfsReadBlocks(gSfsFirstBlockData, 0, 1);
-  45              		.loc 1 16 5 is_stmt 1 view .LVU4
-  46              		.loc 1 16 26 is_stmt 0 view .LVU5
-  47 000e 0122     		movs	r2, #1
-  48 0010 0021     		movs	r1, #0
-  49 0012 FFF7FEFF 		bl	sfsReadBlocks
-  50              	.LVL1:
-  17:Core/Inc/sfs/sfs.c ****     if (ret != SERR_OK)
-  51              		.loc 1 17 5 is_stmt 1 view .LVU6
-  52              		.loc 1 17 8 is_stmt 0 view .LVU7
-  53 0016 18B9     		cbnz	r0, .L2
-  18:Core/Inc/sfs/sfs.c ****     {
-  19:Core/Inc/sfs/sfs.c ****         return ret;
-  20:Core/Inc/sfs/sfs.c ****     }
-  21:Core/Inc/sfs/sfs.c ****     gSfsHeader = (sfsHeader*)gSfsFirstBlockData;
-  54              		.loc 1 21 5 is_stmt 1 view .LVU8
-  55              		.loc 1 21 16 is_stmt 0 view .LVU9
-  56 0018 024B     		ldr	r3, .L4
-  57              	.LVL2:
-  58              		.loc 1 21 16 view .LVU10
-  59 001a 1A68     		ldr	r2, [r3]
-  60 001c 024B     		ldr	r3, .L4+4
-  61              	.LVL3:
-  62              		.loc 1 21 16 view .LVU11
-  63 001e 1A60     		str	r2, [r3]
+  44              		.loc 1 15 5 is_stmt 1 view .LVU3
+  16:Core/Inc/sfs/sfs.c ****     {
+  17:Core/Inc/sfs/sfs.c ****         return ret;
+  18:Core/Inc/sfs/sfs.c ****     }
+  19:Core/Inc/sfs/sfs.c **** 
+  20:Core/Inc/sfs/sfs.c ****     return SERR_OK;
+  21:Core/Inc/sfs/sfs.c **** }
+  45              		.loc 1 21 1 is_stmt 0 view .LVU4
+  46 000c 08BD     		pop	{r3, pc}
+  47              	.L4:
+  48 000e 00BF     		.align	2
+  49              	.L3:
+  50 0010 00000000 		.word	gSfsFirstBlockData
+  51              		.cfi_endproc
+  52              	.LFE0:
+  54              		.section	.text.sfsDeinit,"ax",%progbits
+  55              		.align	1
+  56              		.global	sfsDeinit
+  57              		.syntax unified
+  58              		.thumb
+  59              		.thumb_func
+  61              	sfsDeinit:
+  62              	.LFB1:
   22:Core/Inc/sfs/sfs.c **** 
-  23:Core/Inc/sfs/sfs.c ****     return SERR_OK;
-  64              		.loc 1 23 5 is_stmt 1 view .LVU12
-  65              	.L2:
-  24:Core/Inc/sfs/sfs.c **** }
-  66              		.loc 1 24 1 is_stmt 0 view .LVU13
-  67 0020 08BD     		pop	{r3, pc}
-  68              	.L5:
-  69 0022 00BF     		.align	2
-  70              	.L4:
-  71 0024 00000000 		.word	gSfsFirstBlockData
-  72 0028 00000000 		.word	gSfsHeader
-  73              		.cfi_endproc
-  74              	.LFE0:
-  76              		.section	.text.sfsDeinit,"ax",%progbits
-  77              		.align	1
-  78              		.global	sfsDeinit
-  79              		.syntax unified
-  80              		.thumb
-  81              		.thumb_func
-  83              	sfsDeinit:
-  84              	.LFB1:
-  25:Core/Inc/sfs/sfs.c **** 
-  26:Core/Inc/sfs/sfs.c **** synthErrno sfsDeinit()
-  27:Core/Inc/sfs/sfs.c **** {
-  85              		.loc 1 27 1 is_stmt 1 view -0
-  86              		.cfi_startproc
-  87              		@ args = 0, pretend = 0, frame = 0
-  88              		@ frame_needed = 0, uses_anonymous_args = 0
-  89 0000 08B5     		push	{r3, lr}
-  90              	.LCFI1:
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccW7xIde.s 			page 3
-
-
-  91              		.cfi_def_cfa_offset 8
-  92              		.cfi_offset 3, -8
-  93              		.cfi_offset 14, -4
-  28:Core/Inc/sfs/sfs.c ****     free(gSfsFirstBlockData);
-  94              		.loc 1 28 5 view .LVU15
-  95 0002 034B     		ldr	r3, .L8
-  96 0004 1868     		ldr	r0, [r3]
-  97 0006 FFF7FEFF 		bl	free
-  98              	.LVL4:
-  29:Core/Inc/sfs/sfs.c **** 
-  30:Core/Inc/sfs/sfs.c ****     return SERR_OK;
-  99              		.loc 1 30 5 view .LVU16
-  31:Core/Inc/sfs/sfs.c **** }
- 100              		.loc 1 31 1 is_stmt 0 view .LVU17
- 101 000a 0020     		movs	r0, #0
- 102 000c 08BD     		pop	{r3, pc}
- 103              	.L9:
- 104 000e 00BF     		.align	2
- 105              	.L8:
- 106 0010 00000000 		.word	gSfsFirstBlockData
- 107              		.cfi_endproc
- 108              	.LFE1:
- 110              		.global	gSfsHeader
- 111              		.section	.bss.gSfsHeader,"aw",%nobits
- 112              		.align	2
- 115              	gSfsHeader:
- 116 0000 00000000 		.space	4
- 117              		.global	gSfsFirstBlockData
- 118              		.section	.bss.gSfsFirstBlockData,"aw",%nobits
- 119              		.align	2
- 122              	gSfsFirstBlockData:
- 123 0000 00000000 		.space	4
- 124              		.text
- 125              	.Letext0:
- 126              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/ma
- 127              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/lib/gcc/arm-none-eabi/13
- 128              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/sy
- 129              		.file 5 "Core/Inc/sinf/types.h"
- 130              		.file 6 "Core/Inc/sinf/serrno.h"
- 131              		.file 7 "Core/Inc/sfs/sfs.h"
- 132              		.file 8 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/st
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccW7xIde.s 			page 4
+  23:Core/Inc/sfs/sfs.c **** synthErrno sfsDeinit()
+  24:Core/Inc/sfs/sfs.c **** {
+  63              		.loc 1 24 1 is_stmt 1 view -0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67              		@ link register save eliminated.
+  25:Core/Inc/sfs/sfs.c ****     return SERR_OK;
+  68              		.loc 1 25 5 view .LVU6
+  26:Core/Inc/sfs/sfs.c **** }
+  69              		.loc 1 26 1 is_stmt 0 view .LVU7
+  70 0000 0020     		movs	r0, #0
+  71 0002 7047     		bx	lr
+  72              		.cfi_endproc
+  73              	.LFE1:
+  75              		.global	gSfsFirstBlockData
+  76              		.section	.bss.gSfsFirstBlockData,"aw",%nobits
+  77              		.align	2
+  80              	gSfsFirstBlockData:
+  81 0000 00000000 		.space	512
+  81      00000000 
+  81      00000000 
+  81      00000000 
+  81      00000000 
+  82              		.text
+  83              	.Letext0:
+  84              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/ma
+  85              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/sy
+  86              		.file 4 "Core/Inc/sinf/types.h"
+  87              		.file 5 "Core/Inc/sinf/serrno.h"
+  88              		.file 6 "Core/Inc/sfs/sfs.h"
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s 			page 3
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 sfs.c
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:20     .text.sfsInit:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:26     .text.sfsInit:00000000 sfsInit
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:71     .text.sfsInit:00000024 $d
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:122    .bss.gSfsFirstBlockData:00000000 gSfsFirstBlockData
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:115    .bss.gSfsHeader:00000000 gSfsHeader
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:77     .text.sfsDeinit:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:83     .text.sfsDeinit:00000000 sfsDeinit
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:106    .text.sfsDeinit:00000010 $d
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:112    .bss.gSfsHeader:00000000 $d
-C:\Users\Made\AppData\Local\Temp\ccW7xIde.s:119    .bss.gSfsFirstBlockData:00000000 $d
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:20     .text.sfsInit:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:26     .text.sfsInit:00000000 sfsInit
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:50     .text.sfsInit:00000010 $d
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:80     .bss.gSfsFirstBlockData:00000000 gSfsFirstBlockData
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:55     .text.sfsDeinit:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:61     .text.sfsDeinit:00000000 sfsDeinit
+C:\Users\Made\AppData\Local\Temp\ccrTOOjP.s:77     .bss.gSfsFirstBlockData:00000000 $d
 
 UNDEFINED SYMBOLS
-malloc
 sfsReadBlocks
-free

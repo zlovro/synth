@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #define roundUpTo(x, radix) (((x + radix - 1) / radix) * radix)
 
@@ -36,8 +37,12 @@ typedef char* str;
 #define assertSizeAlignedTo(obj, tgt) static_assert(tgt % sizeof(obj) == 0)
 #define assertAlignedTo(x, y) static_assert(x % y == 0)
 
+#define zmem(m, s) memset(m, 0, s)
+
 #ifdef __GNUC__
 #define pstruct struct __attribute__((packed))
+#define DMA_BUFFER __attribute__((section(".dma_buffer")))
+#define BDMA_BUFFER __attribute__((section(".bdma_buffer")))
 #else
 #define _ALLOW_KEYWORD_MACROS
 #define pstruct struct

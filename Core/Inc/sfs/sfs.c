@@ -7,25 +7,20 @@
 #include <serrno.h>
 #include <stdlib.h>
 
-u8*        gSfsFirstBlockData = NULL;
-sfsHeader* gSfsHeader         = NULL;
+u8        gSfsFirstBlockData[BLOCK_SIZE];
 
 synthErrno sfsInit()
 {
-    gSfsFirstBlockData = malloc(BLOCK_SIZE);
     synthErrno ret     = sfsReadBlocks(gSfsFirstBlockData, 0, 1);
     if (ret != SERR_OK)
     {
         return ret;
     }
-    gSfsHeader = (sfsHeader*)gSfsFirstBlockData;
 
     return SERR_OK;
 }
 
 synthErrno sfsDeinit()
 {
-    free(gSfsFirstBlockData);
-
     return SERR_OK;
 }

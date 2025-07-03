@@ -21,6 +21,7 @@ build/system_stm32h7xx.o: Core/Src/system_stm32h7xx.c \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h \
@@ -37,7 +38,9 @@ build/system_stm32h7xx.o: Core/Src/system_stm32h7xx.c \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h \
- Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
 Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h:
 Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h:
 Drivers/CMSIS/Include/core_cm7.h:
@@ -62,6 +65,7 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h:
@@ -79,3 +83,5 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h:

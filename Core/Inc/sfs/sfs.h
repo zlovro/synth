@@ -6,7 +6,7 @@
 #define SYNTH_FS_H
 
 #include <serrno.h>
-
+#include <solfege/solfege.h>
 #include <types.h>
 
 #ifndef BLOCK_SIZE
@@ -28,7 +28,8 @@ typedef pstruct
     u32 stringLutBlockStart;          // string lut - offsets into stringDataBlock
     u32 stringDataBlockStart;         // contiguous!
     u32 instrumentInfoDataBlockStart; // big array of sfsSingleInstrument
-    u32 sampleDataBlockStart;         // big array of sfsInstrumentSample
+    u32 sampleInfoBlockStart;         // big array of sfsInstrumentSample
+    u32 proximityTableBlockStart;     // big array of proximityTables
 
     u32 instrumentCount;
 
@@ -50,7 +51,7 @@ typedef pstruct
     u8 pitchSemitones;
 
     u16 startAverageAmplitude, endAverageAmplitude;
-    u8 padding[14];
+    u8  padding[14];
 } sfsInstrumentSample;
 
 assertSizeAlignedTo(sfsInstrumentSample, 0x200);
@@ -63,12 +64,8 @@ typedef enum : u8
     SFS_SOUND_TYPE_LOOP   = 1 << 1,
 } sfsSoundType;
 
-enumAsFlag(sfsSoundType)
-
-typedef pstruct
+enumAsFlag(sfsSoundType)typedef pstruct
 {
-    u32 firstSampleBlock;
-
     u16 nameStrIndex;
 
     f32 fadeTimeDefault;
@@ -79,7 +76,7 @@ typedef pstruct
 
     sfsSoundType soundType;
 
-    u8 padding[14];
+    u8 padding[18];
 } sfsSingleInstrument;
 
 assertSizeAlignedTo(sfsSingleInstrument, 0x200);
@@ -87,6 +84,39 @@ assertSizeAlignedTo(sfsSingleInstrument, 0x200);
 #define SFS_INVALID_INSTRUMENT_IDX 0xFF
 #define SFS_INVALID_INSTRUMENT_ID 0xFFFF
 #define SFS_MAX_SUBINSTRUMENTS 12
+#define SFS_MAX_VELOCITY_COUNT 8
+#define SFS_INVALID_VELOCITY 0
+
+#define SFS_FIRST_KEY TONE_OFFSET_C2
+#define SFS_LAST_KEY TONE_OFFSET_C7
+#define SFS_KEY_SEMITONE_RANGE (1 + SFS_LAST_KEY - SFS_FIRST_KEY)
+#define SFS_KEY_COUNT SFS_KEY_SEMITONE_RANGE
+#define SFS_KEYS_WORD_COUNT (SFS_KEY_SEMITONE_RANGE % 32 == 0 ? SFS_KEY_SEMITONE_RANGE / 32 : 1 + (SFS_KEY_SEMITONE_RANGE / 32))
+
+typedef pstruct
+{
+    u8  velocity;
+    u16 sampleIdx;
+    u8  padding;
+} sfsKeyProximityTableEntryVelocity;
+
+typedef pstruct
+{
+    sfsKeyProximityTableEntryVelocity byVelocity[SFS_MAX_VELOCITY_COUNT];
+} sfsKeyProximityTableEntryMaster;
+
+assertSizeAlignedTo(sfsKeyProximityTableEntryMaster, BLOCK_SIZE);
+
+typedef pstruct
+{
+    u32                             sampleIdxOrigin;
+    u8                              padding[sizeof(sfsKeyProximityTableEntryMaster) - 4];
+    sfsKeyProximityTableEntryMaster masterEntries[SFS_KEY_COUNT];
+    u8                              padding0[64];
+} sfsKeyProximityTable;
+
+static_assert(sizeof(sfsKeyProximityTable) % BLOCK_SIZE == 0);
+#define SFS_PROXIMITY_TABLE_BLOCK_SIZE (sizeof(sfsKeyProximityTable) / BLOCK_SIZE)
 
 typedef pstruct
 {
@@ -128,8 +158,9 @@ assertSize(sfsGlyph, 9);
 #define SFS_FONT_SIZE_ALIGNED (roundToBlock(SFS_GLYPH_COUNT * sizeof(sfsGlyph)))
 #define SFS_FONT_SIZE_BLOCKS (SFS_FONT_SIZE_ALIGNED / BLOCK_SIZE)
 
-extern sfsHeader* gSfsHeader;
-extern u8*        gSfsFirstBlockData;
+extern u8 gSfsFirstBlockData[];
+
+#define gSfsHeader ((sfsHeader*)gSfsFirstBlockData)
 
 extern synthErrno sfsInit();
 extern synthErrno sfsDeinit();

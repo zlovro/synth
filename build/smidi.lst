@@ -1,0 +1,1087 @@
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"smidi.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Inc/smidi/smidi.c"
+  19              		.section	.text.smidiReadHeader,"ax",%progbits
+  20              		.align	1
+  21              		.global	smidiReadHeader
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	smidiReadHeader:
+  27              	.LVL0:
+  28              	.LFB0:
+   1:Core/Inc/smidi/smidi.c **** //
+   2:Core/Inc/smidi/smidi.c **** // Created by Made on 13/06/2025.
+   3:Core/Inc/smidi/smidi.c **** //
+   4:Core/Inc/smidi/smidi.c **** 
+   5:Core/Inc/smidi/smidi.c **** #include "smidi.h"
+   6:Core/Inc/smidi/smidi.c **** 
+   7:Core/Inc/smidi/smidi.c **** const u8 gSmidiTestBuffer[] = {
+   8:Core/Inc/smidi/smidi.c ****     0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x01, 0x00, 0x04, 0x00, 0x60, 0x4D, 0x54,
+   9:Core/Inc/smidi/smidi.c ****     0x00, 0x00, 0x0B, 0x00, 0xFF, 0x51, 0x03, 0x06, 0x1A, 0x80, 0x00, 0xFF, 0x2F, 0x00, 0x4D, 0x54,
+  10:Core/Inc/smidi/smidi.c ****     0x00, 0xB0, 0x07, 0x64, 0x00, 0xE0, 0x00, 0x40, 0x00, 0xB0, 0x65, 0x00, 0x00, 0xB0, 0x64, 0x00,
+  11:Core/Inc/smidi/smidi.c ****     0x00, 0xB0, 0x64, 0x00, 0x00, 0xB0, 0x06, 0x0C, 0x00, 0xB0, 0x0A, 0x40, 0x00, 0xB0, 0x07, 0x64,
+  12:Core/Inc/smidi/smidi.c ****     0x00, 0xB0, 0x0A, 0x40, 0x00, 0xB0, 0x07, 0x64, 0x00, 0xE0, 0x00, 0x40, 0x00, 0xC0, 0x00, 0x81,
+  13:Core/Inc/smidi/smidi.c ****     0x64, 0x0C, 0x80, 0x49, 0x40, 0x00, 0x90, 0x4A, 0x64, 0x0C, 0x80, 0x4A, 0x40, 0x00, 0x90, 0x49,
+  14:Core/Inc/smidi/smidi.c ****     0x46, 0x64, 0x3F, 0x80, 0x46, 0x40, 0x02, 0x90, 0x49, 0x6F, 0x18, 0x80, 0x49, 0x40, 0x00, 0x90,
+  15:Core/Inc/smidi/smidi.c ****     0x90, 0x4A, 0x3F, 0x26, 0x80, 0x4A, 0x40, 0x0A, 0x90, 0x4A, 0x2A, 0x30, 0x80, 0x4A, 0x40, 0x00,
+  16:Core/Inc/smidi/smidi.c ****     0x05, 0x90, 0x46, 0x00, 0x10, 0x80, 0x46, 0x40, 0x00, 0x90, 0x45, 0x00, 0x06, 0x90, 0x3E, 0x00,
+  17:Core/Inc/smidi/smidi.c ****     0x00, 0x13, 0x80, 0x46, 0x40, 0x04, 0x80, 0x45, 0x40, 0x01, 0x90, 0x46, 0x02, 0x17, 0x80, 0x46,
+  18:Core/Inc/smidi/smidi.c ****     0x3E, 0x40, 0x01, 0x90, 0x3D, 0x32, 0x0F, 0x90, 0x3E, 0x3A, 0x07, 0x80, 0x3D, 0x40, 0x07, 0x90,
+  19:Core/Inc/smidi/smidi.c ****     0x80, 0x3D, 0x40, 0x01, 0x90, 0x46, 0x5F, 0x30, 0x80, 0x46, 0x40, 0x00, 0x90, 0x48, 0x7F, 0x48,
+  20:Core/Inc/smidi/smidi.c ****     0x2A, 0x80, 0x45, 0x40, 0x06, 0x90, 0x45, 0x0A, 0x2A, 0x80, 0x45, 0x40, 0x06, 0x90, 0x46, 0x00,
+  21:Core/Inc/smidi/smidi.c ****     0x40, 0x0A, 0x90, 0x43, 0x25, 0x02, 0x80, 0x45, 0x40, 0x16, 0x80, 0x43, 0x40, 0x01, 0x90, 0x45,
+  22:Core/Inc/smidi/smidi.c ****     0x4C, 0x7F, 0x18, 0x80, 0x4C, 0x40, 0x00, 0x90, 0x4A, 0x64, 0x81, 0x40, 0x80, 0x4A, 0x40, 0x00,
+  23:Core/Inc/smidi/smidi.c ****     0x00, 0x90, 0x4A, 0x00, 0x0C, 0x80, 0x4A, 0x40, 0x00, 0x90, 0x49, 0x00, 0x19, 0x80, 0x49, 0x40,
+  24:Core/Inc/smidi/smidi.c ****     0x40, 0x02, 0x90, 0x49, 0x02, 0x18, 0x80, 0x49, 0x40, 0x00, 0x90, 0x4C, 0x0C, 0x18, 0x80, 0x4C,
+  25:Core/Inc/smidi/smidi.c ****     0x4A, 0x40, 0x0A, 0x90, 0x4A, 0x55, 0x30, 0x80, 0x4A, 0x40, 0x00, 0x90, 0x49, 0x6A, 0x15, 0x80,
+  26:Core/Inc/smidi/smidi.c ****     0x80, 0x46, 0x40, 0x00, 0x90, 0x45, 0x64, 0x06, 0x90, 0x3E, 0x64, 0x09, 0x80, 0x45, 0x40, 0x00,
+  27:Core/Inc/smidi/smidi.c ****     0x04, 0x80, 0x45, 0x40, 0x01, 0x90, 0x46, 0x4E, 0x17, 0x80, 0x46, 0x40, 0x01, 0x90, 0x43, 0x46,
+  28:Core/Inc/smidi/smidi.c ****     0x26, 0x0F, 0x90, 0x3E, 0x1F, 0x07, 0x80, 0x3D, 0x40, 0x07, 0x90, 0x3D, 0x1B, 0x01, 0x80, 0x3E,
+  29:Core/Inc/smidi/smidi.c ****     0x46, 0x09, 0x30, 0x80, 0x46, 0x40, 0x00, 0x90, 0x48, 0x6C, 0x48, 0x80, 0x48, 0x40, 0x48, 0x90,
+  30:Core/Inc/smidi/smidi.c ****     0x90, 0x45, 0x47, 0x2A, 0x80, 0x45, 0x40, 0x06, 0x90, 0x46, 0x2C, 0x14, 0x80, 0x46, 0x40, 0x02,
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 2
+
+
+  31:Core/Inc/smidi/smidi.c ****     0x5F, 0xB0, 0x65, 0x00, 0x00, 0xB0, 0x64, 0x00, 0x00, 0xB0, 0x06, 0x0C, 0x00, 0xB0, 0x0A, 0x40,
+  32:Core/Inc/smidi/smidi.c ****     0x00, 0xB0, 0x0A, 0x40, 0x00, 0xB0, 0x07, 0x64, 0x00, 0xE0, 0x00, 0x40, 0x00, 0xC0, 0x00, 0x00,
+  33:Core/Inc/smidi/smidi.c ****     0x37, 0x20, 0x23, 0x32, 0x00, 0xB1, 0x0A, 0x40, 0x00, 0xB1, 0x07, 0x64, 0x00, 0xE1, 0x00, 0x40,
+  34:Core/Inc/smidi/smidi.c ****     0x40, 0x00, 0xC1, 0x00, 0x00, 0xB1, 0x65, 0x00, 0x00, 0xB1, 0x64, 0x00, 0x00, 0xB1, 0x06, 0x0C,
+  35:Core/Inc/smidi/smidi.c ****     0x00, 0xB1, 0x06, 0x0C, 0x00, 0xB1, 0x0A, 0x40, 0x00, 0xB1, 0x07, 0x64, 0x00, 0xE1, 0x00, 0x40,
+  36:Core/Inc/smidi/smidi.c ****     0x64, 0x00, 0xE1, 0x00, 0x40, 0x00, 0xC1, 0x00, 0x01, 0xB1, 0x65, 0x00, 0x00, 0xB1, 0x64, 0x00,
+  37:Core/Inc/smidi/smidi.c **** };
+  38:Core/Inc/smidi/smidi.c **** 
+  39:Core/Inc/smidi/smidi.c **** void smidiReadHeader(u8* pData, smidiHeader* pHdr)
+  40:Core/Inc/smidi/smidi.c **** {
+  29              		.loc 1 40 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+  41:Core/Inc/smidi/smidi.c ****     pHdr->magic        = bswap32(*(u32*)(pData + 0));
+  34              		.loc 1 41 5 view .LVU1
+  35              		.loc 1 41 26 is_stmt 0 view .LVU2
+  36 0000 0268     		ldr	r2, [r0]
+  37 0002 130C     		lsrs	r3, r2, #16
+  38 0004 1B02     		lsls	r3, r3, #8
+  39 0006 9BB2     		uxth	r3, r3
+  40 0008 43EA1263 		orr	r3, r3, r2, lsr #24
+  41 000c C2F3072C 		ubfx	ip, r2, #8, #8
+  42 0010 1202     		lsls	r2, r2, #8
+  43 0012 92B2     		uxth	r2, r2
+  44 0014 4CEA0202 		orr	r2, ip, r2
+  45 0018 43EA0243 		orr	r3, r3, r2, lsl #16
+  46              		.loc 1 41 24 view .LVU3
+  47 001c 0B60     		str	r3, [r1]	@ unaligned
+  42:Core/Inc/smidi/smidi.c ****     pHdr->chunkSize    = bswap32(*(u32*)(pData + 4));
+  48              		.loc 1 42 5 is_stmt 1 view .LVU4
+  49              		.loc 1 42 26 is_stmt 0 view .LVU5
+  50 001e 4268     		ldr	r2, [r0, #4]
+  51 0020 130C     		lsrs	r3, r2, #16
+  52 0022 1B02     		lsls	r3, r3, #8
+  53 0024 9BB2     		uxth	r3, r3
+  54 0026 43EA1263 		orr	r3, r3, r2, lsr #24
+  55 002a C2F3072C 		ubfx	ip, r2, #8, #8
+  56 002e 1202     		lsls	r2, r2, #8
+  57 0030 92B2     		uxth	r2, r2
+  58 0032 4CEA0202 		orr	r2, ip, r2
+  59 0036 43EA0243 		orr	r3, r3, r2, lsl #16
+  60              		.loc 1 42 24 view .LVU6
+  61 003a 4B60     		str	r3, [r1, #4]	@ unaligned
+  43:Core/Inc/smidi/smidi.c ****     pHdr->format       = bswap16(*(u16*)(pData + 8));
+  62              		.loc 1 43 5 is_stmt 1 view .LVU7
+  63              		.loc 1 43 26 is_stmt 0 view .LVU8
+  64 003c 0289     		ldrh	r2, [r0, #8]
+  65 003e 1302     		lsls	r3, r2, #8
+  66 0040 43EA1223 		orr	r3, r3, r2, lsr #8
+  67              		.loc 1 43 24 view .LVU9
+  68 0044 0B81     		strh	r3, [r1, #8]	@ unaligned
+  44:Core/Inc/smidi/smidi.c ****     pHdr->trackCount   = bswap16(*(u16*)(pData + 10));
+  69              		.loc 1 44 5 is_stmt 1 view .LVU10
+  70              		.loc 1 44 26 is_stmt 0 view .LVU11
+  71 0046 4289     		ldrh	r2, [r0, #10]
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 3
+
+
+  72 0048 1302     		lsls	r3, r2, #8
+  73 004a 43EA1223 		orr	r3, r3, r2, lsr #8
+  74              		.loc 1 44 24 view .LVU12
+  75 004e 4B81     		strh	r3, [r1, #10]	@ unaligned
+  45:Core/Inc/smidi/smidi.c ****     pHdr->timeDivision = bswap16(*(u16*)(pData + 12));
+  76              		.loc 1 45 5 is_stmt 1 view .LVU13
+  77              		.loc 1 45 26 is_stmt 0 view .LVU14
+  78 0050 8289     		ldrh	r2, [r0, #12]
+  79 0052 1302     		lsls	r3, r2, #8
+  80 0054 43EA1223 		orr	r3, r3, r2, lsr #8
+  81              		.loc 1 45 24 view .LVU15
+  82 0058 8B81     		strh	r3, [r1, #12]	@ unaligned
+  46:Core/Inc/smidi/smidi.c **** }
+  83              		.loc 1 46 1 view .LVU16
+  84 005a 7047     		bx	lr
+  85              		.cfi_endproc
+  86              	.LFE0:
+  88              		.section	.text.smidiReadTrackHeader,"ax",%progbits
+  89              		.align	1
+  90              		.global	smidiReadTrackHeader
+  91              		.syntax unified
+  92              		.thumb
+  93              		.thumb_func
+  95              	smidiReadTrackHeader:
+  96              	.LVL1:
+  97              	.LFB1:
+  47:Core/Inc/smidi/smidi.c **** 
+  48:Core/Inc/smidi/smidi.c **** void smidiReadTrackHeader(u8* pData, smidiTrackHeader* pHdr)
+  49:Core/Inc/smidi/smidi.c **** {
+  98              		.loc 1 49 1 is_stmt 1 view -0
+  99              		.cfi_startproc
+ 100              		@ args = 0, pretend = 0, frame = 0
+ 101              		@ frame_needed = 0, uses_anonymous_args = 0
+ 102              		@ link register save eliminated.
+  50:Core/Inc/smidi/smidi.c ****     pHdr->magic     = bswap32(*(u32*)(pData + 0));
+ 103              		.loc 1 50 5 view .LVU18
+ 104              		.loc 1 50 23 is_stmt 0 view .LVU19
+ 105 0000 0268     		ldr	r2, [r0]
+ 106 0002 130C     		lsrs	r3, r2, #16
+ 107 0004 1B02     		lsls	r3, r3, #8
+ 108 0006 9BB2     		uxth	r3, r3
+ 109 0008 43EA1263 		orr	r3, r3, r2, lsr #24
+ 110 000c C2F3072C 		ubfx	ip, r2, #8, #8
+ 111 0010 1202     		lsls	r2, r2, #8
+ 112 0012 92B2     		uxth	r2, r2
+ 113 0014 4CEA0202 		orr	r2, ip, r2
+ 114 0018 43EA0243 		orr	r3, r3, r2, lsl #16
+ 115              		.loc 1 50 21 view .LVU20
+ 116 001c 0B60     		str	r3, [r1]	@ unaligned
+  51:Core/Inc/smidi/smidi.c ****     pHdr->chunkSize = bswap32(*(u32*)(pData + 4));
+ 117              		.loc 1 51 5 is_stmt 1 view .LVU21
+ 118              		.loc 1 51 23 is_stmt 0 view .LVU22
+ 119 001e 4268     		ldr	r2, [r0, #4]
+ 120 0020 130C     		lsrs	r3, r2, #16
+ 121 0022 1B02     		lsls	r3, r3, #8
+ 122 0024 9BB2     		uxth	r3, r3
+ 123 0026 43EA1263 		orr	r3, r3, r2, lsr #24
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 4
+
+
+ 124 002a C2F30720 		ubfx	r0, r2, #8, #8
+ 125              	.LVL2:
+ 126              		.loc 1 51 23 view .LVU23
+ 127 002e 1202     		lsls	r2, r2, #8
+ 128 0030 92B2     		uxth	r2, r2
+ 129 0032 0243     		orrs	r2, r2, r0
+ 130 0034 43EA0243 		orr	r3, r3, r2, lsl #16
+ 131              		.loc 1 51 21 view .LVU24
+ 132 0038 4B60     		str	r3, [r1, #4]	@ unaligned
+  52:Core/Inc/smidi/smidi.c **** }
+ 133              		.loc 1 52 1 view .LVU25
+ 134 003a 7047     		bx	lr
+ 135              		.cfi_endproc
+ 136              	.LFE1:
+ 138              		.section	.text.smidiVarRead,"ax",%progbits
+ 139              		.align	1
+ 140              		.global	smidiVarRead
+ 141              		.syntax unified
+ 142              		.thumb
+ 143              		.thumb_func
+ 145              	smidiVarRead:
+ 146              	.LVL3:
+ 147              	.LFB3:
+  53:Core/Inc/smidi/smidi.c **** 
+  54:Core/Inc/smidi/smidi.c **** void smidiParseEvent(u8* pData, smidiChannelEvent* pOutEvent)
+  55:Core/Inc/smidi/smidi.c **** {
+  56:Core/Inc/smidi/smidi.c ****     u8* ogData = pData;
+  57:Core/Inc/smidi/smidi.c **** 
+  58:Core/Inc/smidi/smidi.c ****     u8  len;
+  59:Core/Inc/smidi/smidi.c ****     u32 deltaTime = smidiVarRead(pData, &len);
+  60:Core/Inc/smidi/smidi.c ****     pData += len;
+  61:Core/Inc/smidi/smidi.c ****     pOutEvent->deltaTime = deltaTime;
+  62:Core/Inc/smidi/smidi.c **** 
+  63:Core/Inc/smidi/smidi.c ****     u8 meta = *(pData++);
+  64:Core/Inc/smidi/smidi.c **** 
+  65:Core/Inc/smidi/smidi.c ****     if (meta == 0xFF)
+  66:Core/Inc/smidi/smidi.c ****     {
+  67:Core/Inc/smidi/smidi.c ****         pOutEvent->event = SMIDI_EVENT_META | *pData++;
+  68:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+  69:Core/Inc/smidi/smidi.c ****         pData += len;
+  70:Core/Inc/smidi/smidi.c ****     }
+  71:Core/Inc/smidi/smidi.c ****     else if (meta == 0xF0 || meta == 0xF7)
+  72:Core/Inc/smidi/smidi.c ****     {
+  73:Core/Inc/smidi/smidi.c ****         pOutEvent->event = SMIDI_EVENT_SYSEX;
+  74:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+  75:Core/Inc/smidi/smidi.c ****         pData += len;
+  76:Core/Inc/smidi/smidi.c ****     }
+  77:Core/Inc/smidi/smidi.c ****     else
+  78:Core/Inc/smidi/smidi.c ****     {
+  79:Core/Inc/smidi/smidi.c ****         pOutEvent->event = SMIDI_EVENT_CHANNEL | meta >> 4;
+  80:Core/Inc/smidi/smidi.c **** 
+  81:Core/Inc/smidi/smidi.c ****         u8 channel         = meta & 15;
+  82:Core/Inc/smidi/smidi.c ****         pOutEvent->channel = channel;
+  83:Core/Inc/smidi/smidi.c **** 
+  84:Core/Inc/smidi/smidi.c ****         pOutEvent->param1 = *pData++;
+  85:Core/Inc/smidi/smidi.c **** 
+  86:Core/Inc/smidi/smidi.c ****         if (pOutEvent->event < SMIDI_CHANNEL_EVENT_CONTOROLLER)
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 5
+
+
+  87:Core/Inc/smidi/smidi.c ****         {
+  88:Core/Inc/smidi/smidi.c ****             pOutEvent->param2 = *pData++;
+  89:Core/Inc/smidi/smidi.c ****         }
+  90:Core/Inc/smidi/smidi.c ****     }
+  91:Core/Inc/smidi/smidi.c **** 
+  92:Core/Inc/smidi/smidi.c ****     pOutEvent->skip = pData - ogData;
+  93:Core/Inc/smidi/smidi.c **** }
+  94:Core/Inc/smidi/smidi.c **** 
+  95:Core/Inc/smidi/smidi.c **** u32 smidiVarRead(u8* pData, u8* pOutLength)
+  96:Core/Inc/smidi/smidi.c **** {
+ 148              		.loc 1 96 1 is_stmt 1 view -0
+ 149              		.cfi_startproc
+ 150              		@ args = 0, pretend = 0, frame = 0
+ 151              		@ frame_needed = 0, uses_anonymous_args = 0
+ 152              		.loc 1 96 1 is_stmt 0 view .LVU27
+ 153 0000 00B5     		push	{lr}
+ 154              	.LCFI0:
+ 155              		.cfi_def_cfa_offset 4
+ 156              		.cfi_offset 14, -4
+ 157 0002 8446     		mov	ip, r0
+  97:Core/Inc/smidi/smidi.c ****     u8  len   = 0;
+ 158              		.loc 1 97 5 is_stmt 1 view .LVU28
+ 159              	.LVL4:
+  98:Core/Inc/smidi/smidi.c ****     u32 value = 0;
+ 160              		.loc 1 98 5 view .LVU29
+ 161              		.loc 1 98 9 is_stmt 0 view .LVU30
+ 162 0004 0020     		movs	r0, #0
+ 163              	.LVL5:
+  97:Core/Inc/smidi/smidi.c ****     u8  len   = 0;
+ 164              		.loc 1 97 9 view .LVU31
+ 165 0006 0346     		mov	r3, r0
+ 166              	.LVL6:
+ 167              	.L4:
+  99:Core/Inc/smidi/smidi.c ****     u8  byte;
+ 168              		.loc 1 99 5 is_stmt 1 view .LVU32
+ 100:Core/Inc/smidi/smidi.c ****     do
+ 169              		.loc 1 100 5 view .LVU33
+ 101:Core/Inc/smidi/smidi.c ****     {
+ 102:Core/Inc/smidi/smidi.c ****         byte  = *(pData++);
+ 170              		.loc 1 102 9 view .LVU34
+ 171              		.loc 1 102 15 is_stmt 0 view .LVU35
+ 172 0008 9CF80020 		ldrb	r2, [ip]	@ zero_extendqisi2
+ 173 000c 0CF1010C 		add	ip, ip, #1
+ 174              	.LVL7:
+ 103:Core/Inc/smidi/smidi.c ****         value = (value << 7) | (byte & 0x7F);
+ 175              		.loc 1 103 9 is_stmt 1 view .LVU36
+ 176              		.loc 1 103 38 is_stmt 0 view .LVU37
+ 177 0010 02F07F0E 		and	lr, r2, #127
+ 178              		.loc 1 103 15 view .LVU38
+ 179 0014 4EEAC010 		orr	r0, lr, r0, lsl #7
+ 180              	.LVL8:
+ 104:Core/Inc/smidi/smidi.c ****         len++;
+ 181              		.loc 1 104 9 is_stmt 1 view .LVU39
+ 182              		.loc 1 104 12 is_stmt 0 view .LVU40
+ 183 0018 0133     		adds	r3, r3, #1
+ 184              	.LVL9:
+ 185              		.loc 1 104 12 view .LVU41
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 6
+
+
+ 186 001a DBB2     		uxtb	r3, r3
+ 187              	.LVL10:
+ 105:Core/Inc/smidi/smidi.c ****     }
+ 106:Core/Inc/smidi/smidi.c ****     while (byte & 0x80);
+ 188              		.loc 1 106 12 is_stmt 1 discriminator 1 view .LVU42
+ 189 001c 12F0800F 		tst	r2, #128
+ 190 0020 F2D1     		bne	.L4
+ 107:Core/Inc/smidi/smidi.c **** 
+ 108:Core/Inc/smidi/smidi.c ****     *pOutLength = len;
+ 191              		.loc 1 108 5 view .LVU43
+ 192              		.loc 1 108 17 is_stmt 0 view .LVU44
+ 193 0022 0B70     		strb	r3, [r1]
+ 109:Core/Inc/smidi/smidi.c **** 
+ 110:Core/Inc/smidi/smidi.c ****     return value;
+ 194              		.loc 1 110 5 is_stmt 1 view .LVU45
+ 111:Core/Inc/smidi/smidi.c **** }
+ 195              		.loc 1 111 1 is_stmt 0 view .LVU46
+ 196 0024 5DF804FB 		ldr	pc, [sp], #4
+ 197              		.cfi_endproc
+ 198              	.LFE3:
+ 200              		.section	.text.smidiParseEvent,"ax",%progbits
+ 201              		.align	1
+ 202              		.global	smidiParseEvent
+ 203              		.syntax unified
+ 204              		.thumb
+ 205              		.thumb_func
+ 207              	smidiParseEvent:
+ 208              	.LVL11:
+ 209              	.LFB2:
+  55:Core/Inc/smidi/smidi.c ****     u8* ogData = pData;
+ 210              		.loc 1 55 1 is_stmt 1 view -0
+ 211              		.cfi_startproc
+ 212              		@ args = 0, pretend = 0, frame = 8
+ 213              		@ frame_needed = 0, uses_anonymous_args = 0
+  55:Core/Inc/smidi/smidi.c ****     u8* ogData = pData;
+ 214              		.loc 1 55 1 is_stmt 0 view .LVU48
+ 215 0000 70B5     		push	{r4, r5, r6, lr}
+ 216              	.LCFI1:
+ 217              		.cfi_def_cfa_offset 16
+ 218              		.cfi_offset 4, -16
+ 219              		.cfi_offset 5, -12
+ 220              		.cfi_offset 6, -8
+ 221              		.cfi_offset 14, -4
+ 222 0002 82B0     		sub	sp, sp, #8
+ 223              	.LCFI2:
+ 224              		.cfi_def_cfa_offset 24
+ 225 0004 0646     		mov	r6, r0
+ 226 0006 0C46     		mov	r4, r1
+  56:Core/Inc/smidi/smidi.c **** 
+ 227              		.loc 1 56 5 is_stmt 1 view .LVU49
+ 228              	.LVL12:
+  58:Core/Inc/smidi/smidi.c ****     u32 deltaTime = smidiVarRead(pData, &len);
+ 229              		.loc 1 58 5 view .LVU50
+  59:Core/Inc/smidi/smidi.c ****     pData += len;
+ 230              		.loc 1 59 5 view .LVU51
+  59:Core/Inc/smidi/smidi.c ****     pData += len;
+ 231              		.loc 1 59 21 is_stmt 0 view .LVU52
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 7
+
+
+ 232 0008 0DF10701 		add	r1, sp, #7
+ 233              	.LVL13:
+  59:Core/Inc/smidi/smidi.c ****     pData += len;
+ 234              		.loc 1 59 21 view .LVU53
+ 235 000c FFF7FEFF 		bl	smidiVarRead
+ 236              	.LVL14:
+  60:Core/Inc/smidi/smidi.c ****     pOutEvent->deltaTime = deltaTime;
+ 237              		.loc 1 60 5 is_stmt 1 view .LVU54
+  60:Core/Inc/smidi/smidi.c ****     pOutEvent->deltaTime = deltaTime;
+ 238              		.loc 1 60 11 is_stmt 0 view .LVU55
+ 239 0010 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 240 0014 F218     		adds	r2, r6, r3
+ 241              	.LVL15:
+  61:Core/Inc/smidi/smidi.c **** 
+ 242              		.loc 1 61 5 is_stmt 1 view .LVU56
+  61:Core/Inc/smidi/smidi.c **** 
+ 243              		.loc 1 61 26 is_stmt 0 view .LVU57
+ 244 0016 2060     		str	r0, [r4]
+  63:Core/Inc/smidi/smidi.c **** 
+ 245              		.loc 1 63 5 is_stmt 1 view .LVU58
+ 246              	.LVL16:
+  63:Core/Inc/smidi/smidi.c **** 
+ 247              		.loc 1 63 8 is_stmt 0 view .LVU59
+ 248 0018 F35C     		ldrb	r3, [r6, r3]	@ zero_extendqisi2
+ 249              	.LVL17:
+  65:Core/Inc/smidi/smidi.c ****     {
+ 250              		.loc 1 65 5 is_stmt 1 view .LVU60
+  65:Core/Inc/smidi/smidi.c ****     {
+ 251              		.loc 1 65 8 is_stmt 0 view .LVU61
+ 252 001a FF2B     		cmp	r3, #255
+ 253 001c 18D0     		beq	.L11
+ 254 001e 551C     		adds	r5, r2, #1
+ 255              	.LVL18:
+  71:Core/Inc/smidi/smidi.c ****     {
+ 256              		.loc 1 71 10 is_stmt 1 view .LVU62
+  71:Core/Inc/smidi/smidi.c ****     {
+ 257              		.loc 1 71 13 is_stmt 0 view .LVU63
+ 258 0020 F72B     		cmp	r3, #247
+ 259 0022 18BF     		it	ne
+ 260 0024 F02B     		cmpne	r3, #240
+ 261 0026 22D0     		beq	.L12
+ 262              	.LBB2:
+  79:Core/Inc/smidi/smidi.c **** 
+ 263              		.loc 1 79 9 is_stmt 1 view .LVU64
+  79:Core/Inc/smidi/smidi.c **** 
+ 264              		.loc 1 79 48 is_stmt 0 view .LVU65
+ 265 0028 1909     		lsrs	r1, r3, #4
+ 266 002a 41F48071 		orr	r1, r1, #256
+  79:Core/Inc/smidi/smidi.c **** 
+ 267              		.loc 1 79 26 view .LVU66
+ 268 002e A180     		strh	r1, [r4, #4]	@ movhi
+  81:Core/Inc/smidi/smidi.c ****         pOutEvent->channel = channel;
+ 269              		.loc 1 81 9 is_stmt 1 view .LVU67
+  81:Core/Inc/smidi/smidi.c ****         pOutEvent->channel = channel;
+ 270              		.loc 1 81 12 is_stmt 0 view .LVU68
+ 271 0030 03F00F03 		and	r3, r3, #15
+ 272              	.LVL19:
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 8
+
+
+  82:Core/Inc/smidi/smidi.c **** 
+ 273              		.loc 1 82 9 is_stmt 1 view .LVU69
+  82:Core/Inc/smidi/smidi.c **** 
+ 274              		.loc 1 82 28 is_stmt 0 view .LVU70
+ 275 0034 A371     		strb	r3, [r4, #6]
+  84:Core/Inc/smidi/smidi.c **** 
+ 276              		.loc 1 84 9 is_stmt 1 view .LVU71
+  84:Core/Inc/smidi/smidi.c **** 
+ 277              		.loc 1 84 35 is_stmt 0 view .LVU72
+ 278 0036 931C     		adds	r3, r2, #2
+ 279              	.LVL20:
+  84:Core/Inc/smidi/smidi.c **** 
+ 280              		.loc 1 84 29 view .LVU73
+ 281 0038 5078     		ldrb	r0, [r2, #1]	@ zero_extendqisi2
+ 282              	.LVL21:
+  84:Core/Inc/smidi/smidi.c **** 
+ 283              		.loc 1 84 27 view .LVU74
+ 284 003a E071     		strb	r0, [r4, #7]
+  86:Core/Inc/smidi/smidi.c ****         {
+ 285              		.loc 1 86 9 is_stmt 1 view .LVU75
+  86:Core/Inc/smidi/smidi.c ****         {
+ 286              		.loc 1 86 12 is_stmt 0 view .LVU76
+ 287 003c B1F5857F 		cmp	r1, #266
+ 288 0040 02D8     		bhi	.L8
+  88:Core/Inc/smidi/smidi.c ****         }
+ 289              		.loc 1 88 13 is_stmt 1 view .LVU77
+  88:Core/Inc/smidi/smidi.c ****         }
+ 290              		.loc 1 88 39 is_stmt 0 view .LVU78
+ 291 0042 D31C     		adds	r3, r2, #3
+ 292              	.LVL22:
+  88:Core/Inc/smidi/smidi.c ****         }
+ 293              		.loc 1 88 33 view .LVU79
+ 294 0044 9278     		ldrb	r2, [r2, #2]	@ zero_extendqisi2
+  88:Core/Inc/smidi/smidi.c ****         }
+ 295              		.loc 1 88 31 view .LVU80
+ 296 0046 2272     		strb	r2, [r4, #8]
+ 297              	.LVL23:
+ 298              	.L8:
+  88:Core/Inc/smidi/smidi.c ****         }
+ 299              		.loc 1 88 31 view .LVU81
+ 300              	.LBE2:
+  92:Core/Inc/smidi/smidi.c **** }
+ 301              		.loc 1 92 5 is_stmt 1 view .LVU82
+  92:Core/Inc/smidi/smidi.c **** }
+ 302              		.loc 1 92 29 is_stmt 0 view .LVU83
+ 303 0048 9B1B     		subs	r3, r3, r6
+ 304              	.LVL24:
+  92:Core/Inc/smidi/smidi.c **** }
+ 305              		.loc 1 92 21 view .LVU84
+ 306 004a E360     		str	r3, [r4, #12]
+  93:Core/Inc/smidi/smidi.c **** 
+ 307              		.loc 1 93 1 view .LVU85
+ 308 004c 02B0     		add	sp, sp, #8
+ 309              	.LCFI3:
+ 310              		.cfi_remember_state
+ 311              		.cfi_def_cfa_offset 16
+ 312              		@ sp needed
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 9
+
+
+ 313 004e 70BD     		pop	{r4, r5, r6, pc}
+ 314              	.LVL25:
+ 315              	.L11:
+ 316              	.LCFI4:
+ 317              		.cfi_restore_state
+  67:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 318              		.loc 1 67 9 is_stmt 1 view .LVU86
+  67:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 319              		.loc 1 67 53 is_stmt 0 view .LVU87
+ 320 0050 951C     		adds	r5, r2, #2
+ 321              	.LVL26:
+  67:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 322              		.loc 1 67 47 view .LVU88
+ 323 0052 5378     		ldrb	r3, [r2, #1]	@ zero_extendqisi2
+ 324              	.LVL27:
+  67:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 325              		.loc 1 67 45 view .LVU89
+ 326 0054 43F40073 		orr	r3, r3, #512
+  67:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 327              		.loc 1 67 26 view .LVU90
+ 328 0058 A380     		strh	r3, [r4, #4]	@ movhi
+ 329              	.LVL28:
+  68:Core/Inc/smidi/smidi.c ****         pData += len;
+ 330              		.loc 1 68 9 is_stmt 1 view .LVU91
+  68:Core/Inc/smidi/smidi.c ****         pData += len;
+ 331              		.loc 1 68 18 is_stmt 0 view .LVU92
+ 332 005a 0DF10701 		add	r1, sp, #7
+ 333 005e 2846     		mov	r0, r5
+ 334              	.LVL29:
+  68:Core/Inc/smidi/smidi.c ****         pData += len;
+ 335              		.loc 1 68 18 view .LVU93
+ 336 0060 FFF7FEFF 		bl	smidiVarRead
+ 337              	.LVL30:
+  69:Core/Inc/smidi/smidi.c ****     }
+ 338              		.loc 1 69 9 is_stmt 1 view .LVU94
+  69:Core/Inc/smidi/smidi.c ****     }
+ 339              		.loc 1 69 15 is_stmt 0 view .LVU95
+ 340 0064 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 341 0068 0344     		add	r3, r3, r0
+ 342 006a 2B44     		add	r3, r3, r5
+ 343              	.LVL31:
+  69:Core/Inc/smidi/smidi.c ****     }
+ 344              		.loc 1 69 15 view .LVU96
+ 345 006c ECE7     		b	.L8
+ 346              	.LVL32:
+ 347              	.L12:
+  73:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 348              		.loc 1 73 9 is_stmt 1 view .LVU97
+  73:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 349              		.loc 1 73 26 is_stmt 0 view .LVU98
+ 350 006e 4FF44073 		mov	r3, #768
+ 351              	.LVL33:
+  73:Core/Inc/smidi/smidi.c ****         pData += smidiVarRead(pData, &len);
+ 352              		.loc 1 73 26 view .LVU99
+ 353 0072 A380     		strh	r3, [r4, #4]	@ movhi
+ 354              	.LVL34:
+  74:Core/Inc/smidi/smidi.c ****         pData += len;
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 10
+
+
+ 355              		.loc 1 74 9 is_stmt 1 view .LVU100
+  74:Core/Inc/smidi/smidi.c ****         pData += len;
+ 356              		.loc 1 74 18 is_stmt 0 view .LVU101
+ 357 0074 0DF10701 		add	r1, sp, #7
+ 358 0078 2846     		mov	r0, r5
+ 359              	.LVL35:
+  74:Core/Inc/smidi/smidi.c ****         pData += len;
+ 360              		.loc 1 74 18 view .LVU102
+ 361 007a FFF7FEFF 		bl	smidiVarRead
+ 362              	.LVL36:
+  75:Core/Inc/smidi/smidi.c ****     }
+ 363              		.loc 1 75 9 is_stmt 1 view .LVU103
+  75:Core/Inc/smidi/smidi.c ****     }
+ 364              		.loc 1 75 15 is_stmt 0 view .LVU104
+ 365 007e 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 366 0082 0344     		add	r3, r3, r0
+ 367 0084 2B44     		add	r3, r3, r5
+ 368              	.LVL37:
+  75:Core/Inc/smidi/smidi.c ****     }
+ 369              		.loc 1 75 15 view .LVU105
+ 370 0086 DFE7     		b	.L8
+ 371              		.cfi_endproc
+ 372              	.LFE2:
+ 374              		.section	.text.smidiParseData,"ax",%progbits
+ 375              		.align	1
+ 376              		.global	smidiParseData
+ 377              		.syntax unified
+ 378              		.thumb
+ 379              		.thumb_func
+ 381              	smidiParseData:
+ 382              	.LVL38:
+ 383              	.LFB4:
+ 112:Core/Inc/smidi/smidi.c **** 
+ 113:Core/Inc/smidi/smidi.c **** smidiChannelEvent gSmidiCurrentEvent = {};
+ 114:Core/Inc/smidi/smidi.c **** 
+ 115:Core/Inc/smidi/smidi.c **** void smidiParseData(u8* pData, u32 pLen, void (*pCallback)(int))
+ 116:Core/Inc/smidi/smidi.c **** {
+ 384              		.loc 1 116 1 is_stmt 1 view -0
+ 385              		.cfi_startproc
+ 386              		@ args = 0, pretend = 0, frame = 24
+ 387              		@ frame_needed = 0, uses_anonymous_args = 0
+ 388              		.loc 1 116 1 is_stmt 0 view .LVU107
+ 389 0000 2DE9F047 		push	{r4, r5, r6, r7, r8, r9, r10, lr}
+ 390              	.LCFI5:
+ 391              		.cfi_def_cfa_offset 32
+ 392              		.cfi_offset 4, -32
+ 393              		.cfi_offset 5, -28
+ 394              		.cfi_offset 6, -24
+ 395              		.cfi_offset 7, -20
+ 396              		.cfi_offset 8, -16
+ 397              		.cfi_offset 9, -12
+ 398              		.cfi_offset 10, -8
+ 399              		.cfi_offset 14, -4
+ 400 0004 86B0     		sub	sp, sp, #24
+ 401              	.LCFI6:
+ 402              		.cfi_def_cfa_offset 56
+ 403 0006 8046     		mov	r8, r0
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 11
+
+
+ 404 0008 8946     		mov	r9, r1
+ 405 000a 1746     		mov	r7, r2
+ 117:Core/Inc/smidi/smidi.c ****     int track = 0;
+ 406              		.loc 1 117 5 is_stmt 1 view .LVU108
+ 407              	.LVL39:
+ 118:Core/Inc/smidi/smidi.c **** 
+ 119:Core/Inc/smidi/smidi.c ****     smidiHeader header;
+ 408              		.loc 1 119 5 view .LVU109
+ 120:Core/Inc/smidi/smidi.c ****     smidiReadHeader(pData, &header);
+ 409              		.loc 1 120 5 view .LVU110
+ 410 000c 02A9     		add	r1, sp, #8
+ 411              	.LVL40:
+ 412              		.loc 1 120 5 is_stmt 0 view .LVU111
+ 413 000e FFF7FEFF 		bl	smidiReadHeader
+ 414              	.LVL41:
+ 121:Core/Inc/smidi/smidi.c **** 
+ 122:Core/Inc/smidi/smidi.c ****     u8* ptr = pData + sizeof(smidiHeader);
+ 415              		.loc 1 122 5 is_stmt 1 view .LVU112
+ 416              		.loc 1 122 9 is_stmt 0 view .LVU113
+ 417 0012 08F10E04 		add	r4, r8, #14
+ 418              	.LVL42:
+ 123:Core/Inc/smidi/smidi.c ****     while (ptr < pData + pLen)
+ 419              		.loc 1 123 5 is_stmt 1 view .LVU114
+ 117:Core/Inc/smidi/smidi.c **** 
+ 420              		.loc 1 117 9 is_stmt 0 view .LVU115
+ 421 0016 0025     		movs	r5, #0
+ 422              		.loc 1 123 11 view .LVU116
+ 423 0018 0FE0     		b	.L14
+ 424              	.LVL43:
+ 425              	.L16:
+ 426              	.LBB3:
+ 124:Core/Inc/smidi/smidi.c ****     {
+ 125:Core/Inc/smidi/smidi.c ****         smidiTrackHeader trk;
+ 126:Core/Inc/smidi/smidi.c ****         smidiReadTrackHeader(ptr, &trk);
+ 127:Core/Inc/smidi/smidi.c **** 
+ 128:Core/Inc/smidi/smidi.c ****         ptr += sizeof(smidiTrackHeader);
+ 129:Core/Inc/smidi/smidi.c ****         u8* pnt = ptr;
+ 130:Core/Inc/smidi/smidi.c **** 
+ 131:Core/Inc/smidi/smidi.c ****         while (ptr - pnt < trk.chunkSize)
+ 132:Core/Inc/smidi/smidi.c ****         {
+ 133:Core/Inc/smidi/smidi.c ****             smidiParseEvent(ptr, &gSmidiCurrentEvent);
+ 427              		.loc 1 133 13 is_stmt 1 view .LVU117
+ 428 001a DFF83CA0 		ldr	r10, .L20
+ 429 001e 5146     		mov	r1, r10
+ 430 0020 2046     		mov	r0, r4
+ 431 0022 FFF7FEFF 		bl	smidiParseEvent
+ 432              	.LVL44:
+ 134:Core/Inc/smidi/smidi.c ****             pCallback(track);
+ 433              		.loc 1 134 13 view .LVU118
+ 434 0026 2846     		mov	r0, r5
+ 435 0028 B847     		blx	r7
+ 436              	.LVL45:
+ 135:Core/Inc/smidi/smidi.c ****             ptr += gSmidiCurrentEvent.skip;
+ 437              		.loc 1 135 13 view .LVU119
+ 438              		.loc 1 135 38 is_stmt 0 view .LVU120
+ 439 002a DAF80C30 		ldr	r3, [r10, #12]
+ 440              		.loc 1 135 17 view .LVU121
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 12
+
+
+ 441 002e 1C44     		add	r4, r4, r3
+ 442              	.LVL46:
+ 443              	.L15:
+ 131:Core/Inc/smidi/smidi.c ****         {
+ 444              		.loc 1 131 26 is_stmt 1 view .LVU122
+ 131:Core/Inc/smidi/smidi.c ****         {
+ 445              		.loc 1 131 20 is_stmt 0 view .LVU123
+ 446 0030 A31B     		subs	r3, r4, r6
+ 131:Core/Inc/smidi/smidi.c ****         {
+ 447              		.loc 1 131 31 view .LVU124
+ 448 0032 019A     		ldr	r2, [sp, #4]
+ 131:Core/Inc/smidi/smidi.c ****         {
+ 449              		.loc 1 131 26 view .LVU125
+ 450 0034 9342     		cmp	r3, r2
+ 451 0036 F0D3     		bcc	.L16
+ 136:Core/Inc/smidi/smidi.c ****         }
+ 137:Core/Inc/smidi/smidi.c **** 
+ 138:Core/Inc/smidi/smidi.c ****         track++;
+ 452              		.loc 1 138 9 is_stmt 1 view .LVU126
+ 453              		.loc 1 138 14 is_stmt 0 view .LVU127
+ 454 0038 0135     		adds	r5, r5, #1
+ 455              	.LVL47:
+ 456              	.L14:
+ 457              		.loc 1 138 14 view .LVU128
+ 458              	.LBE3:
+ 123:Core/Inc/smidi/smidi.c ****     {
+ 459              		.loc 1 123 16 is_stmt 1 view .LVU129
+ 123:Core/Inc/smidi/smidi.c ****     {
+ 460              		.loc 1 123 24 is_stmt 0 view .LVU130
+ 461 003a 08EB0903 		add	r3, r8, r9
+ 123:Core/Inc/smidi/smidi.c ****     {
+ 462              		.loc 1 123 16 view .LVU131
+ 463 003e A342     		cmp	r3, r4
+ 464 0040 06D9     		bls	.L19
+ 465              	.LBB4:
+ 125:Core/Inc/smidi/smidi.c ****         smidiReadTrackHeader(ptr, &trk);
+ 466              		.loc 1 125 9 is_stmt 1 view .LVU132
+ 126:Core/Inc/smidi/smidi.c **** 
+ 467              		.loc 1 126 9 view .LVU133
+ 468 0042 6946     		mov	r1, sp
+ 469 0044 2046     		mov	r0, r4
+ 470 0046 FFF7FEFF 		bl	smidiReadTrackHeader
+ 471              	.LVL48:
+ 128:Core/Inc/smidi/smidi.c ****         u8* pnt = ptr;
+ 472              		.loc 1 128 9 view .LVU134
+ 128:Core/Inc/smidi/smidi.c ****         u8* pnt = ptr;
+ 473              		.loc 1 128 13 is_stmt 0 view .LVU135
+ 474 004a 0834     		adds	r4, r4, #8
+ 475              	.LVL49:
+ 129:Core/Inc/smidi/smidi.c **** 
+ 476              		.loc 1 129 9 is_stmt 1 view .LVU136
+ 131:Core/Inc/smidi/smidi.c ****         {
+ 477              		.loc 1 131 9 view .LVU137
+ 128:Core/Inc/smidi/smidi.c ****         u8* pnt = ptr;
+ 478              		.loc 1 128 13 is_stmt 0 view .LVU138
+ 479 004c 2646     		mov	r6, r4
+ 131:Core/Inc/smidi/smidi.c ****         {
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 13
+
+
+ 480              		.loc 1 131 15 view .LVU139
+ 481 004e EFE7     		b	.L15
+ 482              	.LVL50:
+ 483              	.L19:
+ 131:Core/Inc/smidi/smidi.c ****         {
+ 484              		.loc 1 131 15 view .LVU140
+ 485              	.LBE4:
+ 139:Core/Inc/smidi/smidi.c ****     }
+ 140:Core/Inc/smidi/smidi.c **** }
+ 486              		.loc 1 140 1 view .LVU141
+ 487 0050 06B0     		add	sp, sp, #24
+ 488              	.LCFI7:
+ 489              		.cfi_def_cfa_offset 32
+ 490              		@ sp needed
+ 491 0052 BDE8F087 		pop	{r4, r5, r6, r7, r8, r9, r10, pc}
+ 492              	.LVL51:
+ 493              	.L21:
+ 494              		.loc 1 140 1 view .LVU142
+ 495 0056 00BF     		.align	2
+ 496              	.L20:
+ 497 0058 00000000 		.word	gSmidiCurrentEvent
+ 498              		.cfi_endproc
+ 499              	.LFE4:
+ 501              		.global	gSmidiCurrentEvent
+ 502              		.section	.bss.gSmidiCurrentEvent,"aw",%nobits
+ 503              		.align	2
+ 506              	gSmidiCurrentEvent:
+ 507 0000 00000000 		.space	16
+ 507      00000000 
+ 507      00000000 
+ 507      00000000 
+ 508              		.global	gSmidiTestBuffer
+ 509              		.section	.rodata.gSmidiTestBuffer,"a"
+ 510              		.align	2
+ 513              	gSmidiTestBuffer:
+ 514 0000 4D546864 		.ascii	"MThd\000\000\000\006\000\001\000\004\000`MTrk\000\000"
+ 514      00000006 
+ 514      00010004 
+ 514      00604D54 
+ 514      726B0000 
+ 515 0014 000C00FF 		.ascii	"\000\014\000\377X\004\004\002\030\010\000\377/\000M"
+ 515      58040402 
+ 515      180800FF 
+ 515      2F004D
+ 516 0023 54726B00 		.ascii	"Trk\000\000\000\013\000\377Q\003\006\032\200\000\377"
+ 516      00000B00 
+ 516      FF510306 
+ 516      1A8000FF 
+ 517 0033 2F004D54 		.ascii	"/\000MTrk\000\000\003~\000\377\003\011Kontakt 7\000"
+ 517      726B0000 
+ 517      037E00FF 
+ 517      03094B6F 
+ 517      6E74616B 
+ 518 004b B00A4000 		.ascii	"\260\012@\000\260\007d\000\340\000@\000\260e\000\000"
+ 518      B0076400 
+ 518      E0004000 
+ 518      B0650000 
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 14
+
+
+ 519 005b B0640000 		.ascii	"\260d\000\000\260\006\014\000\260\012@\000\260\007d"
+ 519      B0060C00 
+ 519      B00A4000 
+ 519      B00764
+ 520 006a 00E00040 		.ascii	"\000\340\000@\000\300\000\000\260e\000\000\260d\000"
+ 520      00C00000 
+ 520      B0650000 
+ 520      B06400
+ 521 0079 00B0060C 		.ascii	"\000\260\006\014\000\260\012@\000\260\007d\000\340\000"
+ 521      00B00A40 
+ 521      00B00764 
+ 521      00E000
+ 522 0088 4000C000 		.ascii	"@\000\300\000\000\220Jd\000\260e\000\000\260d\000\000"
+ 522      00904A64 
+ 522      00B06500 
+ 522      00B06400 
+ 522      00
+ 523 0099 B0060C00 		.ascii	"\260\006\014\000\260\012@\000\260\007d\000\340\000@"
+ 523      B00A4000 
+ 523      B0076400 
+ 523      E00040
+ 524 00a8 00C00081 		.ascii	"\000\300\000\201@\200J@\000\220Id\027\200I@\000\220"
+ 524      40804A40 
+ 524      00904964 
+ 524      17804940 
+ 524      0090
+ 525 00ba 4A641680 		.ascii	"Jd\026\200J@\000\220Id\014\200I@\000\220Jd\014\200J"
+ 525      4A400090 
+ 525      49640C80 
+ 525      49400090 
+ 525      4A640C80 
+ 526 00cf 40009049 		.ascii	"@\000\220Id\031\200I@\002\220Fd\020\200F@\000\220Ed"
+ 526      64198049 
+ 526      40029046 
+ 526      64108046 
+ 526      40009045 
+ 527 00e4 0F804540 		.ascii	"\017\200E@\000\220Fd?\200F@\002\220Io\030\200I@\000"
+ 527      00904664 
+ 527      3F804640 
+ 527      0290496F 
+ 527      18804940 
+ 528 00f9 904C6418 		.ascii	"\220Ld\030\200L@\000\220IZ\030\200I@\000\220JP\020\200"
+ 528      804C4000 
+ 528      90495A18 
+ 528      80494000 
+ 528      904A5010 
+ 529 010e 4A400890 		.ascii	"J@\010\220J?&\200J@\012\220J*0\200J@\000\220I\025\025"
+ 529      4A3F2680 
+ 529      4A400A90 
+ 529      4A2A3080 
+ 529      4A400090 
+ 530 0125 80494000 		.ascii	"\200I@\000\220J\007\023\200J@\000\220I\0005\200I@\005"
+ 530      904A0713 
+ 530      804A4000 
+ 530      90490035 
+ 530      80494005 
+ 531 0139 90460010 		.ascii	"\220F\000\020\200F@\000\220E\000\006\220>\000\011\200"
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 15
+
+
+ 531      80464000 
+ 531      90450006 
+ 531      903E0009 
+ 531      80
+ 532 014a 45400090 		.ascii	"E@\000\220F\000\016\200>@\001\220C\000\027\200C@\001"
+ 532      46000E80 
+ 532      3E400190 
+ 532      43001780 
+ 532      434001
+ 533 015d 90450013 		.ascii	"\220E\000\023\200F@\004\200E@\001\220F\002\027\200F"
+ 533      80464004 
+ 533      80454001 
+ 533      90460217 
+ 533      8046
+ 534 016f 40019043 		.ascii	"@\001\220C\013\027\200C@\001\220?\026\027\200?@\001"
+ 534      0B178043 
+ 534      4001903F 
+ 534      1617803F 
+ 534      4001
+ 535 0181 903E2517 		.ascii	"\220>%\027\200>@\001\220=2\017\220>:\007\200=@\007\220"
+ 535      803E4001 
+ 535      903D320F 
+ 535      903E3A07 
+ 535      803D4007 
+ 536 0196 3D3E0180 		.ascii	"=>\001\200>@\016\220>C\011\200=@\007\220=L\004\200>"
+ 536      3E400E90 
+ 536      3E430980 
+ 536      3D400790 
+ 536      3D4C0480 
+ 537 01ab 401F803D 		.ascii	"@\037\200=@\001\220F_0\200F@\000\220H\177H\200H@H\220"
+ 537      40019046 
+ 537      5F308046 
+ 537      40009048 
+ 537      7F488048 
+ 538 01c2 456A2780 		.ascii	"Ej'\200E@\011\220E?*\200E@\006\220E'*\200E@\006\220"
+ 538      45400990 
+ 538      453F2A80 
+ 538      45400690 
+ 538      45272A80 
+ 539 01da 450A2A80 		.ascii	"E\012*\200E@\006\220F\000\024\200F@\002\220E\000\024"
+ 539      45400690 
+ 539      46001480 
+ 539      46400290 
+ 539      450014
+ 540 01ed 80454004 		.ascii	"\200E@\004\220F\002\015\220E\022\002\200F@\012\220C"
+ 540      9046020D 
+ 540      90451202 
+ 540      8046400A 
+ 540      9043
+ 541 01ff 25028045 		.ascii	"%\002\200E@\026\200C@\001\220EG\030\200E@\000\220Fo"
+ 541      40168043 
+ 541      40019045 
+ 541      47188045 
+ 541      40009046 
+ 542 0214 18804640 		.ascii	"\030\200F@\000\220I\177\030\200I@\000\220L\177\030\200"
+ 542      0090497F 
+ 542      18804940 
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 16
+
+
+ 542      00904C7F 
+ 542      1880
+ 543 0226 4C400090 		.ascii	"L@\000\220Jd\201@\200J@\000\220I\014\027\200I@\000\220"
+ 543      4A648140 
+ 543      804A4000 
+ 543      90490C17 
+ 543      80494000 
+ 544 023b 4A001680 		.ascii	"J\000\026\200J@\000\220I\000\014\200I@\000\220J\000"
+ 544      4A400090 
+ 544      49000C80 
+ 544      49400090 
+ 544      4A00
+ 545 024d 0C804A40 		.ascii	"\014\200J@\000\220I\000\031\200I@\002\220F\000\020\200"
+ 545      00904900 
+ 545      19804940 
+ 545      02904600 
+ 545      1080
+ 546 025f 46400090 		.ascii	"F@\000\220E\000\017\200E@\000\220F\000?\200F@\002\220"
+ 546      45000F80 
+ 546      45400090 
+ 546      46003F80 
+ 546      46400290 
+ 547 0273 49021880 		.ascii	"I\002\030\200I@\000\220L\014\030\200L@\000\220I\026"
+ 547      49400090 
+ 547      4C0C1880 
+ 547      4C400090 
+ 547      4916
+ 548 0285 18804940 		.ascii	"\030\200I@\000\220J!\020\200J@\010\220J6&\200J@\012"
+ 548      00904A21 
+ 548      10804A40 
+ 548      08904A36 
+ 548      26804A40 
+ 549 029a 904A5530 		.ascii	"\220JU0\200J@\000\220Ij\025\200I@\000\220J\177\023\200"
+ 549      804A4000 
+ 549      90496A15 
+ 549      80494000 
+ 549      904A7F13 
+ 550 02af 4A400090 		.ascii	"J@\000\220I\1775\200I@\005\220Fd\020\200F@\000\220E"
+ 550      497F3580 
+ 550      49400590 
+ 550      46641080 
+ 550      46400090 
+ 551 02c4 6406903E 		.ascii	"d\006\220>d\011\200E@\000\220Ft\016\200>@\001\220Cj"
+ 551      64098045 
+ 551      40009046 
+ 551      740E803E 
+ 551      40019043 
+ 552 02d9 17804340 		.ascii	"\027\200C@\001\220E[\023\200F@\004\200E@\001\220FN\027"
+ 552      0190455B 
+ 552      13804640 
+ 552      04804540 
+ 552      0190464E 
+ 553 02ee 80464001 		.ascii	"\200F@\001\220CF\027\200C@\001\220?5\027\200?@\001\220"
+ 553      90434617 
+ 553      80434001 
+ 553      903F3517 
+ 553      803F4001 
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 17
+
+
+ 554 0303 3E2C1780 		.ascii	">,\027\200>@\001\220=&\017\220>\037\007\200=@\007\220"
+ 554      3E400190 
+ 554      3D260F90 
+ 554      3E1F0780 
+ 554      3D400790 
+ 555 0317 3D1B0180 		.ascii	"=\033\001\200>@\016\220>\022\011\200=@\007\220=\006"
+ 555      3E400E90 
+ 555      3E120980 
+ 555      3D400790 
+ 555      3D06
+ 556 0329 04803E40 		.ascii	"\004\200>@\037\200=@\001\220F\0110\200F@\000\220HlH"
+ 556      1F803D40 
+ 556      01904609 
+ 556      30804640 
+ 556      0090486C 
+ 557 033e 80484048 		.ascii	"\200H@H\220E\177'\200E@\011\220Ed*\200E@\006\220Ek*"
+ 557      90457F27 
+ 557      80454009 
+ 557      9045642A 
+ 557      80454006 
+ 558 0356 80454006 		.ascii	"\200E@\006\220EG*\200E@\006\220F,\024\200F@\002\220"
+ 558      9045472A 
+ 558      80454006 
+ 558      90462C14 
+ 558      80464002 
+ 559 036b 451E1480 		.ascii	"E\036\024\200E@\004\220F\027\015\220E\036\002\200F@"
+ 559      45400490 
+ 559      46170D90 
+ 559      451E0280 
+ 559      4640
+ 560 037d 24804540 		.ascii	"$\200E@_\260e\000\000\260d\000\000\260\006\014\000\260"
+ 560      5FB06500 
+ 560      00B06400 
+ 560      00B0060C 
+ 560      00B0
+ 561 038f 0A4000B0 		.ascii	"\012@\000\260\007d\000\340\000@\000\300\000\001\260"
+ 561      076400E0 
+ 561      004000C0 
+ 561      0001B0
+ 562 039e 650000B0 		.ascii	"e\000\000\260d\000\000\260\006\014\000\260\012@\000"
+ 562      640000B0 
+ 562      060C00B0 
+ 562      0A4000
+ 563 03ad B0076400 		.ascii	"\260\007d\000\340\000@\000\300\000\000\377/\000MTrk"
+ 563      E0004000 
+ 563      C00000FF 
+ 563      2F004D54 
+ 563      726B
+ 564 03bf 000000A8 		.ascii	"\000\000\000\250\000\377\003\014Kontakt 7 #2\000\261"
+ 564      00FF030C 
+ 564      4B6F6E74 
+ 564      616B7420 
+ 564      37202332 
+ 565 03d5 0A4000B1 		.ascii	"\012@\000\261\007d\000\341\000@\000\261e\000\000\261"
+ 565      076400E1 
+ 565      004000B1 
+ 565      650000B1 
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 18
+
+
+ 566 03e5 640000B1 		.ascii	"d\000\000\261\006\014\000\261\012@\000\261\007d\000"
+ 566      060C00B1 
+ 566      0A4000B1 
+ 566      076400
+ 567 03f4 E1004000 		.ascii	"\341\000@\000\301\000\000\261e\000\000\261d\000\000"
+ 567      C10000B1 
+ 567      650000B1 
+ 567      640000
+ 568 0403 B1060C00 		.ascii	"\261\006\014\000\261\012@\000\261\007d\000\341\000@"
+ 568      B10A4000 
+ 568      B1076400 
+ 568      E10040
+ 569 0412 00C10000 		.ascii	"\000\301\000\000\261e\000\000\261d\000\000\261\006\014"
+ 569      B1650000 
+ 569      B1640000 
+ 569      B1060C
+ 570 0421 00B10A40 		.ascii	"\000\261\012@\000\261\007d\000\341\000@\000\301\000"
+ 570      00B10764 
+ 570      00E10040 
+ 570      00C100
+ 571 0430 9800B165 		.ascii	"\230\000\261e\000\000\261d\000\000\261\006\014\000\261"
+ 571      0000B164 
+ 571      0000B106 
+ 571      0C00B1
+ 572 043f 0A4000B1 		.ascii	"\012@\000\261\007d\000\341\000@\000\301\000\001\261"
+ 572      076400E1 
+ 572      004000C1 
+ 572      0001B1
+ 573 044e 650000B1 		.ascii	"e\000\000\261d\000\000\261\006\014\000\261\012@\000"
+ 573      640000B1 
+ 573      060C00B1 
+ 573      0A4000
+ 574 045d B1076400 		.ascii	"\261\007d\000\341\000@\000\301\000\000\377/\000"
+ 574      E1004000 
+ 574      C10000FF 
+ 574      2F00
+ 575              		.text
+ 576              	.Letext0:
+ 577              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/ma
+ 578              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/sy
+ 579              		.file 4 "Core/Inc/sinf/types.h"
+ 580              		.file 5 "Core/Inc/smidi/smidi.h"
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cclCigD3.s 			page 19
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 smidi.c
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:20     .text.smidiReadHeader:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:26     .text.smidiReadHeader:00000000 smidiReadHeader
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:89     .text.smidiReadTrackHeader:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:95     .text.smidiReadTrackHeader:00000000 smidiReadTrackHeader
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:139    .text.smidiVarRead:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:145    .text.smidiVarRead:00000000 smidiVarRead
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:201    .text.smidiParseEvent:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:207    .text.smidiParseEvent:00000000 smidiParseEvent
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:375    .text.smidiParseData:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:381    .text.smidiParseData:00000000 smidiParseData
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:497    .text.smidiParseData:00000058 $d
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:506    .bss.gSmidiCurrentEvent:00000000 gSmidiCurrentEvent
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:503    .bss.gSmidiCurrentEvent:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:513    .rodata.gSmidiTestBuffer:00000000 gSmidiTestBuffer
+C:\Users\Made\AppData\Local\Temp\cclCigD3.s:510    .rodata.gSmidiTestBuffer:00000000 $d
+
+NO UNDEFINED SYMBOLS

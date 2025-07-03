@@ -21,34 +21,29 @@
 #define SYS_FONT_SPACING_X 1
 #define SYS_FONT_SPACING_Y 1
 
-#define SYS_MAX_AVAILABLE_RAM (768 * 1024)
-#define SYS_POLYPHONY_COUNT 64
+#define SYS_MAX_AVAILABLE_RAM (512 * 1024)
 #define SYS_TRACK_COUNT 8
 #define SYS_TRACK_BUFFER_SIZE (BLOCK_SIZE * 2)
 #define SYS_TRACK_BUFFER_SAMPLE_COUNT (SYS_TRACK_BUFFER_SIZE / 2)
-
-#define SYS_DAC_SAMPLE_COUNT 0x1000
-#define SYS_DAC_BUFFER_SIZE (sizeof(u16) * SYS_DAC_SAMPLE_COUNT)
+#define SYS_POLYPHONY_COUNT (SYS_MAX_AVAILABLE_RAM / SYS_TRACK_BUFFER_SIZE)
 
 #define SYS_AUDIO_BUFFER_SIZE BLOCK_SIZE
 #define SYS_AUDIO_BUFFER_SAMPLE_COUNT (BLOCK_SIZE / 2)
 
-#define SYS_TIM TIM4
-#define delayUsMainThread(u) delayUs(SYS_TIM, u)
+#define SYS_DAC_BUFFER_SIZE (SYS_AUDIO_BUFFER_SIZE * 2)
+#define SYS_DAC_SAMPLE_COUNT (SYS_DAC_BUFFER_SIZE / sizeof(u16))
+#define SYS_DAC_HALF_BUFFER_SIZE (SYS_DAC_BUFFER_SIZE / 2)
+#define SYS_DAC_HALF_SAMPLE_COUNT (SYS_DAC_SAMPLE_COUNT / 2)
+
+#define SYS_TRI_FCLK (120000000 / (11 + 1))
+#define SYS_TRI_BUF_SIZE (SYS_TRI_FCLK / 400000)
+#define SYS_TRI_BUF_HALF_SIZE (SYS_TRI_BUF_SIZE / 2)
 
 #define SYS_POLL_RATE 10
 #define SYS_POLL_PERIOD_TICKS (1000 / SYS_POLL_RATE)
 #define SYS_POLL_PERIOD_US (1e6 / SYS_POLL_RATE)
 
-#define SYS_FIRST_KEY TONE_OFFSET_C2
-#define SYS_LAST_KEY TONE_OFFSET_C7
-// #define SYS_LAST_KEY (TONE_OFFSET_C2 + 15)
-#define SYS_KEY_SEMITONE_RANGE (1 + SYS_LAST_KEY - SYS_FIRST_KEY)
-#define SYS_KEY_COUNT SYS_KEY_SEMITONE_RANGE
-#define SYS_KEYS_WORD_COUNT (SYS_KEY_SEMITONE_RANGE % 32 == 0 ? SYS_KEY_SEMITONE_RANGE / 32 : 1 + (SYS_KEY_SEMITONE_RANGE / 32))
-
-enum
-{
+enum {
     SYS_BTNMTX1_BUTTON_0_MASK = 1 << 0,
     SYS_BTNMTX1_BUTTON_1_MASK = 1 << 1,
     SYS_BTNMTX1_BUTTON_2_MASK = 1 << 2,
@@ -67,96 +62,113 @@ enum
     SYS_BTNMTX1_BUTTON_F_MASK = 1 << 15,
 };
 
-typedef enum : u8
-{
+typedef enum : u8 {
     SYS_BTNSTATE_NULL,
     SYS_BTNSTATE_DOWN, // just pressed
     SYS_BTNSTATE_UP,   // just released
     SYS_BTNSTATE_HELD,
 } sysButtonState;
 
-typedef enum : u8
-{
+typedef enum : u8 {
+    SYS_MENU_ERROR,
     SYS_MENU_LOADING,
     SYS_MENU_LOADING_DONE,
     SYS_MENU_DEFAULT,
     SYS_MENU_INVALID = 0xFF,
 } sysMenuId;
 
-typedef struct
-{
+typedef struct {
     sfsSingleInstrument base;
     u32                 loadedBlock;
     u16                 instrumentId;
     char                cachedName[64];
 } sysSingleInstrumentRuntime;
 
-typedef struct
-{
+typedef struct {
     sysButtonState state;
     u8             velocity;
 } sysKeyData;
 
-typedef struct
-{
-    sysKeyData                 keys[SYS_KEY_COUNT];
+typedef struct {
+    sysKeyData                 keys[SFS_KEY_COUNT];
     sysSingleInstrumentRuntime instrument;
+    u16                        lastInstrumentId;
     u32                        currentBlock;
     bool                       isLoaded;
+    bool                       isActive;
 } sysTrack;
 
-typedef struct
-{
+typedef struct {
     u32 currentState;
     u32 lastState;
 } sysInputBitmap;
 
-typedef struct
-{
+typedef struct {
     s32 timeStampPressedFirst, timeStampPressedSecond;
 } sysKeyTimestamp;
 
-typedef struct
-{
+typedef struct {
     u8 pitchBendRangeSemitones;
 } sysSettings;
 
-extern sysSettings gSysSettings;
-extern bool        gSysIsLoaded;
-extern u32         gSysDeltaTimeMs;
-extern u8          gSysCurrentMenuId;
-extern u8          gSysLastMenuId;
-extern f32         gSysCurrentMenuTimer;
-extern u16         gSysDacBuf[];
-extern u16         gSysAudioFrontBuf[];
-extern u16         gSysAudioBackBuf[];
-extern sysTrack    gSysTracks[];
-extern u16         gSysTrackData[SYS_TRACK_COUNT][SYS_TRACK_BUFFER_SAMPLE_COUNT];
-extern u8          gSysTmpBlock[BLOCK_SIZE];
-extern u32         gSysDmaProgress;
-extern u32         gSysDataLoadCounter;
+extern sysSettings          gSysSettings;
+extern bool                 gSysIsLoaded;
+extern u32                  gSysTickCounter;
+extern f32                  gSysDeltaTime;
+extern u8                   gSysCurrentMenuId;
+extern u8                   gSysLastMenuId;
+extern f32                  gSysCurrentMenuTimer;
+extern DMA_BUFFER u16       gSysDacBuf[];
+extern DMA_BUFFER u16       gSysTriBuf[];
+extern s16                  gSysAudioFrontBuf[];
+extern s16                  gSysAudioBackBuf[];
+extern sfsKeyProximityTable gSysProximityTable;
+extern sysTrack *           gSysTrackCurrent;
+extern sysTrack             gSysTrackInfo[];
+extern s16                  gSysPolyphonyData[SYS_POLYPHONY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
+extern u32                  gSysPolyphonyProgress[SYS_POLYPHONY_COUNT];
+extern u8                   gSysTmpBlock[];
+extern u32                  gSysDmaProgress;
+extern u32                  gSysDataLoadCounter;
+extern char                 gSysStrError[];
 
 extern sysInputBitmap  gSysBtnMtx1State;
-extern sysInputBitmap  gSysBtnKeyStates[SYS_KEYS_WORD_COUNT];
-extern sysKeyTimestamp gSysKeyTimestamps[SYS_KEY_SEMITONE_RANGE];
+extern sysInputBitmap  gSysBtnKeyStates[SFS_KEYS_WORD_COUNT];
+extern sysKeyTimestamp gSysKeyTimestamps[SFS_KEY_SEMITONE_RANGE];
 
-extern ADC_HandleTypeDef* gSysAdc;
+extern ADC_HandleTypeDef *gSysAdc;
 
 #define sysBtnMtx1GetState(b) sysGetButtonState(&gSysBtnMtx1State, b)
 
 #define sysGetTrackData(i) ((u16*)(gSysTrackData + i))
 
-synthErrno     sysInit(DAC_HandleTypeDef* pDac, ADC_HandleTypeDef* pAdc);
-void           sysPoll();
-void           sysUpdateTrackData();
-void           sysRender();
-sysButtonState sysGetButtonState(sysInputBitmap* pMap, u32 pBtn);
-void           sysHandleInputs();
-void           sysReadInputs();
-synthErrno     sysDeinit();
-void           sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-void           sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
+synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc);
 
-#define sysGetMainTrack() gSysTracks
+void sysPoll();
+
+void sysUpdateTrackData();
+
+void sysRender();
+
+sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn);
+
+void sysHandleInputs();
+
+void sysReadInputs();
+
+void sysHandlePitchBend();
+
+void sysSynthesizeAudio();
+
+synthErrno sysDeinit();
+
+void sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
+
+void sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
+
+void sysError(synthErrno pCode);
+
+#define sysGetMainTrack() gSysTrackInfo
+
 
 #endif //SSYS_H

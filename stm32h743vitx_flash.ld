@@ -164,7 +164,17 @@ SECTIONS
     . = ALIGN(4);
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
-  } >DTCMRAM
+  } >RAM
+
+  .dma_buffer (NOLOAD) : /* Space before ':' is critical */
+  {
+    *(.dma_buffer)
+  } >RAM_D2
+
+  .bdma_buffer : /* Space before ':' is critical */
+    {
+      *(.bdma_buffer)
+    } >RAM_D3
 
   /* User_heap_stack section, used to check that there is enough RAM left */
   ._user_heap_stack :
