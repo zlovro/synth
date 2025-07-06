@@ -98,7 +98,7 @@ bool muxRead(mux *pMux, u8 pChan);
 
 void muxWrite(mux *pMux, u8 pChan, bool pVal);
 
-void uartPrintf(const char *format, ...);
+void serialPrintf(const char *format, ...);
 
 /* USER CODE END EFP */
 
@@ -116,18 +116,10 @@ void uartPrintf(const char *format, ...);
 #define LED0_GPIO_Port GPIOA
 #define AUDIO_OUT_Pin GPIO_PIN_4
 #define AUDIO_OUT_GPIO_Port GPIOA
-#define TRI_Pin GPIO_PIN_5
-#define TRI_GPIO_Port GPIOA
 #define PITCHBEND_IN_Pin GPIO_PIN_6
 #define PITCHBEND_IN_GPIO_Port GPIOA
 #define BTN_RUN_Pin GPIO_PIN_5
 #define BTN_RUN_GPIO_Port GPIOC
-#define COMP_TRI_Pin GPIO_PIN_7
-#define COMP_TRI_GPIO_Port GPIOE
-#define COMP_OUT_Pin GPIO_PIN_8
-#define COMP_OUT_GPIO_Port GPIOE
-#define COMP_AUDIO_Pin GPIO_PIN_11
-#define COMP_AUDIO_GPIO_Port GPIOE
 #define MUX_EN_OG_KEY_ROW_Pin GPIO_PIN_8
 #define MUX_EN_OG_KEY_ROW_GPIO_Port GPIOD
 #define MUX_EN_OG_KEY_COL_Pin GPIO_PIN_9

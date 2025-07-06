@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
   29:Core/Src/stm32h7xx_it.c **** 
   30:Core/Src/stm32h7xx_it.c **** /* USER CODE END TD */
   31:Core/Src/stm32h7xx_it.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 2
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 2
 
 
   32:Core/Src/stm32h7xx_it.c **** /* Private define ------------------------------------------------------------*/
@@ -88,13 +88,13 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
   56:Core/Src/stm32h7xx_it.c **** 
   57:Core/Src/stm32h7xx_it.c **** /* External variables --------------------------------------------------------*/
   58:Core/Src/stm32h7xx_it.c **** extern DMA_HandleTypeDef hdma_dac1_ch1;
-  59:Core/Src/stm32h7xx_it.c **** extern DMA_HandleTypeDef hdma_dac1_ch2;
-  60:Core/Src/stm32h7xx_it.c **** extern DAC_HandleTypeDef hdac1;
-  61:Core/Src/stm32h7xx_it.c **** extern DMA_HandleTypeDef hdma_spi4_tx;
-  62:Core/Src/stm32h7xx_it.c **** extern SPI_HandleTypeDef hspi4;
-  63:Core/Src/stm32h7xx_it.c **** extern TIM_HandleTypeDef htim6;
-  64:Core/Src/stm32h7xx_it.c **** extern TIM_HandleTypeDef htim7;
-  65:Core/Src/stm32h7xx_it.c **** extern DMA_HandleTypeDef hdma_uart4_tx;
+  59:Core/Src/stm32h7xx_it.c **** extern DAC_HandleTypeDef hdac1;
+  60:Core/Src/stm32h7xx_it.c **** extern DMA_HandleTypeDef hdma_spi4_tx;
+  61:Core/Src/stm32h7xx_it.c **** extern SPI_HandleTypeDef hspi4;
+  62:Core/Src/stm32h7xx_it.c **** extern TIM_HandleTypeDef htim6;
+  63:Core/Src/stm32h7xx_it.c **** extern TIM_HandleTypeDef htim7;
+  64:Core/Src/stm32h7xx_it.c **** extern DMA_HandleTypeDef hdma_uart4_tx;
+  65:Core/Src/stm32h7xx_it.c **** extern UART_HandleTypeDef huart4;
   66:Core/Src/stm32h7xx_it.c **** extern TIM_HandleTypeDef htim2;
   67:Core/Src/stm32h7xx_it.c **** 
   68:Core/Src/stm32h7xx_it.c **** /* USER CODE BEGIN EV */
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
   34              	.L2:
   80:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
   81:Core/Src/stm32h7xx_it.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 3
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 3
 
 
   82:Core/Src/stm32h7xx_it.c ****   /* USER CODE END NonMaskableInt_IRQn 0 */
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
   69              		.thumb
   70              		.thumb_func
   72              	MemManage_Handler:
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 4
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 4
 
 
   73              	.LFB337:
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  127:Core/Src/stm32h7xx_it.c ****   /* USER CODE END BusFault_IRQn 0 */
  128:Core/Src/stm32h7xx_it.c ****   while (1)
  104              		.loc 1 128 3 view .LVU13
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 5
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 5
 
 
  129:Core/Src/stm32h7xx_it.c ****   {
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  142              	.LFB340:
  148:Core/Src/stm32h7xx_it.c **** }
  149:Core/Src/stm32h7xx_it.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 6
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 6
 
 
  150:Core/Src/stm32h7xx_it.c **** /**
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  175              		.syntax unified
  176              		.thumb
  177              		.thumb_func
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 7
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 7
 
 
  179              	PendSV_Handler:
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  208              	.LFE343:
  210              		.section	.text.DMA1_Stream0_IRQHandler,"ax",%progbits
  211              		.align	1
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 8
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 8
 
 
  212              		.global	DMA1_Stream0_IRQHandler
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  248              	DMA1_Stream1_IRQHandler:
  249              	.LFB345:
  223:Core/Src/stm32h7xx_it.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 9
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 9
 
 
  224:Core/Src/stm32h7xx_it.c **** /**
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  287              		.cfi_def_cfa_offset 8
  288              		.cfi_offset 3, -8
  289              		.cfi_offset 14, -4
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 10
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 10
 
 
  243:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN DMA1_Stream2_IRQn 0 */
@@ -561,19 +561,19 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  299 000c 00000000 		.word	hdma_uart4_tx
  300              		.cfi_endproc
  301              	.LFE346:
- 303              		.section	.text.DMA1_Stream3_IRQHandler,"ax",%progbits
+ 303              		.section	.text.TIM2_IRQHandler,"ax",%progbits
  304              		.align	1
- 305              		.global	DMA1_Stream3_IRQHandler
+ 305              		.global	TIM2_IRQHandler
  306              		.syntax unified
  307              		.thumb
  308              		.thumb_func
- 310              	DMA1_Stream3_IRQHandler:
+ 310              	TIM2_IRQHandler:
  311              	.LFB347:
  251:Core/Src/stm32h7xx_it.c **** 
  252:Core/Src/stm32h7xx_it.c **** /**
- 253:Core/Src/stm32h7xx_it.c ****   * @brief This function handles DMA1 stream3 global interrupt.
+ 253:Core/Src/stm32h7xx_it.c ****   * @brief This function handles TIM2 global interrupt.
  254:Core/Src/stm32h7xx_it.c ****   */
- 255:Core/Src/stm32h7xx_it.c **** void DMA1_Stream3_IRQHandler(void)
+ 255:Core/Src/stm32h7xx_it.c **** void TIM2_IRQHandler(void)
  256:Core/Src/stm32h7xx_it.c **** {
  312              		.loc 1 256 1 is_stmt 1 view -0
  313              		.cfi_startproc
@@ -584,42 +584,42 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  318              		.cfi_def_cfa_offset 8
  319              		.cfi_offset 3, -8
  320              		.cfi_offset 14, -4
- 257:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
+ 257:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN TIM2_IRQn 0 */
  258:Core/Src/stm32h7xx_it.c **** 
- 259:Core/Src/stm32h7xx_it.c ****   /* USER CODE END DMA1_Stream3_IRQn 0 */
- 260:Core/Src/stm32h7xx_it.c ****   HAL_DMA_IRQHandler(&hdma_dac1_ch2);
+ 259:Core/Src/stm32h7xx_it.c ****   /* USER CODE END TIM2_IRQn 0 */
+ 260:Core/Src/stm32h7xx_it.c ****   HAL_TIM_IRQHandler(&htim2);
  321              		.loc 1 260 3 view .LVU38
  322 0002 0248     		ldr	r0, .L29
- 323 0004 FFF7FEFF 		bl	HAL_DMA_IRQHandler
+ 323 0004 FFF7FEFF 		bl	HAL_TIM_IRQHandler
  324              	.LVL3:
- 261:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
+ 261:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN TIM2_IRQn 1 */
  262:Core/Src/stm32h7xx_it.c **** 
- 263:Core/Src/stm32h7xx_it.c ****   /* USER CODE END DMA1_Stream3_IRQn 1 */
+ 263:Core/Src/stm32h7xx_it.c ****   /* USER CODE END TIM2_IRQn 1 */
  264:Core/Src/stm32h7xx_it.c **** }
  325              		.loc 1 264 1 is_stmt 0 view .LVU39
  326 0008 08BD     		pop	{r3, pc}
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 11
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 11
 
 
  327              	.L30:
  328 000a 00BF     		.align	2
  329              	.L29:
- 330 000c 00000000 		.word	hdma_dac1_ch2
+ 330 000c 00000000 		.word	htim2
  331              		.cfi_endproc
  332              	.LFE347:
- 334              		.section	.text.TIM2_IRQHandler,"ax",%progbits
+ 334              		.section	.text.UART4_IRQHandler,"ax",%progbits
  335              		.align	1
- 336              		.global	TIM2_IRQHandler
+ 336              		.global	UART4_IRQHandler
  337              		.syntax unified
  338              		.thumb
  339              		.thumb_func
- 341              	TIM2_IRQHandler:
+ 341              	UART4_IRQHandler:
  342              	.LFB348:
  265:Core/Src/stm32h7xx_it.c **** 
  266:Core/Src/stm32h7xx_it.c **** /**
- 267:Core/Src/stm32h7xx_it.c ****   * @brief This function handles TIM2 global interrupt.
+ 267:Core/Src/stm32h7xx_it.c ****   * @brief This function handles UART4 global interrupt.
  268:Core/Src/stm32h7xx_it.c ****   */
- 269:Core/Src/stm32h7xx_it.c **** void TIM2_IRQHandler(void)
+ 269:Core/Src/stm32h7xx_it.c **** void UART4_IRQHandler(void)
  270:Core/Src/stm32h7xx_it.c **** {
  343              		.loc 1 270 1 is_stmt 1 view -0
  344              		.cfi_startproc
@@ -630,24 +630,24 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  349              		.cfi_def_cfa_offset 8
  350              		.cfi_offset 3, -8
  351              		.cfi_offset 14, -4
- 271:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN TIM2_IRQn 0 */
+ 271:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN UART4_IRQn 0 */
  272:Core/Src/stm32h7xx_it.c **** 
- 273:Core/Src/stm32h7xx_it.c ****   /* USER CODE END TIM2_IRQn 0 */
- 274:Core/Src/stm32h7xx_it.c ****   HAL_TIM_IRQHandler(&htim2);
+ 273:Core/Src/stm32h7xx_it.c ****   /* USER CODE END UART4_IRQn 0 */
+ 274:Core/Src/stm32h7xx_it.c ****   HAL_UART_IRQHandler(&huart4);
  352              		.loc 1 274 3 view .LVU41
  353 0002 0248     		ldr	r0, .L33
- 354 0004 FFF7FEFF 		bl	HAL_TIM_IRQHandler
+ 354 0004 FFF7FEFF 		bl	HAL_UART_IRQHandler
  355              	.LVL4:
- 275:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN TIM2_IRQn 1 */
+ 275:Core/Src/stm32h7xx_it.c ****   /* USER CODE BEGIN UART4_IRQn 1 */
  276:Core/Src/stm32h7xx_it.c **** 
- 277:Core/Src/stm32h7xx_it.c ****   /* USER CODE END TIM2_IRQn 1 */
+ 277:Core/Src/stm32h7xx_it.c ****   /* USER CODE END UART4_IRQn 1 */
  278:Core/Src/stm32h7xx_it.c **** }
  356              		.loc 1 278 1 is_stmt 0 view .LVU42
  357 0008 08BD     		pop	{r3, pc}
  358              	.L34:
  359 000a 00BF     		.align	2
  360              	.L33:
- 361 000c 00000000 		.word	htim2
+ 361 000c 00000000 		.word	huart4
  362              		.cfi_endproc
  363              	.LFE348:
  365              		.section	.text.TIM6_DAC_IRQHandler,"ax",%progbits
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  370              		.thumb_func
  372              	TIM6_DAC_IRQHandler:
  373              	.LFB349:
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 12
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 12
 
 
  279:Core/Src/stm32h7xx_it.c **** 
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  299:Core/Src/stm32h7xx_it.c **** {
  410              		.loc 1 299 1 is_stmt 1 view -0
  411              		.cfi_startproc
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 13
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 13
 
 
  412              		@ args = 0, pretend = 0, frame = 0
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  450              		.loc 1 317 3 view .LVU51
  451 0002 0248     		ldr	r0, .L45
  452 0004 FFF7FEFF 		bl	HAL_SPI_IRQHandler
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 14
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 14
 
 
  453              	.LVL8:
@@ -804,68 +804,70 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 1
  470              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h"
  471              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h"
  472              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h"
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 15
+ 473              		.file 10 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 15
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32h7xx_it.c
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:20     .text.NMI_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:26     .text.NMI_Handler:00000000 NMI_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:43     .text.HardFault_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:49     .text.HardFault_Handler:00000000 HardFault_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:66     .text.MemManage_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:72     .text.MemManage_Handler:00000000 MemManage_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:89     .text.BusFault_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:95     .text.BusFault_Handler:00000000 BusFault_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:112    .text.UsageFault_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:118    .text.UsageFault_Handler:00000000 UsageFault_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:135    .text.SVC_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:141    .text.SVC_Handler:00000000 SVC_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:154    .text.DebugMon_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:160    .text.DebugMon_Handler:00000000 DebugMon_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:173    .text.PendSV_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:179    .text.PendSV_Handler:00000000 PendSV_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:192    .text.SysTick_Handler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:198    .text.SysTick_Handler:00000000 SysTick_Handler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:211    .text.DMA1_Stream0_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:217    .text.DMA1_Stream0_IRQHandler:00000000 DMA1_Stream0_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:237    .text.DMA1_Stream0_IRQHandler:0000000c $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:242    .text.DMA1_Stream1_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:248    .text.DMA1_Stream1_IRQHandler:00000000 DMA1_Stream1_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:268    .text.DMA1_Stream1_IRQHandler:0000000c $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:273    .text.DMA1_Stream2_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:279    .text.DMA1_Stream2_IRQHandler:00000000 DMA1_Stream2_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:299    .text.DMA1_Stream2_IRQHandler:0000000c $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:304    .text.DMA1_Stream3_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:310    .text.DMA1_Stream3_IRQHandler:00000000 DMA1_Stream3_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:330    .text.DMA1_Stream3_IRQHandler:0000000c $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:335    .text.TIM2_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:341    .text.TIM2_IRQHandler:00000000 TIM2_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:361    .text.TIM2_IRQHandler:0000000c $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:366    .text.TIM6_DAC_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:372    .text.TIM6_DAC_IRQHandler:00000000 TIM6_DAC_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:396    .text.TIM6_DAC_IRQHandler:00000010 $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:402    .text.TIM7_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:408    .text.TIM7_IRQHandler:00000000 TIM7_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:428    .text.TIM7_IRQHandler:0000000c $d
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:433    .text.SPI4_IRQHandler:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:439    .text.SPI4_IRQHandler:00000000 SPI4_IRQHandler
-C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s:459    .text.SPI4_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:20     .text.NMI_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:26     .text.NMI_Handler:00000000 NMI_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:43     .text.HardFault_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:49     .text.HardFault_Handler:00000000 HardFault_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:66     .text.MemManage_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:72     .text.MemManage_Handler:00000000 MemManage_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:89     .text.BusFault_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:95     .text.BusFault_Handler:00000000 BusFault_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:112    .text.UsageFault_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:118    .text.UsageFault_Handler:00000000 UsageFault_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:135    .text.SVC_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:141    .text.SVC_Handler:00000000 SVC_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:154    .text.DebugMon_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:160    .text.DebugMon_Handler:00000000 DebugMon_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:173    .text.PendSV_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:179    .text.PendSV_Handler:00000000 PendSV_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:192    .text.SysTick_Handler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:198    .text.SysTick_Handler:00000000 SysTick_Handler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:211    .text.DMA1_Stream0_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:217    .text.DMA1_Stream0_IRQHandler:00000000 DMA1_Stream0_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:237    .text.DMA1_Stream0_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:242    .text.DMA1_Stream1_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:248    .text.DMA1_Stream1_IRQHandler:00000000 DMA1_Stream1_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:268    .text.DMA1_Stream1_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:273    .text.DMA1_Stream2_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:279    .text.DMA1_Stream2_IRQHandler:00000000 DMA1_Stream2_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:299    .text.DMA1_Stream2_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:304    .text.TIM2_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:310    .text.TIM2_IRQHandler:00000000 TIM2_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:330    .text.TIM2_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:335    .text.UART4_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:341    .text.UART4_IRQHandler:00000000 UART4_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:361    .text.UART4_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:366    .text.TIM6_DAC_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:372    .text.TIM6_DAC_IRQHandler:00000000 TIM6_DAC_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:396    .text.TIM6_DAC_IRQHandler:00000010 $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:402    .text.TIM7_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:408    .text.TIM7_IRQHandler:00000000 TIM7_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:428    .text.TIM7_IRQHandler:0000000c $d
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:433    .text.SPI4_IRQHandler:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:439    .text.SPI4_IRQHandler:00000000 SPI4_IRQHandler
+C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s:459    .text.SPI4_IRQHandler:0000000c $d
 
 UNDEFINED SYMBOLS
 HAL_DMA_IRQHandler
 hdma_dac1_ch1
 hdma_spi4_tx
 hdma_uart4_tx
-hdma_dac1_ch2
 HAL_TIM_IRQHandler
 htim2
+HAL_UART_IRQHandler
+huart4
 HAL_DAC_IRQHandler
 hdac1
 htim6
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccIy02oZ.s 			page 16
+
+
 htim7
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccUs89CJ.s 			page 16
-
-
 HAL_SPI_IRQHandler
 hspi4

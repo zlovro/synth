@@ -25,8 +25,6 @@
 /* USER CODE END Includes */
 extern DMA_HandleTypeDef hdma_dac1_ch1;
 
-extern DMA_HandleTypeDef hdma_dac1_ch2;
-
 extern DMA_HandleTypeDef hdma_spi4_tx;
 
 extern DMA_HandleTypeDef hdma_uart4_tx;
@@ -146,79 +144,6 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* hadc)
 }
 
 /**
-* @brief COMP MSP Initialization
-* This function configures the hardware resources used in this example
-* @param hcomp: COMP handle pointer
-* @retval None
-*/
-void HAL_COMP_MspInit(COMP_HandleTypeDef* hcomp)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hcomp->Instance==COMP2)
-  {
-  /* USER CODE BEGIN COMP2_MspInit 0 */
-
-  /* USER CODE END COMP2_MspInit 0 */
-    /* Peripheral clock enable */
-    __HAL_RCC_COMP12_CLK_ENABLE();
-
-    __HAL_RCC_GPIOE_CLK_ENABLE();
-    /**COMP2 GPIO Configuration
-    PE7     ------> COMP2_INM
-    PE8     ------> COMP2_OUT
-    PE11     ------> COMP2_INP
-    */
-    GPIO_InitStruct.Pin = COMP_TRI_Pin|COMP_AUDIO_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = COMP_OUT_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF13_COMP2;
-    HAL_GPIO_Init(COMP_OUT_GPIO_Port, &GPIO_InitStruct);
-
-  /* USER CODE BEGIN COMP2_MspInit 1 */
-
-  /* USER CODE END COMP2_MspInit 1 */
-
-  }
-
-}
-
-/**
-* @brief COMP MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param hcomp: COMP handle pointer
-* @retval None
-*/
-void HAL_COMP_MspDeInit(COMP_HandleTypeDef* hcomp)
-{
-  if(hcomp->Instance==COMP2)
-  {
-  /* USER CODE BEGIN COMP2_MspDeInit 0 */
-
-  /* USER CODE END COMP2_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_COMP12_CLK_DISABLE();
-
-    /**COMP2 GPIO Configuration
-    PE7     ------> COMP2_INM
-    PE8     ------> COMP2_OUT
-    PE11     ------> COMP2_INP
-    */
-    HAL_GPIO_DeInit(GPIOE, COMP_TRI_Pin|COMP_OUT_Pin|COMP_AUDIO_Pin);
-
-  /* USER CODE BEGIN COMP2_MspDeInit 1 */
-
-  /* USER CODE END COMP2_MspDeInit 1 */
-  }
-
-}
-
-/**
 * @brief DAC MSP Initialization
 * This function configures the hardware resources used in this example
 * @param hdac: DAC handle pointer
@@ -238,12 +163,11 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**DAC1 GPIO Configuration
     PA4     ------> DAC1_OUT1
-    PA5     ------> DAC1_OUT2
     */
-    GPIO_InitStruct.Pin = AUDIO_OUT_Pin|TRI_Pin;
+    GPIO_InitStruct.Pin = AUDIO_OUT_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_Init(AUDIO_OUT_GPIO_Port, &GPIO_InitStruct);
 
     /* DAC1 DMA Init */
     /* DAC1_CH1 Init */
@@ -263,24 +187,6 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* hdac)
     }
 
     __HAL_LINKDMA(hdac,DMA_Handle1,hdma_dac1_ch1);
-
-    /* DAC1_CH2 Init */
-    hdma_dac1_ch2.Instance = DMA1_Stream3;
-    hdma_dac1_ch2.Init.Request = DMA_REQUEST_DAC2;
-    hdma_dac1_ch2.Init.Direction = DMA_MEMORY_TO_PERIPH;
-    hdma_dac1_ch2.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_dac1_ch2.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_dac1_ch2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_dac1_ch2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_dac1_ch2.Init.Mode = DMA_CIRCULAR;
-    hdma_dac1_ch2.Init.Priority = DMA_PRIORITY_MEDIUM;
-    hdma_dac1_ch2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-    if (HAL_DMA_Init(&hdma_dac1_ch2) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(hdac,DMA_Handle2,hdma_dac1_ch2);
 
     /* DAC1 interrupt Init */
     HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
@@ -311,13 +217,11 @@ void HAL_DAC_MspDeInit(DAC_HandleTypeDef* hdac)
 
     /**DAC1 GPIO Configuration
     PA4     ------> DAC1_OUT1
-    PA5     ------> DAC1_OUT2
     */
-    HAL_GPIO_DeInit(GPIOA, AUDIO_OUT_Pin|TRI_Pin);
+    HAL_GPIO_DeInit(AUDIO_OUT_GPIO_Port, AUDIO_OUT_Pin);
 
     /* DAC1 DMA DeInit */
     HAL_DMA_DeInit(hdac->DMA_Handle1);
-    HAL_DMA_DeInit(hdac->DMA_Handle2);
 
     /* DAC1 interrupt DeInit */
   /* USER CODE BEGIN DAC1:TIM6_DAC_IRQn disable */
@@ -344,22 +248,11 @@ void HAL_DAC_MspDeInit(DAC_HandleTypeDef* hdac)
 void HAL_SD_MspInit(SD_HandleTypeDef* hsd)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
   if(hsd->Instance==SDMMC1)
   {
   /* USER CODE BEGIN SDMMC1_MspInit 0 */
 
   /* USER CODE END SDMMC1_MspInit 0 */
-
-  /** Initializes the peripherals clock
-  */
-    PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SDMMC;
-    PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
     /* Peripheral clock enable */
     __HAL_RCC_SDMMC1_CLK_ENABLE();
 
@@ -750,17 +643,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
     /**UART4 GPIO Configuration
-    PA0     ------> UART4_TX
     PA11     ------> UART4_RX
+    PA12     ------> UART4_TX
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
+    GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -786,6 +672,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
 
     __HAL_LINKDMA(huart,hdmatx,hdma_uart4_tx);
 
+    /* UART4 interrupt Init */
+    HAL_NVIC_SetPriority(UART4_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(UART4_IRQn);
   /* USER CODE BEGIN UART4_MspInit 1 */
 
   /* USER CODE END UART4_MspInit 1 */
@@ -811,13 +700,16 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     __HAL_RCC_UART4_CLK_DISABLE();
 
     /**UART4 GPIO Configuration
-    PA0     ------> UART4_TX
     PA11     ------> UART4_RX
+    PA12     ------> UART4_TX
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_0|GPIO_PIN_11);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
 
     /* UART4 DMA DeInit */
     HAL_DMA_DeInit(huart->hdmatx);
+
+    /* UART4 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(UART4_IRQn);
   /* USER CODE BEGIN UART4_MspDeInit 1 */
 
   /* USER CODE END UART4_MspDeInit 1 */

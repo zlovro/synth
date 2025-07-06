@@ -21,7 +21,6 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h \
- Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h \
@@ -43,7 +42,7 @@ build/main.o: Core/Src/main.c Core/Inc/main.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
  Core/Inc/sinf/types.h Core/Inc/sfs/sfs.h Core/Inc/sinf/serrno.h \
  Core/Inc/solfege/solfege.h Core/Inc/glcd/glcd.h Core/Inc/smidi/smidi.h \
- Core/Inc/ssys/ssys.h
+ Core/Inc/ssys/ssys.h Core/Inc/sser/sser.h
 Core/Inc/main.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 Core/Inc/stm32h7xx_hal_conf.h:
@@ -69,7 +68,6 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h:
-Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h:
@@ -96,3 +94,4 @@ Core/Inc/solfege/solfege.h:
 Core/Inc/glcd/glcd.h:
 Core/Inc/smidi/smidi.h:
 Core/Inc/ssys/ssys.h:
+Core/Inc/sser/sser.h:

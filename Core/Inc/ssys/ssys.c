@@ -13,6 +13,8 @@
 #include <sfs/sfs.h>
 #include <smidi/smidi.h>
 
+#include "sser/sser.h"
+
 sysSettings gSysSettings         = {2};
 bool        gSysIsLoaded         = false;
 u32         gSysTickCounter      = 0;
@@ -242,19 +244,10 @@ loopEnd:
 
     for (int i = 0; i < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++i)
     {
-        s16 sample = gSysAudioBackBuf[i];
-
-        s16 s = (0x8000 + sample) / 16;
-        UNUSED(s);
-        // gSysAudioFrontBuf[i] = i % 2 == 0 ? 0xFFF : 0;
-        // gSysAudioFrontBuf[i] = 0xFFF;
-        gSysAudioFrontBuf[i] = s;
+        gSysAudioFrontBuf[i] = (0x8000 + gSysAudioBackBuf[i]) / 16;
     }
 
-    // for (int i = 0; i < 4; ++i)
-    // {
-    //     gSysAudioFrontBuf[SYS_AUDIO_BUFFER_SAMPLE_COUNT - 1 - i] = i % 2 ? 0xFFF : 0;
-    // }
+    sserSendAudio((u8*) gSysAudioFrontBuf, SYS_AUDIO_BUFFER_SIZE);
 }
 
 sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn) {

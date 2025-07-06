@@ -23,7 +23,6 @@ build/ssys.o: Core/Inc/ssys/ssys.c Core/Inc/ssys/ssys.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h \
- Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h \
@@ -43,7 +42,8 @@ build/ssys.o: Core/Inc/ssys/ssys.c Core/Inc/ssys/ssys.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h Core/Inc/main.h \
- Core/Inc/glcd/glcd.h Core/Inc/sfs/sfs.h Core/Inc/smidi/smidi.h
+ Core/Inc/glcd/glcd.h Core/Inc/sfs/sfs.h Core/Inc/smidi/smidi.h \
+ Core/Inc/sser/sser.h
 Core/Inc/ssys/ssys.h:
 Core/Inc/sinf/types.h:
 Core/Inc/sinf/serrno.h:
@@ -73,7 +73,6 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_adc.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_adc_ex.h:
-Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_comp.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h:
@@ -97,3 +96,4 @@ Core/Inc/main.h:
 Core/Inc/glcd/glcd.h:
 Core/Inc/sfs/sfs.h:
 Core/Inc/smidi/smidi.h:
+Core/Inc/sser/sser.h:

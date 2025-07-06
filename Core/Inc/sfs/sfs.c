@@ -7,11 +7,10 @@
 #include <serrno.h>
 #include <stdlib.h>
 
-u8        gSfsFirstBlockData[BLOCK_SIZE];
+u8 gSfsFirstBlockData[BLOCK_SIZE];
 
-synthErrno sfsInit()
-{
-    synthErrno ret     = sfsReadBlocks(gSfsFirstBlockData, 0, 1);
+synthErrno sfsInit() {
+    synthErrno ret = sfsReadBlocks(gSfsFirstBlockData, 0, 1);
     if (ret != SERR_OK)
     {
         return ret;
@@ -20,7 +19,6 @@ synthErrno sfsInit()
     return SERR_OK;
 }
 
-synthErrno sfsDeinit()
-{
+synthErrno sfsDeinit() {
     return SERR_OK;
 }
