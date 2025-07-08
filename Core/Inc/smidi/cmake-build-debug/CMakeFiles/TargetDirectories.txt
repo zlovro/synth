@@ -1,0 +1,3 @@
+C:/Users/Made/Documents/src/cxx/cross/synth-midi/cmake-build-debug/CMakeFiles/synth_midi.dir
+C:/Users/Made/Documents/src/cxx/cross/synth-midi/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Made/Documents/src/cxx/cross/synth-midi/cmake-build-debug/CMakeFiles/rebuild_cache.dir
