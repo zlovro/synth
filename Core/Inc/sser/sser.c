@@ -14,7 +14,7 @@
 #include "usbd_hid.h"
 // #include "usbd_cdc_if.h"
 
-void *              gSserHidAudioBuf = NULL;
+u8*              gSserHidAudioBuf = NULL;
 UART_HandleTypeDef *gSserUartDev;
 USBD_HandleTypeDef *gSserUsbDev;
 bool                gSserBusy = false;
@@ -47,7 +47,7 @@ void sserPrintf(const char *pFormat, ...) {
 
     va_end(args);
 
-    HAL_UART_Transmit_DMA(gSserUartDev, gSserPrintfBuf, len);
+    HAL_UART_Transmit_DMA(gSserUartDev, (u8*)gSserPrintfBuf, len);
 }
 
 // pLen must be a multiple of HID audio size

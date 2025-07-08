@@ -26,7 +26,7 @@ typedef struct {
 #define SSER_TX_BUF_SIZE 2048
 #define SSER_MAX_DATA_SIZE (SSER_TX_BUF_SIZE - 2 - 1 - 2 - 2)
 
-extern void* gSserHidAudioBuf;
+extern u8* gSserHidAudioBuf;
 extern u32 gSserHidAudioQueueSize;
 extern UART_HandleTypeDef* gSserUartDev;
 extern USBD_HandleTypeDef* gSserUsbDev;
