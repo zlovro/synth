@@ -33,13 +33,6 @@ void sserInitUsb(USBD_HandleTypeDef* pUsbDev) {
 }
 
 void sserPrintf(const char *pFormat, ...) {
-    if (gSserBusy)
-    {
-        return;
-    }
-
-    gSserBusy = true;
-
     va_list args;
     va_start(args, format);
 
@@ -60,7 +53,7 @@ void sserSendAudio(u8 *pDataIn, u16 pLen) {
     gSserBusy = true;
 
     gSserHidAudioBuf       = pDataIn;
-    gSserHidAudioQueueSize = SSER_HID_AUDIO_SIZE / pLen;
+    gSserHidAudioQueueSize = pLen / SSER_HID_AUDIO_SIZE;
 
     gSserHidReportBuf[0] = SSER_HID_REPORT_ID_AUDIO;
     memcpy(gSserHidReportBuf + 1, pDataIn, SSER_HID_AUDIO_SIZE);

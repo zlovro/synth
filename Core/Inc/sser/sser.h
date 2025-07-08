@@ -33,14 +33,14 @@ extern USBD_HandleTypeDef* gSserUsbDev;
 extern bool gSserBusy;
 
 #define SSER_TX_BUF_DATA (gSserTxBuf + 5)
-#define SSER_HID_AUDIO_SIZE 64
+#define SSER_HID_AUDIO_SIZE 32
 #define SSER_HID_AUDIO_REPORT_SIZE (SSER_HID_AUDIO_SIZE + 1)
 #define SSER_HID_MAX_REPORT_SIZE SSER_HID_AUDIO_REPORT_SIZE
 
 extern u8 gSserHidReportBuf[SSER_HID_MAX_REPORT_SIZE];
 
 typedef enum : u16 {
-    SSER_HID_USAGE_AUDIO,
+    SSER_HID_USAGE_AUDIO = 0xE8,
 } sserHidUsage;
 
 typedef enum : u8 {
