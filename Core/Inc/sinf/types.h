@@ -10,6 +10,10 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __arm__
+#include "arm_math.h"
+#endif
+
 #define roundUpTo(x, radix) (((x + radix - 1) / radix) * radix)
 
 typedef uint8_t  u8;

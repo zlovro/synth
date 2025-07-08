@@ -105,6 +105,10 @@ void glcdClsSoft() {
 
 void glcdInit(SD_HandleTypeDef *pSd, SPI_HandleTypeDef *pSpi, GPIO_TypeDef *pCsPort, u16 pPin) {
     HAL_Delay(50);
+    HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
+    HAL_Delay(50);
+    HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_SET);
+    HAL_Delay(50);
 
     gGlcdCsPort = pCsPort;
     gGlcdCsPin  = pPin;

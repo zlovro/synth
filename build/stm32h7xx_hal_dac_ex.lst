@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
   28:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****      [..]
   29:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****       (+) Use HAL_DACEx_DualStart() to enable both channel and start conversion
   30:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****           for dual mode operation.
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 2
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 2
 
 
   31:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****           If software trigger is selected, using HAL_DACEx_DualStart() will start
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
   85:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** /*       The delay below is specified under conditions:                       */
   86:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** /*        - DAC channel output buffer enabled                                 */
   87:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** /* Literal set to maximum value (refer to device datasheet,                   */
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 3
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 3
 
 
   88:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** /* electrical characteristics, parameter "tTRIM").                            */
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
   38 0002 50B3     		cbz	r0, .L5
  133:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   {
  134:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     return HAL_ERROR;
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 4
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 4
 
 
  135:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  151:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     tmp_swtrig |= DAC_SWTRIGR_SWTRIG1;
  152:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
  153:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   if ((hdac->Instance->CR & (DAC_CR_TEN2 | DAC_CR_TSEL2)) == (DAC_TRIGGER_SOFTWARE << (DAC_CHANNEL_
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 5
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 5
 
 
   76              		.loc 1 153 3 is_stmt 1 view .LVU18
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  155:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
  113              		.loc 1 155 16 is_stmt 0 view .LVU34
  114 0054 40F00200 		orr	r0, r0, #2
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 6
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 6
 
 
  115              	.LVL6:
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  182:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
  183:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
  184:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 7
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 7
 
 
  185:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   /* Disable the Peripheral */
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  200:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   * @param  Channel The DAC channel that will request data from DMA.
  201:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *          This parameter can be one of the following values:
  202:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            @arg DAC_CHANNEL_1: DAC Channel1 selected
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 8
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 8
 
 
  203:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            @arg DAC_CHANNEL_2: DAC Channel2 selected
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  230:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   __HAL_LOCK(hdac);
  220              		.loc 1 230 3 view .LVU61
  221              		.loc 1 230 3 view .LVU62
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 9
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 9
 
 
  222 000e 4279     		ldrb	r2, [r0, #5]	@ zero_extendqisi2
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  259              		.loc 1 247 5 is_stmt 1 view .LVU80
  260 0032 2068     		ldr	r0, [r4]
  261 0034 0268     		ldr	r2, [r0]
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 10
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 10
 
 
  262 0036 42F48052 		orr	r2, r2, #4096
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  280              		.loc 1 283 3 view .LVU86
  281              		.loc 1 283 6 is_stmt 0 view .LVU87
  282 004e 002D     		cmp	r5, #0
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 11
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 11
 
 
  283 0050 2FD1     		bne	.L19
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  313 0076 1368     		ldr	r3, [r2]
  314 0078 43F48033 		orr	r3, r3, #65536
  315 007c 1360     		str	r3, [r2]
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 12
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 12
 
 
  316              	.LVL23:
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  349              		.loc 1 272 7 view .LVU111
  272:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****       break;
  350              		.loc 1 272 31 is_stmt 0 view .LVU112
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 13
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 13
 
 
  351 009e 2068     		ldr	r0, [r4]
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  391 00c4 2369     		ldr	r3, [r4, #16]
  311:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
  392              		.loc 1 311 21 view .LVU127
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 14
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 14
 
 
  393 00c6 43F00403 		orr	r3, r3, #4
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  432              		.loc 1 329 1 is_stmt 1 view -0
  433              		.cfi_startproc
  434              		@ args = 0, pretend = 0, frame = 0
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 15
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 15
 
 
  435              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -898,7 +898,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  465              		.loc 1 352 5 is_stmt 1 view .LVU142
  466              		.loc 1 352 14 is_stmt 0 view .LVU143
  467 0026 8068     		ldr	r0, [r0, #8]
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 16
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 16
 
 
  468              	.LVL38:
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  492 003e C068     		ldr	r0, [r0, #12]
  493              	.LVL41:
  360:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 17
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 17
 
 
  494              		.loc 1 360 14 view .LVU153
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  394:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            @arg DAC_TRIANGLEAMPLITUDE_3: Select max triangle amplitude of 3
  395:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            @arg DAC_TRIANGLEAMPLITUDE_7: Select max triangle amplitude of 7
  396:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            @arg DAC_TRIANGLEAMPLITUDE_15: Select max triangle amplitude of 15
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 18
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 18
 
 
  397:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            @arg DAC_TRIANGLEAMPLITUDE_31: Select max triangle amplitude of 31
@@ -1078,7 +1078,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  423:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   hdac->State = HAL_DAC_STATE_BUSY;
  560              		.loc 1 423 3 view .LVU170
  561              		.loc 1 423 15 is_stmt 0 view .LVU171
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 19
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 19
 
 
  562 0014 0220     		movs	r0, #2
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  600 0042 7047     		bx	lr
  601              	.LVL51:
  602              	.L41:
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 20
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 20
 
 
  420:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  468:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     return HAL_ERROR;
  469:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
  470:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 21
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 21
 
 
  471:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   /* Check the parameters */
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  486:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   hdac->State = HAL_DAC_STATE_READY;
  666              		.loc 1 486 3 is_stmt 1 view .LVU202
  667              		.loc 1 486 15 is_stmt 0 view .LVU203
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 22
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 22
 
 
  668 0036 83F804E0 		strb	lr, [r3, #4]
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  501:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *          This parameter can be one of the following values:
  502:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            DAC_ALIGN_8B_R: 8bit right data alignment selected
  503:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            DAC_ALIGN_12B_L: 12bit left data alignment selected
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 23
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 23
 
 
  504:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *            DAC_ALIGN_12B_R: 12bit right data alignment selected
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  535:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
  536:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
  537:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   tmp = (uint32_t)hdac->Instance;
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 24
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 24
 
 
  730              		.loc 1 537 3 is_stmt 1 view .LVU225
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  774              	.LFB342:
  546:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
  547:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** /**
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 25
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 25
 
 
  548:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   * @brief  Conversion complete callback in non-blocking mode for Channel2.
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  583:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   * @retval None
  584:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   */
  585:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** __weak void HAL_DACEx_ErrorCallbackCh2(DAC_HandleTypeDef *hdac)
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 26
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 26
 
 
  586:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** {
@@ -1558,7 +1558,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  640:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   /* Check if DAC running */
  641:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   if ((hdac == NULL) || (sConfig == NULL))
  642:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   {
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 27
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 27
 
 
  643:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     status = HAL_ERROR;
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  697:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     }
  698:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
  699:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     /* Still need to check if right calibration is current value or one step below */
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 28
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 28
 
 
  700:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     /* Indeed the first value that causes the DAC_SR_CAL_FLAGx bit to change from 0 to 1  */
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  754:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   */
  755:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** HAL_StatusTypeDef HAL_DACEx_SetUserTrimming(DAC_HandleTypeDef *hdac, DAC_ChannelConfTypeDef *sConfi
  756:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****                                             uint32_t NewTrimmingValue)
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 29
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 29
 
 
  757:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** {
@@ -1738,7 +1738,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  811:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   *
  812:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** @verbatim
  813:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   ==============================================================================
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 30
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 30
 
 
  814:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****              ##### Peripheral Control functions #####
@@ -1798,7 +1798,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  799              		@ frame_needed = 0, uses_anonymous_args = 0
  800              		.loc 1 864 1 is_stmt 0 view .LVU243
  801 0000 10B5     		push	{r4, lr}
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 31
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 31
 
 
  802              	.LCFI7:
@@ -1858,7 +1858,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  845              	.LFE343:
  847              		.section	.text.DAC_DMAHalfConvCpltCh2,"ax",%progbits
  848              		.align	1
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 32
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 32
 
 
  849              		.global	DAC_DMAHalfConvCpltCh2
@@ -1918,7 +1918,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  889              	.LFB344:
  586:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   /* Prevent unused argument(s) compilation warning */
  890              		.loc 1 586 1 is_stmt 1 view -0
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 33
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 33
 
 
  891              		.cfi_startproc
@@ -1978,7 +1978,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  906:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** #if (USE_HAL_DAC_REGISTER_CALLBACKS == 1)
  907:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   hdac->ErrorCallbackCh2(hdac);
  908:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** #else
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 34
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 34
 
 
  909:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   HAL_DACEx_ErrorCallbackCh2(hdac);
@@ -2038,7 +2038,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  980              		@ args = 0, pretend = 0, frame = 8
  981              		@ frame_needed = 0, uses_anonymous_args = 0
  627:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 35
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 35
 
 
  982              		.loc 1 627 3 view .LVU281
@@ -2098,7 +2098,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1022 0026 0121     		movs	r1, #1
  1023              	.LVL85:
  652:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 36
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 36
 
 
  1024              		.loc 1 652 5 is_stmt 0 discriminator 2 view .LVU296
@@ -2158,7 +2158,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1064              		.loc 1 670 11 is_stmt 0 view .LVU310
  1065 0064 0821     		movs	r1, #8
  669:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     delta = 0x08UL;
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 37
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 37
 
 
  1066              		.loc 1 669 19 view .LVU311
@@ -2218,7 +2218,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1106 0092 9740     		lsls	r7, r7, r2
  1107 0094 23EA0703 		bic	r3, r3, r7
  1108 0098 00FA02F7 		lsl	r7, r0, r2
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 38
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 38
 
 
  1109 009c 3B43     		orrs	r3, r3, r7
@@ -2278,7 +2278,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1150 00dc 1B68     		ldr	r3, [r3]
  1151 00de 9B09     		lsrs	r3, r3, #6
  1152 00e0 1D4F     		ldr	r7, .L91+4
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 39
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 39
 
 
  1153 00e2 A7FB0373 		umull	r7, r3, r7, r3
@@ -2338,7 +2338,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1191              		.loc 1 723 7 is_stmt 1 view .LVU354
  1192 0110 BB6B     		ldr	r3, [r7, #56]
  1193 0112 0B40     		ands	r3, r3, r1
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 40
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 40
 
 
  1194 0114 00FA02F2 		lsl	r2, r0, r2
@@ -2398,7 +2398,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1238              		.cfi_restore 8
  1239              		.cfi_restore 14
  643:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   }
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 41
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 41
 
 
  1240              		.loc 1 643 12 view .LVU365
@@ -2458,7 +2458,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1289              		.loc 1 758 3 view .LVU372
  761:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   assert_param(IS_DAC_NEWTRIMMINGVALUE(NewTrimmingValue));
  1290              		.loc 1 761 3 view .LVU373
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 42
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 42
 
 
  762:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
@@ -2518,7 +2518,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1332              		.loc 1 778 5 is_stmt 1 view .LVU386
  778:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****     sConfig->DAC_TrimmingValue = NewTrimmingValue;
  1333              		.loc 1 778 31 is_stmt 0 view .LVU387
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 43
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 43
 
 
  1334 0030 CEF81040 		str	r4, [lr, #16]
@@ -2578,7 +2578,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1381              	.LVL113:
  1382              	.LFB348:
  797:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c ****   /* Check the parameter */
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 44
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 44
 
 
  1383              		.loc 1 797 1 is_stmt 1 view -0
@@ -2638,7 +2638,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1427 0000 0368     		ldr	r3, [r0]
  834:Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dac_ex.c **** 
  1428              		.loc 1 834 24 view .LVU410
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 45
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 45
 
 
  1429 0002 DA6A     		ldr	r2, [r3, #44]
@@ -2669,49 +2669,49 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 1
  1450              		.file 6 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
  1451              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dac.h"
  1452              		.file 8 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h"
-ARM GAS  C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s 			page 46
+ARM GAS  C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s 			page 46
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stm32h7xx_hal_dac_ex.c
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:20     .text.HAL_DACEx_DualStart:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:26     .text.HAL_DACEx_DualStart:00000000 HAL_DACEx_DualStart
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:136    .text.HAL_DACEx_DualStop:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:142    .text.HAL_DACEx_DualStop:00000000 HAL_DACEx_DualStop
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:184    .text.HAL_DACEx_DualStart_DMA:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:190    .text.HAL_DACEx_DualStart_DMA:00000000 HAL_DACEx_DualStart_DMA
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:413    .text.HAL_DACEx_DualStart_DMA:000000d8 $d
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:793    .text.DAC_DMAConvCpltCh2:00000000 DAC_DMAConvCpltCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:854    .text.DAC_DMAHalfConvCpltCh2:00000000 DAC_DMAHalfConvCpltCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:908    .text.DAC_DMAErrorCh2:00000000 DAC_DMAErrorCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:423    .text.HAL_DACEx_DualStop_DMA:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:429    .text.HAL_DACEx_DualStop_DMA:00000000 HAL_DACEx_DualStop_DMA
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:524    .text.HAL_DACEx_TriangleWaveGenerate:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:530    .text.HAL_DACEx_TriangleWaveGenerate:00000000 HAL_DACEx_TriangleWaveGenerate
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:611    .text.HAL_DACEx_NoiseWaveGenerate:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:617    .text.HAL_DACEx_NoiseWaveGenerate:00000000 HAL_DACEx_NoiseWaveGenerate
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:698    .text.HAL_DACEx_DualSetValue:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:704    .text.HAL_DACEx_DualSetValue:00000000 HAL_DACEx_DualSetValue
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:766    .text.HAL_DACEx_ConvCpltCallbackCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:772    .text.HAL_DACEx_ConvCpltCallbackCh2:00000000 HAL_DACEx_ConvCpltCallbackCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:787    .text.DAC_DMAConvCpltCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:827    .text.HAL_DACEx_ConvHalfCpltCallbackCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:833    .text.HAL_DACEx_ConvHalfCpltCallbackCh2:00000000 HAL_DACEx_ConvHalfCpltCallbackCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:848    .text.DAC_DMAHalfConvCpltCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:881    .text.HAL_DACEx_ErrorCallbackCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:887    .text.HAL_DACEx_ErrorCallbackCh2:00000000 HAL_DACEx_ErrorCallbackCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:902    .text.DAC_DMAErrorCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:948    .text.HAL_DACEx_DMAUnderrunCallbackCh2:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:954    .text.HAL_DACEx_DMAUnderrunCallbackCh2:00000000 HAL_DACEx_DMAUnderrunCallbackCh2
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:969    .text.HAL_DACEx_SelfCalibrate:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:975    .text.HAL_DACEx_SelfCalibrate:00000000 HAL_DACEx_SelfCalibrate
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1270   .text.HAL_DACEx_SelfCalibrate:00000154 $d
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1276   .text.HAL_DACEx_SetUserTrimming:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1282   .text.HAL_DACEx_SetUserTrimming:00000000 HAL_DACEx_SetUserTrimming
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1374   .text.HAL_DACEx_GetTrimOffset:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1380   .text.HAL_DACEx_GetTrimOffset:00000000 HAL_DACEx_GetTrimOffset
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1410   .text.HAL_DACEx_DualGetValue:00000000 $t
-C:\Users\Made\AppData\Local\Temp\ccyFYcU1.s:1416   .text.HAL_DACEx_DualGetValue:00000000 HAL_DACEx_DualGetValue
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:20     .text.HAL_DACEx_DualStart:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:26     .text.HAL_DACEx_DualStart:00000000 HAL_DACEx_DualStart
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:136    .text.HAL_DACEx_DualStop:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:142    .text.HAL_DACEx_DualStop:00000000 HAL_DACEx_DualStop
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:184    .text.HAL_DACEx_DualStart_DMA:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:190    .text.HAL_DACEx_DualStart_DMA:00000000 HAL_DACEx_DualStart_DMA
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:413    .text.HAL_DACEx_DualStart_DMA:000000d8 $d
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:793    .text.DAC_DMAConvCpltCh2:00000000 DAC_DMAConvCpltCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:854    .text.DAC_DMAHalfConvCpltCh2:00000000 DAC_DMAHalfConvCpltCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:908    .text.DAC_DMAErrorCh2:00000000 DAC_DMAErrorCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:423    .text.HAL_DACEx_DualStop_DMA:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:429    .text.HAL_DACEx_DualStop_DMA:00000000 HAL_DACEx_DualStop_DMA
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:524    .text.HAL_DACEx_TriangleWaveGenerate:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:530    .text.HAL_DACEx_TriangleWaveGenerate:00000000 HAL_DACEx_TriangleWaveGenerate
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:611    .text.HAL_DACEx_NoiseWaveGenerate:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:617    .text.HAL_DACEx_NoiseWaveGenerate:00000000 HAL_DACEx_NoiseWaveGenerate
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:698    .text.HAL_DACEx_DualSetValue:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:704    .text.HAL_DACEx_DualSetValue:00000000 HAL_DACEx_DualSetValue
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:766    .text.HAL_DACEx_ConvCpltCallbackCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:772    .text.HAL_DACEx_ConvCpltCallbackCh2:00000000 HAL_DACEx_ConvCpltCallbackCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:787    .text.DAC_DMAConvCpltCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:827    .text.HAL_DACEx_ConvHalfCpltCallbackCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:833    .text.HAL_DACEx_ConvHalfCpltCallbackCh2:00000000 HAL_DACEx_ConvHalfCpltCallbackCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:848    .text.DAC_DMAHalfConvCpltCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:881    .text.HAL_DACEx_ErrorCallbackCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:887    .text.HAL_DACEx_ErrorCallbackCh2:00000000 HAL_DACEx_ErrorCallbackCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:902    .text.DAC_DMAErrorCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:948    .text.HAL_DACEx_DMAUnderrunCallbackCh2:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:954    .text.HAL_DACEx_DMAUnderrunCallbackCh2:00000000 HAL_DACEx_DMAUnderrunCallbackCh2
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:969    .text.HAL_DACEx_SelfCalibrate:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:975    .text.HAL_DACEx_SelfCalibrate:00000000 HAL_DACEx_SelfCalibrate
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1270   .text.HAL_DACEx_SelfCalibrate:00000154 $d
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1276   .text.HAL_DACEx_SetUserTrimming:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1282   .text.HAL_DACEx_SetUserTrimming:00000000 HAL_DACEx_SetUserTrimming
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1374   .text.HAL_DACEx_GetTrimOffset:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1380   .text.HAL_DACEx_GetTrimOffset:00000000 HAL_DACEx_GetTrimOffset
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1410   .text.HAL_DACEx_DualGetValue:00000000 $t
+C:\Users\Made\AppData\Local\Temp\ccvC7T8b.s:1416   .text.HAL_DACEx_DualGetValue:00000000 HAL_DACEx_DualGetValue
 
 UNDEFINED SYMBOLS
 HAL_DMA_Start_IT

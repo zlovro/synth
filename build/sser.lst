@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 1
 
 
    1              		.cpu cortex-m7
@@ -38,32 +38,38 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
    8:Core/Inc/sser/sser.c **** #include <stdio.h>
    9:Core/Inc/sser/sser.c **** #include <string.h>
   10:Core/Inc/sser/sser.c **** 
-  11:Core/Inc/sser/sser.c **** u8                  gSserTxBuf[SSER_TX_BUF_SIZE] = {};
-  12:Core/Inc/sser/sser.c **** u16                 gSserTxOffset                = 0;
-  13:Core/Inc/sser/sser.c **** sserMsg             gSserMsg                     = {};
-  14:Core/Inc/sser/sser.c **** UART_HandleTypeDef *gSserUart                     = NULL;
-  15:Core/Inc/sser/sser.c **** 
-  16:Core/Inc/sser/sser.c **** void sserInit(UART_HandleTypeDef *pDev) {
-  29              		.loc 1 16 41 view -0
+  11:Core/Inc/sser/sser.c **** #include "main.h"
+  12:Core/Inc/sser/sser.c **** #include "stm32h7xx_hal.h"
+  13:Core/Inc/sser/sser.c **** // #include "usbd_cdc_if.h"
+  14:Core/Inc/sser/sser.c **** 
+  15:Core/Inc/sser/sser.c **** u8      gSserTxBuf[SSER_TX_BUF_SIZE] = {};
+  16:Core/Inc/sser/sser.c **** u16     gSserTxOffset                = 0;
+  17:Core/Inc/sser/sser.c **** sserMsg gSserMsg                     = {};
+  18:Core/Inc/sser/sser.c **** UART_HandleTypeDef* gUartDev;
+  19:Core/Inc/sser/sser.c **** bool gSserBusy = false;
+  20:Core/Inc/sser/sser.c **** u32 gSserDiscarded = 0;
+  21:Core/Inc/sser/sser.c **** 
+  22:Core/Inc/sser/sser.c **** void sserInit(UART_HandleTypeDef* pDev) {
+  29              		.loc 1 22 41 view -0
   30              		.cfi_startproc
   31              		@ args = 0, pretend = 0, frame = 0
   32              		@ frame_needed = 0, uses_anonymous_args = 0
   33              		@ link register save eliminated.
-  17:Core/Inc/sser/sser.c ****     gSserUart = pDev;
-  34              		.loc 1 17 5 view .LVU1
-  35              		.loc 1 17 15 is_stmt 0 view .LVU2
+  23:Core/Inc/sser/sser.c ****     gUartDev = pDev;
+  34              		.loc 1 23 5 view .LVU1
+  35              		.loc 1 23 14 is_stmt 0 view .LVU2
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 2
+
+
   36 0000 014B     		ldr	r3, .L2
   37 0002 1860     		str	r0, [r3]
-  18:Core/Inc/sser/sser.c **** }
-  38              		.loc 1 18 1 view .LVU3
+  24:Core/Inc/sser/sser.c **** }
+  38              		.loc 1 24 1 view .LVU3
   39 0004 7047     		bx	lr
   40              	.L3:
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 2
-
-
   41 0006 00BF     		.align	2
   42              	.L2:
-  43 0008 00000000 		.word	gSserUart
+  43 0008 00000000 		.word	gUartDev
   44              		.cfi_endproc
   45              	.LFE338:
   47              		.section	.text.sserSendMsg,"ax",%progbits
@@ -74,9 +80,9 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
   52              		.thumb_func
   54              	sserSendMsg:
   55              	.LFB339:
-  19:Core/Inc/sser/sser.c **** 
-  20:Core/Inc/sser/sser.c **** void sserSendMsg() {
-  56              		.loc 1 20 20 is_stmt 1 view -0
+  25:Core/Inc/sser/sser.c **** 
+  26:Core/Inc/sser/sser.c **** void sserSendMsg() {
+  56              		.loc 1 26 20 is_stmt 1 view -0
   57              		.cfi_startproc
   58              		@ args = 0, pretend = 0, frame = 0
   59              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -85,64 +91,64 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
   62              		.cfi_def_cfa_offset 8
   63              		.cfi_offset 3, -8
   64              		.cfi_offset 14, -4
-  21:Core/Inc/sser/sser.c ****     gSserTxOffset = 0;
-  65              		.loc 1 21 5 view .LVU5
-  66              		.loc 1 21 19 is_stmt 0 view .LVU6
+  27:Core/Inc/sser/sser.c ****     gSserTxOffset = 0;
+  65              		.loc 1 27 5 view .LVU5
+  66              		.loc 1 27 19 is_stmt 0 view .LVU6
   67 0002 104B     		ldr	r3, .L6
   68 0004 0022     		movs	r2, #0
   69 0006 1A80     		strh	r2, [r3]	@ movhi
-  22:Core/Inc/sser/sser.c **** 
-  23:Core/Inc/sser/sser.c ****     sserTxWrite(SSER_MSG_START, u16);
-  70              		.loc 1 23 5 is_stmt 1 view .LVU7
+  28:Core/Inc/sser/sser.c **** 
+  29:Core/Inc/sser/sser.c ****     sserTxWrite(SSER_MSG_START, u16);
+  70              		.loc 1 29 5 is_stmt 1 view .LVU7
   71 0008 0F49     		ldr	r1, .L6+4
   72 000a 4AF2A002 		movw	r2, #41120
   73 000e 0A80     		strh	r2, [r1]	@ movhi
-  74              		.loc 1 23 5 view .LVU8
+  74              		.loc 1 29 5 view .LVU8
   75 0010 0222     		movs	r2, #2
   76 0012 1A80     		strh	r2, [r3]	@ movhi
-  24:Core/Inc/sser/sser.c ****     sserTxWrite(gSserMsg.id, u8);
-  77              		.loc 1 24 5 view .LVU9
+  30:Core/Inc/sser/sser.c ****     sserTxWrite(gSserMsg.id, u8);
+  77              		.loc 1 30 5 view .LVU9
   78 0014 0D4A     		ldr	r2, .L6+8
   79 0016 1078     		ldrb	r0, [r2]	@ zero_extendqisi2
   80 0018 8870     		strb	r0, [r1, #2]
-  81              		.loc 1 24 5 view .LVU10
+  81              		.loc 1 30 5 view .LVU10
   82 001a 0320     		movs	r0, #3
   83 001c 1880     		strh	r0, [r3]	@ movhi
-  25:Core/Inc/sser/sser.c ****     sserTxWrite(gSserMsg.len, u16);
-  84              		.loc 1 25 5 view .LVU11
+  31:Core/Inc/sser/sser.c ****     sserTxWrite(gSserMsg.len, u16);
+  84              		.loc 1 31 5 view .LVU11
   85 001e 5288     		ldrh	r2, [r2, #2]
   86 0020 A1F80320 		strh	r2, [r1, #3]	@ unaligned
-  87              		.loc 1 25 5 view .LVU12
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 3
+
+
+  87              		.loc 1 31 5 view .LVU12
   88 0024 0520     		movs	r0, #5
   89 0026 1880     		strh	r0, [r3]	@ movhi
-  26:Core/Inc/sser/sser.c **** 
-  27:Core/Inc/sser/sser.c ****     gSserTxOffset += gSserMsg.len;
-  90              		.loc 1 27 5 view .LVU13
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 3
-
-
-  91              		.loc 1 27 19 is_stmt 0 view .LVU14
+  32:Core/Inc/sser/sser.c **** 
+  33:Core/Inc/sser/sser.c ****     gSserTxOffset += gSserMsg.len;
+  90              		.loc 1 33 5 view .LVU13
+  91              		.loc 1 33 19 is_stmt 0 view .LVU14
   92 0028 0244     		add	r2, r2, r0
   93 002a 92B2     		uxth	r2, r2
   94 002c 1A80     		strh	r2, [r3]	@ movhi
-  28:Core/Inc/sser/sser.c **** 
-  29:Core/Inc/sser/sser.c ****     sserTxWrite(SSER_MSG_END, u16);
-  95              		.loc 1 29 5 is_stmt 1 view .LVU15
+  34:Core/Inc/sser/sser.c **** 
+  35:Core/Inc/sser/sser.c ****     sserTxWrite(SSER_MSG_END, u16);
+  95              		.loc 1 35 5 is_stmt 1 view .LVU15
   96 002e 4EF2E000 		movw	r0, #57568
   97 0032 8852     		strh	r0, [r1, r2]	@ movhi
-  98              		.loc 1 29 5 view .LVU16
+  98              		.loc 1 35 5 view .LVU16
   99 0034 0232     		adds	r2, r2, #2
  100 0036 92B2     		uxth	r2, r2
  101 0038 1A80     		strh	r2, [r3]	@ movhi
-  30:Core/Inc/sser/sser.c **** 
-  31:Core/Inc/sser/sser.c ****     HAL_UART_Transmit_DMA(gSserUart, gSserTxBuf, gSserTxOffset);
- 102              		.loc 1 31 5 view .LVU17
+  36:Core/Inc/sser/sser.c **** 
+  37:Core/Inc/sser/sser.c ****     HAL_UART_Transmit_DMA(gUartDev, gSserTxBuf, gSserTxOffset);
+ 102              		.loc 1 37 5 view .LVU17
  103 003a 054B     		ldr	r3, .L6+12
  104 003c 1868     		ldr	r0, [r3]
  105 003e FFF7FEFF 		bl	HAL_UART_Transmit_DMA
  106              	.LVL1:
-  32:Core/Inc/sser/sser.c **** }
- 107              		.loc 1 32 1 is_stmt 0 view .LVU18
+  38:Core/Inc/sser/sser.c **** }
+ 107              		.loc 1 38 1 is_stmt 0 view .LVU18
  108 0042 08BD     		pop	{r3, pc}
  109              	.L7:
  110              		.align	2
@@ -150,7 +156,7 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
  112 0044 00000000 		.word	gSserTxOffset
  113 0048 00000000 		.word	gSserTxBuf
  114 004c 00000000 		.word	gSserMsg
- 115 0050 00000000 		.word	gSserUart
+ 115 0050 00000000 		.word	gUartDev
  116              		.cfi_endproc
  117              	.LFE339:
  119              		.section	.text.sserParseMsg,"ax",%progbits
@@ -162,119 +168,119 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
  126              	sserParseMsg:
  127              	.LVL2:
  128              	.LFB340:
-  33:Core/Inc/sser/sser.c **** 
-  34:Core/Inc/sser/sser.c **** void sserParseMsg(u8 *pDataIn) {
- 129              		.loc 1 34 32 is_stmt 1 view -0
+  39:Core/Inc/sser/sser.c **** 
+  40:Core/Inc/sser/sser.c **** void sserParseMsg(u8 *pDataIn) {
+ 129              		.loc 1 40 32 is_stmt 1 view -0
  130              		.cfi_startproc
  131              		@ args = 0, pretend = 0, frame = 0
  132              		@ frame_needed = 0, uses_anonymous_args = 0
  133              		@ link register save eliminated.
- 134              		.loc 1 34 32 is_stmt 0 view .LVU20
+ 134              		.loc 1 40 32 is_stmt 0 view .LVU20
  135 0000 10B4     		push	{r4}
  136              	.LCFI1:
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 4
+
+
  137              		.cfi_def_cfa_offset 4
  138              		.cfi_offset 4, -4
-  35:Core/Inc/sser/sser.c ****     gSserTxOffset = 0;
- 139              		.loc 1 35 5 is_stmt 1 view .LVU21
- 140              		.loc 1 35 19 is_stmt 0 view .LVU22
+  41:Core/Inc/sser/sser.c ****     gSserTxOffset = 0;
+ 139              		.loc 1 41 5 is_stmt 1 view .LVU21
+ 140              		.loc 1 41 19 is_stmt 0 view .LVU22
  141 0002 134A     		ldr	r2, .L12
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 4
-
-
  142 0004 0023     		movs	r3, #0
  143 0006 1380     		strh	r3, [r2]	@ movhi
-  36:Core/Inc/sser/sser.c **** 
-  37:Core/Inc/sser/sser.c ****     u16 _ = sserRead(pDataIn, u16);
- 144              		.loc 1 37 5 is_stmt 1 view .LVU23
+  42:Core/Inc/sser/sser.c **** 
+  43:Core/Inc/sser/sser.c ****     u16 _ = sserRead(pDataIn, u16);
+ 144              		.loc 1 43 5 is_stmt 1 view .LVU23
  145              	.LVL3:
- 146              		.loc 1 37 13 view .LVU24
+ 146              		.loc 1 43 13 view .LVU24
  147 0008 0221     		movs	r1, #2
  148 000a 1180     		strh	r1, [r2]	@ movhi
  149              	.LVL4:
-  38:Core/Inc/sser/sser.c **** 
-  39:Core/Inc/sser/sser.c ****     gSserMsg.id  = sserRead(pDataIn, u8);
- 150              		.loc 1 39 5 view .LVU25
- 151              		.loc 1 39 20 is_stmt 0 view .LVU26
+  44:Core/Inc/sser/sser.c **** 
+  45:Core/Inc/sser/sser.c ****     gSserMsg.id  = sserRead(pDataIn, u8);
+ 150              		.loc 1 45 5 view .LVU25
+ 151              		.loc 1 45 20 is_stmt 0 view .LVU26
  152 000c 8478     		ldrb	r4, [r0, #2]	@ zero_extendqisi2
- 153              		.loc 1 39 18 view .LVU27
+ 153              		.loc 1 45 18 view .LVU27
  154 000e 1149     		ldr	r1, .L12+4
  155 0010 0C70     		strb	r4, [r1]
- 156              		.loc 1 39 20 is_stmt 1 view .LVU28
+ 156              		.loc 1 45 20 is_stmt 1 view .LVU28
  157 0012 0324     		movs	r4, #3
  158 0014 1480     		strh	r4, [r2]	@ movhi
-  40:Core/Inc/sser/sser.c ****     gSserMsg.len = sserRead(pDataIn, u16);
- 159              		.loc 1 40 5 view .LVU29
- 160              		.loc 1 40 20 is_stmt 0 view .LVU30
+  46:Core/Inc/sser/sser.c ****     gSserMsg.len = sserRead(pDataIn, u16);
+ 159              		.loc 1 46 5 view .LVU29
+ 160              		.loc 1 46 20 is_stmt 0 view .LVU30
  161 0016 B0F80340 		ldrh	r4, [r0, #3]
- 162              		.loc 1 40 18 view .LVU31
+ 162              		.loc 1 46 18 view .LVU31
  163 001a 4C80     		strh	r4, [r1, #2]	@ movhi
- 164              		.loc 1 40 20 is_stmt 1 view .LVU32
+ 164              		.loc 1 46 20 is_stmt 1 view .LVU32
  165 001c 0521     		movs	r1, #5
  166 001e 1180     		strh	r1, [r2]	@ movhi
-  41:Core/Inc/sser/sser.c **** 
-  42:Core/Inc/sser/sser.c ****     for (int i = 0; i < gSserMsg.len; ++i)
- 167              		.loc 1 42 5 view .LVU33
+  47:Core/Inc/sser/sser.c **** 
+  48:Core/Inc/sser/sser.c ****     for (int i = 0; i < gSserMsg.len; ++i)
+ 167              		.loc 1 48 5 view .LVU33
  168              	.LBB2:
- 169              		.loc 1 42 10 view .LVU34
+ 169              		.loc 1 48 10 view .LVU34
  170              	.LVL5:
- 171              		.loc 1 42 5 is_stmt 0 view .LVU35
+ 171              		.loc 1 48 5 is_stmt 0 view .LVU35
  172 0020 0BE0     		b	.L9
  173              	.LVL6:
  174              	.L10:
-  43:Core/Inc/sser/sser.c ****     {
-  44:Core/Inc/sser/sser.c ****         SSER_TX_BUF_DATA[i] = sserRead(pDataIn, u8);
- 175              		.loc 1 44 9 is_stmt 1 view .LVU36
- 176              		.loc 1 44 31 is_stmt 0 view .LVU37
+  49:Core/Inc/sser/sser.c ****     {
+  50:Core/Inc/sser/sser.c ****         SSER_TX_BUF_DATA[i] = sserRead(pDataIn, u8);
+ 175              		.loc 1 50 9 is_stmt 1 view .LVU36
+ 176              		.loc 1 50 31 is_stmt 0 view .LVU37
  177 0022 0B4A     		ldr	r2, .L12
  178 0024 1488     		ldrh	r4, [r2]
- 179              		.loc 1 44 25 view .LVU38
+ 179              		.loc 1 50 25 view .LVU38
  180 0026 591D     		adds	r1, r3, #5
- 181              		.loc 1 44 31 view .LVU39
+ 181              		.loc 1 50 31 view .LVU39
  182 0028 10F804C0 		ldrb	ip, [r0, r4]	@ zero_extendqisi2
- 183              		.loc 1 44 29 view .LVU40
+ 183              		.loc 1 50 29 view .LVU40
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 5
+
+
  184 002c 0A4C     		ldr	r4, .L12+8
  185 002e 04F801C0 		strb	ip, [r4, r1]
- 186              		.loc 1 44 31 is_stmt 1 view .LVU41
+ 186              		.loc 1 50 31 is_stmt 1 view .LVU41
  187 0032 1188     		ldrh	r1, [r2]
  188 0034 0131     		adds	r1, r1, #1
  189 0036 1180     		strh	r1, [r2]	@ movhi
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 5
-
-
-  42:Core/Inc/sser/sser.c ****     {
- 190              		.loc 1 42 39 discriminator 3 view .LVU42
+  48:Core/Inc/sser/sser.c ****     {
+ 190              		.loc 1 48 39 discriminator 3 view .LVU42
  191 0038 0133     		adds	r3, r3, #1
  192              	.LVL7:
  193              	.L9:
-  42:Core/Inc/sser/sser.c ****     {
- 194              		.loc 1 42 23 discriminator 1 view .LVU43
-  42:Core/Inc/sser/sser.c ****     {
- 195              		.loc 1 42 33 is_stmt 0 discriminator 1 view .LVU44
+  48:Core/Inc/sser/sser.c ****     {
+ 194              		.loc 1 48 23 discriminator 1 view .LVU43
+  48:Core/Inc/sser/sser.c ****     {
+ 195              		.loc 1 48 33 is_stmt 0 discriminator 1 view .LVU44
  196 003a 064A     		ldr	r2, .L12+4
  197 003c 5288     		ldrh	r2, [r2, #2]
-  42:Core/Inc/sser/sser.c ****     {
- 198              		.loc 1 42 23 discriminator 1 view .LVU45
+  48:Core/Inc/sser/sser.c ****     {
+ 198              		.loc 1 48 23 discriminator 1 view .LVU45
  199 003e 9A42     		cmp	r2, r3
  200 0040 EFDC     		bgt	.L10
  201              	.LBE2:
-  45:Core/Inc/sser/sser.c ****     }
-  46:Core/Inc/sser/sser.c **** 
-  47:Core/Inc/sser/sser.c ****     _ = sserRead(pDataIn, u16);
- 202              		.loc 1 47 5 is_stmt 1 view .LVU46
- 203              		.loc 1 47 9 is_stmt 0 view .LVU47
+  51:Core/Inc/sser/sser.c ****     }
+  52:Core/Inc/sser/sser.c **** 
+  53:Core/Inc/sser/sser.c ****     _ = sserRead(pDataIn, u16);
+ 202              		.loc 1 53 5 is_stmt 1 view .LVU46
+ 203              		.loc 1 53 9 is_stmt 0 view .LVU47
  204 0042 034A     		ldr	r2, .L12
  205 0044 1388     		ldrh	r3, [r2]
  206              	.LVL8:
- 207              		.loc 1 47 9 is_stmt 1 view .LVU48
+ 207              		.loc 1 53 9 is_stmt 1 view .LVU48
  208 0046 0233     		adds	r3, r3, #2
  209              	.LVL9:
- 210              		.loc 1 47 9 is_stmt 0 view .LVU49
+ 210              		.loc 1 53 9 is_stmt 0 view .LVU49
  211 0048 1380     		strh	r3, [r2]	@ movhi
  212              	.LVL10:
-  48:Core/Inc/sser/sser.c ****     UNUSED(_);
- 213              		.loc 1 48 5 is_stmt 1 view .LVU50
-  49:Core/Inc/sser/sser.c **** }
- 214              		.loc 1 49 1 is_stmt 0 view .LVU51
+  54:Core/Inc/sser/sser.c ****     UNUSED(_);
+ 213              		.loc 1 54 5 is_stmt 1 view .LVU50
+  55:Core/Inc/sser/sser.c **** }
+ 214              		.loc 1 55 1 is_stmt 0 view .LVU51
  215 004a 5DF8044B 		ldr	r4, [sp], #4
  216              	.LCFI2:
  217              		.cfi_restore 4
@@ -292,21 +298,21 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
  230              		.align	1
  231              		.global	sserPrintf
  232              		.syntax unified
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 6
+
+
  233              		.thumb
  234              		.thumb_func
  236              	sserPrintf:
  237              	.LVL11:
  238              	.LFB341:
-  50:Core/Inc/sser/sser.c **** 
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 6
-
-
-  51:Core/Inc/sser/sser.c **** void sserPrintf(const char *pFormat, ...) {
- 239              		.loc 1 51 43 is_stmt 1 view -0
+  56:Core/Inc/sser/sser.c **** 
+  57:Core/Inc/sser/sser.c **** void sserPrintf(const char *pFormat, ...) {
+ 239              		.loc 1 57 43 is_stmt 1 view -0
  240              		.cfi_startproc
  241              		@ args = 4, pretend = 16, frame = 8
  242              		@ frame_needed = 0, uses_anonymous_args = 1
- 243              		.loc 1 51 43 is_stmt 0 view .LVU53
+ 243              		.loc 1 57 43 is_stmt 0 view .LVU53
  244 0000 0FB4     		push	{r0, r1, r2, r3}
  245              	.LCFI3:
  246              		.cfi_def_cfa_offset 16
@@ -321,197 +327,302 @@ ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 1
  255 0004 83B0     		sub	sp, sp, #12
  256              	.LCFI5:
  257              		.cfi_def_cfa_offset 32
- 258 0006 04AA     		add	r2, sp, #16
- 259 0008 52F8041B 		ldr	r1, [r2], #4
-  52:Core/Inc/sser/sser.c ****     va_list args;
- 260              		.loc 1 52 5 is_stmt 1 view .LVU54
-  53:Core/Inc/sser/sser.c ****     va_start(args, format);
- 261              		.loc 1 53 5 view .LVU55
- 262 000c 0192     		str	r2, [sp, #4]
-  54:Core/Inc/sser/sser.c **** 
-  55:Core/Inc/sser/sser.c ****     int len = vsprintf((str) SSER_TX_BUF_DATA, pFormat, args);
- 263              		.loc 1 55 5 view .LVU56
- 264              		.loc 1 55 15 is_stmt 0 view .LVU57
- 265 000e 0748     		ldr	r0, .L16
- 266 0010 FFF7FEFF 		bl	vsprintf
- 267              	.LVL12:
-  56:Core/Inc/sser/sser.c **** 
-  57:Core/Inc/sser/sser.c ****     va_end(args);
- 268              		.loc 1 57 5 is_stmt 1 view .LVU58
-  58:Core/Inc/sser/sser.c **** 
-  59:Core/Inc/sser/sser.c ****     gSserMsg.id  = SSER_MSG_ID_CONSOLE;
- 269              		.loc 1 59 5 view .LVU59
- 270              		.loc 1 59 18 is_stmt 0 view .LVU60
- 271 0014 064B     		ldr	r3, .L16+4
- 272 0016 0022     		movs	r2, #0
- 273 0018 1A70     		strb	r2, [r3]
-  60:Core/Inc/sser/sser.c ****     gSserMsg.len = len;
- 274              		.loc 1 60 5 is_stmt 1 view .LVU61
- 275              		.loc 1 60 18 is_stmt 0 view .LVU62
- 276 001a 5880     		strh	r0, [r3, #2]	@ movhi
-  61:Core/Inc/sser/sser.c ****     sserSendMsg();
- 277              		.loc 1 61 5 is_stmt 1 view .LVU63
- 278 001c FFF7FEFF 		bl	sserSendMsg
- 279              	.LVL13:
-  62:Core/Inc/sser/sser.c **** }
- 280              		.loc 1 62 1 is_stmt 0 view .LVU64
- 281 0020 03B0     		add	sp, sp, #12
- 282              	.LCFI6:
- 283              		.cfi_def_cfa_offset 20
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 7
-
-
- 284              		@ sp needed
- 285 0022 5DF804EB 		ldr	lr, [sp], #4
- 286              	.LCFI7:
- 287              		.cfi_restore 14
- 288              		.cfi_def_cfa_offset 16
- 289 0026 04B0     		add	sp, sp, #16
- 290              	.LCFI8:
- 291              		.cfi_restore 3
- 292              		.cfi_restore 2
- 293              		.cfi_restore 1
- 294              		.cfi_restore 0
- 295              		.cfi_def_cfa_offset 0
- 296 0028 7047     		bx	lr
- 297              	.L17:
- 298 002a 00BF     		.align	2
- 299              	.L16:
- 300 002c 05000000 		.word	gSserTxBuf+5
- 301 0030 00000000 		.word	gSserMsg
- 302              		.cfi_endproc
- 303              	.LFE341:
- 305              		.section	.text.sserSendAudio,"ax",%progbits
- 306              		.align	1
- 307              		.global	sserSendAudio
- 308              		.syntax unified
- 309              		.thumb
- 310              		.thumb_func
- 312              	sserSendAudio:
- 313              	.LVL14:
- 314              	.LFB342:
-  63:Core/Inc/sser/sser.c **** 
-  64:Core/Inc/sser/sser.c **** void sserSendAudio(u8 *pDataIn, u16 pLen) {
- 315              		.loc 1 64 43 is_stmt 1 view -0
- 316              		.cfi_startproc
- 317              		@ args = 0, pretend = 0, frame = 0
- 318              		@ frame_needed = 0, uses_anonymous_args = 0
- 319              		.loc 1 64 43 is_stmt 0 view .LVU66
- 320 0000 08B5     		push	{r3, lr}
- 321              	.LCFI9:
- 322              		.cfi_def_cfa_offset 8
- 323              		.cfi_offset 3, -8
- 324              		.cfi_offset 14, -4
- 325 0002 0A46     		mov	r2, r1
-  65:Core/Inc/sser/sser.c ****     gSserMsg.id  = SSER_MSG_ID_AUDIO;
- 326              		.loc 1 65 5 is_stmt 1 view .LVU67
- 327              		.loc 1 65 18 is_stmt 0 view .LVU68
- 328 0004 054B     		ldr	r3, .L20
- 329 0006 0121     		movs	r1, #1
- 330              	.LVL15:
- 331              		.loc 1 65 18 view .LVU69
- 332 0008 1970     		strb	r1, [r3]
-  66:Core/Inc/sser/sser.c ****     gSserMsg.len = pLen;
- 333              		.loc 1 66 5 is_stmt 1 view .LVU70
- 334              		.loc 1 66 18 is_stmt 0 view .LVU71
- 335 000a 5A80     		strh	r2, [r3, #2]	@ movhi
+  58:Core/Inc/sser/sser.c ****     if (gSserBusy)
+ 258              		.loc 1 58 5 is_stmt 1 view .LVU54
+ 259              		.loc 1 58 9 is_stmt 0 view .LVU55
+ 260 0006 0C4B     		ldr	r3, .L19
+ 261 0008 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 262              		.loc 1 58 8 view .LVU56
+ 263 000a 23B1     		cbz	r3, .L18
+ 264              	.L14:
+  59:Core/Inc/sser/sser.c ****     {
+  60:Core/Inc/sser/sser.c ****         return;
+  61:Core/Inc/sser/sser.c ****     }
+  62:Core/Inc/sser/sser.c **** 
+  63:Core/Inc/sser/sser.c ****     gSserBusy = true;
+  64:Core/Inc/sser/sser.c **** 
+  65:Core/Inc/sser/sser.c ****     va_list args;
+  66:Core/Inc/sser/sser.c ****     va_start(args, format);
   67:Core/Inc/sser/sser.c **** 
-  68:Core/Inc/sser/sser.c ****     memcpy(SSER_TX_BUF_DATA, pDataIn, gSserMsg.len);
- 336              		.loc 1 68 5 is_stmt 1 view .LVU72
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 8
-
-
- 337 000c 0146     		mov	r1, r0
- 338 000e 0448     		ldr	r0, .L20+4
- 339              	.LVL16:
- 340              		.loc 1 68 5 is_stmt 0 view .LVU73
- 341 0010 FFF7FEFF 		bl	memcpy
- 342              	.LVL17:
+  68:Core/Inc/sser/sser.c ****     int len = vsprintf((str) SSER_TX_BUF_DATA, pFormat, args);
   69:Core/Inc/sser/sser.c **** 
-  70:Core/Inc/sser/sser.c ****     sserSendMsg();
- 343              		.loc 1 70 5 is_stmt 1 view .LVU74
- 344 0014 FFF7FEFF 		bl	sserSendMsg
- 345              	.LVL18:
-  71:Core/Inc/sser/sser.c **** }
- 346              		.loc 1 71 1 is_stmt 0 view .LVU75
- 347 0018 08BD     		pop	{r3, pc}
- 348              	.L21:
- 349 001a 00BF     		.align	2
- 350              	.L20:
- 351 001c 00000000 		.word	gSserMsg
- 352 0020 05000000 		.word	gSserTxBuf+5
- 353              		.cfi_endproc
- 354              	.LFE342:
- 356              		.global	gSserUart
- 357              		.section	.bss.gSserUart,"aw",%nobits
- 358              		.align	2
- 361              	gSserUart:
- 362 0000 00000000 		.space	4
- 363              		.global	gSserMsg
- 364              		.section	.bss.gSserMsg,"aw",%nobits
- 365              		.align	2
- 368              	gSserMsg:
- 369 0000 00000000 		.space	4
- 370              		.global	gSserTxOffset
- 371              		.section	.bss.gSserTxOffset,"aw",%nobits
- 372              		.align	1
- 375              	gSserTxOffset:
- 376 0000 0000     		.space	2
- 377              		.global	gSserTxBuf
- 378              		.section	.bss.gSserTxBuf,"aw",%nobits
- 379              		.align	2
- 382              	gSserTxBuf:
- 383 0000 00000000 		.space	2048
- 383      00000000 
- 383      00000000 
- 383      00000000 
- 383      00000000 
- 384              		.text
- 385              	.Letext0:
- 386              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/ma
- 387              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/sy
- 388              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/lib/gcc/arm-none-eabi/13
- 389              		.file 5 "Core/Inc/sinf/types.h"
- 390              		.file 6 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h"
- 391              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
- 392              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
- 393              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
- 394              		.file 10 "Core/Inc/sser/sser.h"
- 395              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/lib/gcc/arm-none-eabi/1
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 9
+  70:Core/Inc/sser/sser.c ****     va_end(args);
+  71:Core/Inc/sser/sser.c **** 
+  72:Core/Inc/sser/sser.c ****     gSserMsg.id  = SSER_MSG_ID_CONSOLE;
+  73:Core/Inc/sser/sser.c ****     gSserMsg.len = len;
+  74:Core/Inc/sser/sser.c ****     sserSendMsg();
+  75:Core/Inc/sser/sser.c **** }
+ 265              		.loc 1 75 1 view .LVU57
+ 266 000c 03B0     		add	sp, sp, #12
+ 267              	.LCFI6:
+ 268              		.cfi_remember_state
+ 269              		.cfi_def_cfa_offset 20
+ 270              		@ sp needed
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 7
 
 
- 396              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/s
- 397              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/s
- 398              		.file 14 "<built-in>"
-ARM GAS  C:\Users\Made\AppData\Local\Temp\cc15AAFc.s 			page 10
+ 271 000e 5DF804EB 		ldr	lr, [sp], #4
+ 272              	.LCFI7:
+ 273              		.cfi_restore 14
+ 274              		.cfi_def_cfa_offset 16
+ 275 0012 04B0     		add	sp, sp, #16
+ 276              	.LCFI8:
+ 277              		.cfi_restore 3
+ 278              		.cfi_restore 2
+ 279              		.cfi_restore 1
+ 280              		.cfi_restore 0
+ 281              		.cfi_def_cfa_offset 0
+ 282 0014 7047     		bx	lr
+ 283              	.L18:
+ 284              	.LCFI9:
+ 285              		.cfi_restore_state
+  63:Core/Inc/sser/sser.c **** 
+ 286              		.loc 1 63 5 is_stmt 1 view .LVU58
+  63:Core/Inc/sser/sser.c **** 
+ 287              		.loc 1 63 15 is_stmt 0 view .LVU59
+ 288 0016 084B     		ldr	r3, .L19
+ 289 0018 0122     		movs	r2, #1
+ 290 001a 1A70     		strb	r2, [r3]
+  65:Core/Inc/sser/sser.c ****     va_start(args, format);
+ 291              		.loc 1 65 5 is_stmt 1 view .LVU60
+  66:Core/Inc/sser/sser.c **** 
+ 292              		.loc 1 66 5 view .LVU61
+ 293 001c 05AA     		add	r2, sp, #20
+ 294 001e 0192     		str	r2, [sp, #4]
+  68:Core/Inc/sser/sser.c **** 
+ 295              		.loc 1 68 5 view .LVU62
+  68:Core/Inc/sser/sser.c **** 
+ 296              		.loc 1 68 15 is_stmt 0 view .LVU63
+ 297 0020 0499     		ldr	r1, [sp, #16]
+ 298 0022 0648     		ldr	r0, .L19+4
+ 299 0024 FFF7FEFF 		bl	vsprintf
+ 300              	.LVL12:
+  70:Core/Inc/sser/sser.c **** 
+ 301              		.loc 1 70 5 is_stmt 1 view .LVU64
+  72:Core/Inc/sser/sser.c ****     gSserMsg.len = len;
+ 302              		.loc 1 72 5 view .LVU65
+  72:Core/Inc/sser/sser.c ****     gSserMsg.len = len;
+ 303              		.loc 1 72 18 is_stmt 0 view .LVU66
+ 304 0028 054B     		ldr	r3, .L19+8
+ 305 002a 0022     		movs	r2, #0
+ 306 002c 1A70     		strb	r2, [r3]
+  73:Core/Inc/sser/sser.c ****     sserSendMsg();
+ 307              		.loc 1 73 5 is_stmt 1 view .LVU67
+  73:Core/Inc/sser/sser.c ****     sserSendMsg();
+ 308              		.loc 1 73 18 is_stmt 0 view .LVU68
+ 309 002e 5880     		strh	r0, [r3, #2]	@ movhi
+  74:Core/Inc/sser/sser.c **** }
+ 310              		.loc 1 74 5 is_stmt 1 view .LVU69
+ 311 0030 FFF7FEFF 		bl	sserSendMsg
+ 312              	.LVL13:
+  74:Core/Inc/sser/sser.c **** }
+ 313              		.loc 1 74 5 is_stmt 0 view .LVU70
+ 314 0034 EAE7     		b	.L14
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 8
+
+
+ 315              	.L20:
+ 316 0036 00BF     		.align	2
+ 317              	.L19:
+ 318 0038 00000000 		.word	gSserBusy
+ 319 003c 05000000 		.word	gSserTxBuf+5
+ 320 0040 00000000 		.word	gSserMsg
+ 321              		.cfi_endproc
+ 322              	.LFE341:
+ 324              		.section	.text.sserSendAudio,"ax",%progbits
+ 325              		.align	1
+ 326              		.global	sserSendAudio
+ 327              		.syntax unified
+ 328              		.thumb
+ 329              		.thumb_func
+ 331              	sserSendAudio:
+ 332              	.LVL14:
+ 333              	.LFB342:
+  76:Core/Inc/sser/sser.c **** 
+  77:Core/Inc/sser/sser.c **** void sserSendAudio(u8 *pDataIn, u16 pLen) {
+ 334              		.loc 1 77 43 is_stmt 1 view -0
+ 335              		.cfi_startproc
+ 336              		@ args = 0, pretend = 0, frame = 0
+ 337              		@ frame_needed = 0, uses_anonymous_args = 0
+ 338              		.loc 1 77 43 is_stmt 0 view .LVU72
+ 339 0000 08B5     		push	{r3, lr}
+ 340              	.LCFI10:
+ 341              		.cfi_def_cfa_offset 8
+ 342              		.cfi_offset 3, -8
+ 343              		.cfi_offset 14, -4
+  78:Core/Inc/sser/sser.c ****     if (gSserBusy)
+ 344              		.loc 1 78 5 is_stmt 1 view .LVU73
+ 345              		.loc 1 78 9 is_stmt 0 view .LVU74
+ 346 0002 0B4B     		ldr	r3, .L25
+ 347 0004 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 348              		.loc 1 78 8 view .LVU75
+ 349 0006 23B1     		cbz	r3, .L22
+  79:Core/Inc/sser/sser.c ****     {
+  80:Core/Inc/sser/sser.c ****         gSserDiscarded++;
+ 350              		.loc 1 80 9 is_stmt 1 view .LVU76
+ 351              		.loc 1 80 23 is_stmt 0 view .LVU77
+ 352 0008 0A4A     		ldr	r2, .L25+4
+ 353 000a 1368     		ldr	r3, [r2]
+ 354 000c 0133     		adds	r3, r3, #1
+ 355 000e 1360     		str	r3, [r2]
+  81:Core/Inc/sser/sser.c ****         return;
+ 356              		.loc 1 81 9 is_stmt 1 view .LVU78
+ 357              	.LVL15:
+ 358              	.L21:
+  82:Core/Inc/sser/sser.c ****     }
+  83:Core/Inc/sser/sser.c **** 
+  84:Core/Inc/sser/sser.c ****     gSserBusy = true;
+  85:Core/Inc/sser/sser.c **** 
+  86:Core/Inc/sser/sser.c ****     gSserMsg.id  = SSER_MSG_ID_AUDIO;
+  87:Core/Inc/sser/sser.c ****     gSserMsg.len = pLen;
+  88:Core/Inc/sser/sser.c **** 
+  89:Core/Inc/sser/sser.c ****     // for (int i = 0; i < pLen; ++i)
+  90:Core/Inc/sser/sser.c ****     // {
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 9
+
+
+  91:Core/Inc/sser/sser.c ****     //     SSER_TX_BUF_DATA[i] = i;
+  92:Core/Inc/sser/sser.c ****     // }
+  93:Core/Inc/sser/sser.c ****     //
+  94:Core/Inc/sser/sser.c ****     // UNUSED(pDataIn);
+  95:Core/Inc/sser/sser.c **** 
+  96:Core/Inc/sser/sser.c ****     memcpy(SSER_TX_BUF_DATA, pDataIn, gSserMsg.len);
+  97:Core/Inc/sser/sser.c **** 
+  98:Core/Inc/sser/sser.c ****     sserSendMsg();
+  99:Core/Inc/sser/sser.c **** }
+ 359              		.loc 1 99 1 is_stmt 0 view .LVU79
+ 360 0010 08BD     		pop	{r3, pc}
+ 361              	.LVL16:
+ 362              	.L22:
+ 363              		.loc 1 99 1 view .LVU80
+ 364 0012 0A46     		mov	r2, r1
+  84:Core/Inc/sser/sser.c **** 
+ 365              		.loc 1 84 5 is_stmt 1 view .LVU81
+  84:Core/Inc/sser/sser.c **** 
+ 366              		.loc 1 84 15 is_stmt 0 view .LVU82
+ 367 0014 0121     		movs	r1, #1
+ 368              	.LVL17:
+  84:Core/Inc/sser/sser.c **** 
+ 369              		.loc 1 84 15 view .LVU83
+ 370 0016 064B     		ldr	r3, .L25
+ 371 0018 1970     		strb	r1, [r3]
+  86:Core/Inc/sser/sser.c ****     gSserMsg.len = pLen;
+ 372              		.loc 1 86 5 is_stmt 1 view .LVU84
+  86:Core/Inc/sser/sser.c ****     gSserMsg.len = pLen;
+ 373              		.loc 1 86 18 is_stmt 0 view .LVU85
+ 374 001a 074B     		ldr	r3, .L25+8
+ 375 001c 1970     		strb	r1, [r3]
+  87:Core/Inc/sser/sser.c **** 
+ 376              		.loc 1 87 5 is_stmt 1 view .LVU86
+  87:Core/Inc/sser/sser.c **** 
+ 377              		.loc 1 87 18 is_stmt 0 view .LVU87
+ 378 001e 5A80     		strh	r2, [r3, #2]	@ movhi
+  96:Core/Inc/sser/sser.c **** 
+ 379              		.loc 1 96 5 is_stmt 1 view .LVU88
+ 380 0020 0146     		mov	r1, r0
+ 381 0022 0648     		ldr	r0, .L25+12
+ 382              	.LVL18:
+  96:Core/Inc/sser/sser.c **** 
+ 383              		.loc 1 96 5 is_stmt 0 view .LVU89
+ 384 0024 FFF7FEFF 		bl	memcpy
+ 385              	.LVL19:
+  98:Core/Inc/sser/sser.c **** }
+ 386              		.loc 1 98 5 is_stmt 1 view .LVU90
+ 387 0028 FFF7FEFF 		bl	sserSendMsg
+ 388              	.LVL20:
+ 389 002c F0E7     		b	.L21
+ 390              	.L26:
+ 391 002e 00BF     		.align	2
+ 392              	.L25:
+ 393 0030 00000000 		.word	gSserBusy
+ 394 0034 00000000 		.word	gSserDiscarded
+ 395 0038 00000000 		.word	gSserMsg
+ 396 003c 05000000 		.word	gSserTxBuf+5
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 10
+
+
+ 397              		.cfi_endproc
+ 398              	.LFE342:
+ 400              		.global	gSserDiscarded
+ 401              		.section	.bss.gSserDiscarded,"aw",%nobits
+ 402              		.align	2
+ 405              	gSserDiscarded:
+ 406 0000 00000000 		.space	4
+ 407              		.global	gSserBusy
+ 408              		.section	.bss.gSserBusy,"aw",%nobits
+ 411              	gSserBusy:
+ 412 0000 00       		.space	1
+ 413              		.global	gUartDev
+ 414              		.section	.bss.gUartDev,"aw",%nobits
+ 415              		.align	2
+ 418              	gUartDev:
+ 419 0000 00000000 		.space	4
+ 420              		.global	gSserMsg
+ 421              		.section	.bss.gSserMsg,"aw",%nobits
+ 422              		.align	2
+ 425              	gSserMsg:
+ 426 0000 00000000 		.space	4
+ 427              		.global	gSserTxOffset
+ 428              		.section	.bss.gSserTxOffset,"aw",%nobits
+ 429              		.align	1
+ 432              	gSserTxOffset:
+ 433 0000 0000     		.space	2
+ 434              		.global	gSserTxBuf
+ 435              		.section	.bss.gSserTxBuf,"aw",%nobits
+ 436              		.align	2
+ 439              	gSserTxBuf:
+ 440 0000 00000000 		.space	2048
+ 440      00000000 
+ 440      00000000 
+ 440      00000000 
+ 440      00000000 
+ 441              		.text
+ 442              	.Letext0:
+ 443              		.file 2 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/ma
+ 444              		.file 3 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/sy
+ 445              		.file 4 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/lib/gcc/arm-none-eabi/13
+ 446              		.file 5 "Core/Inc/sinf/types.h"
+ 447              		.file 6 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h"
+ 448              		.file 7 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 449              		.file 8 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 450              		.file 9 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h"
+ 451              		.file 10 "Core/Inc/sser/sser.h"
+ 452              		.file 11 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/lib/gcc/arm-none-eabi/1
+ 453              		.file 12 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/s
+ 454              		.file 13 "C:/Program Files (x86)/Arm GNU Toolchain arm-none-eabi/13.3 rel1/arm-none-eabi/include/s
+ 455              		.file 14 "<built-in>"
+ARM GAS  C:\Users\Made\AppData\Local\Temp\cc4IDwib.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 sser.c
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:20     .text.sserInit:00000000 $t
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:26     .text.sserInit:00000000 sserInit
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:43     .text.sserInit:00000008 $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:361    .bss.gSserUart:00000000 gSserUart
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:48     .text.sserSendMsg:00000000 $t
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:54     .text.sserSendMsg:00000000 sserSendMsg
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:112    .text.sserSendMsg:00000044 $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:375    .bss.gSserTxOffset:00000000 gSserTxOffset
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:382    .bss.gSserTxBuf:00000000 gSserTxBuf
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:368    .bss.gSserMsg:00000000 gSserMsg
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:120    .text.sserParseMsg:00000000 $t
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:126    .text.sserParseMsg:00000000 sserParseMsg
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:223    .text.sserParseMsg:00000050 $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:230    .text.sserPrintf:00000000 $t
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:236    .text.sserPrintf:00000000 sserPrintf
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:300    .text.sserPrintf:0000002c $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:306    .text.sserSendAudio:00000000 $t
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:312    .text.sserSendAudio:00000000 sserSendAudio
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:351    .text.sserSendAudio:0000001c $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:358    .bss.gSserUart:00000000 $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:365    .bss.gSserMsg:00000000 $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:372    .bss.gSserTxOffset:00000000 $d
-C:\Users\Made\AppData\Local\Temp\cc15AAFc.s:379    .bss.gSserTxBuf:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:20     .text.sserInit:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:26     .text.sserInit:00000000 sserInit
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:43     .text.sserInit:00000008 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:418    .bss.gUartDev:00000000 gUartDev
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:48     .text.sserSendMsg:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:54     .text.sserSendMsg:00000000 sserSendMsg
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:112    .text.sserSendMsg:00000044 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:432    .bss.gSserTxOffset:00000000 gSserTxOffset
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:439    .bss.gSserTxBuf:00000000 gSserTxBuf
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:425    .bss.gSserMsg:00000000 gSserMsg
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:120    .text.sserParseMsg:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:126    .text.sserParseMsg:00000000 sserParseMsg
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:223    .text.sserParseMsg:00000050 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:230    .text.sserPrintf:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:236    .text.sserPrintf:00000000 sserPrintf
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:318    .text.sserPrintf:00000038 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:411    .bss.gSserBusy:00000000 gSserBusy
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:325    .text.sserSendAudio:00000000 $t
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:331    .text.sserSendAudio:00000000 sserSendAudio
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:393    .text.sserSendAudio:00000030 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:405    .bss.gSserDiscarded:00000000 gSserDiscarded
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:402    .bss.gSserDiscarded:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:412    .bss.gSserBusy:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:415    .bss.gUartDev:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:422    .bss.gSserMsg:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:429    .bss.gSserTxOffset:00000000 $d
+C:\Users\Made\AppData\Local\Temp\cc4IDwib.s:436    .bss.gSserTxBuf:00000000 $d
 
 UNDEFINED SYMBOLS
 HAL_UART_Transmit_DMA

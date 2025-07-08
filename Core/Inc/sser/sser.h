@@ -7,6 +7,8 @@
 
 #include <types.h>
 #include "stm32h7xx_hal.h"
+#include "usbd_def.h"
+// #include "usbd_def.h"
 
 constexpr u16 SSER_MSG_START = 0xA0A0;
 constexpr u16 SSER_MSG_END   = 0xE0E0;
@@ -24,17 +26,29 @@ typedef struct {
 #define SSER_TX_BUF_SIZE 2048
 #define SSER_MAX_DATA_SIZE (SSER_TX_BUF_SIZE - 2 - 1 - 2 - 2)
 
-extern u8                  gSserTxBuf[SSER_TX_BUF_SIZE];
-extern u16                 gSserTxOffset;
-extern sserMsg             gSserMsg;
-extern UART_HandleTypeDef *gSserUart;
+extern void* gSserHidAudioBuf;
+extern u32 gSserHidAudioQueueSize;
+extern UART_HandleTypeDef* gSserUartDev;
+extern USBD_HandleTypeDef* gSserUsbDev;
+extern bool gSserBusy;
 
+#define SSER_TX_BUF_DATA (gSserTxBuf + 5)
+#define SSER_HID_AUDIO_SIZE 64
+#define SSER_HID_AUDIO_REPORT_SIZE (SSER_HID_AUDIO_SIZE + 1)
+#define SSER_HID_MAX_REPORT_SIZE SSER_HID_AUDIO_REPORT_SIZE
 
-#define SSER_TX_BUF_DATA (gSserTxBuf + sizeof(u16) + sizeof(u8) + sizeof(u16))
+extern u8 gSserHidReportBuf[SSER_HID_MAX_REPORT_SIZE];
 
-void sserInit(UART_HandleTypeDef *pDev);
-void sserSendMsg();
-void sserParseMsg(u8 *pDataIn);
+typedef enum : u16 {
+    SSER_HID_USAGE_AUDIO,
+} sserHidUsage;
+
+typedef enum : u8 {
+    SSER_HID_REPORT_ID_AUDIO,
+} sserHidReportId;
+
+void sserInitUart(UART_HandleTypeDef* pDev);
+void sserInitUsb(USBD_HandleTypeDef* pUsbDev);
 void sserPrintf(const char *pFormat, ...);
 void sserSendAudio(u8 *pDataIn, u16 pLen);
 

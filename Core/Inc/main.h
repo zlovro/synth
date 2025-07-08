@@ -112,6 +112,8 @@ void serialPrintf(const char *format, ...);
 #define usage7 10khz timer
 #define LCD_CS_Pin GPIO_PIN_3
 #define LCD_CS_GPIO_Port GPIOE
+#define LCD_RESET_Pin GPIO_PIN_5
+#define LCD_RESET_GPIO_Port GPIOE
 #define LED0_Pin GPIO_PIN_1
 #define LED0_GPIO_Port GPIOA
 #define AUDIO_OUT_Pin GPIO_PIN_4

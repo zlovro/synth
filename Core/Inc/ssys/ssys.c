@@ -179,6 +179,7 @@ void sysSynthesizeAudio() {
 
                     u32 sampleIdx = gSysProximityTable.sampleIdxOrigin + best->sampleIdx;
                     u32 block     = (sampleIdx * sizeof(sfsInstrumentSample)) / BLOCK_SIZE;
+
                     sfsReadBlocks(gSysTmpBlock, gSfsHeader->sampleInfoBlockStart + block, 1);
                     sfsInstrumentSample *sample = ((sfsInstrumentSample *) gSysTmpBlock) + (sampleIdx % (BLOCK_SIZE / sizeof(sfsInstrumentSample)));
 

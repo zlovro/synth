@@ -40,7 +40,11 @@ build/stm32h7xx_it.o: Core/Src/stm32h7xx_it.c Core/Inc/main.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h \
- Core/Inc/sinf/types.h Core/Inc/stm32h7xx_it.h
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
+ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
+ Core/Inc/sinf/types.h Drivers/CMSIS/DSP/Include/arm_math.h \
+ Drivers/CMSIS/Include/cmsis_compiler.h Core/Inc/stm32h7xx_it.h
 Core/Inc/main.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
 Core/Inc/stm32h7xx_hal_conf.h:
@@ -85,5 +89,10 @@ Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h:
 Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h:
+Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
 Core/Inc/sinf/types.h:
+Drivers/CMSIS/DSP/Include/arm_math.h:
+Drivers/CMSIS/Include/cmsis_compiler.h:
 Core/Inc/stm32h7xx_it.h:

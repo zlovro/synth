@@ -7,65 +7,63 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <tgmath.h>
 
-u8                  gSserTxBuf[SSER_TX_BUF_SIZE] = {};
-u16                 gSserTxOffset                = 0;
-sserMsg             gSserMsg                     = {};
-UART_HandleTypeDef *gSserUart                     = NULL;
+#include "main.h"
+#include "stm32h7xx_hal.h"
+#include "usbd_hid.h"
+// #include "usbd_cdc_if.h"
 
-void sserInit(UART_HandleTypeDef *pDev) {
-    gSserUart = pDev;
+void *              gSserHidAudioBuf = NULL;
+UART_HandleTypeDef *gSserUartDev;
+USBD_HandleTypeDef *gSserUsbDev;
+bool                gSserBusy = false;
+u8                  gSserHidReportBuf[SSER_HID_MAX_REPORT_SIZE];
+u32                 gSserHidAudioQueueSize = 0;
+
+
+char gSserPrintfBuf[512];
+
+void sserInitUart(UART_HandleTypeDef* pDev) {
+    gSserUartDev = pDev;
 }
 
-void sserSendMsg() {
-    gSserTxOffset = 0;
-
-    sserTxWrite(SSER_MSG_START, u16);
-    sserTxWrite(gSserMsg.id, u8);
-    sserTxWrite(gSserMsg.len, u16);
-
-    gSserTxOffset += gSserMsg.len;
-
-    sserTxWrite(SSER_MSG_END, u16);
-
-    HAL_UART_Transmit_DMA(gSserUart, gSserTxBuf, gSserTxOffset);
-}
-
-void sserParseMsg(u8 *pDataIn) {
-    gSserTxOffset = 0;
-
-    u16 _ = sserRead(pDataIn, u16);
-
-    gSserMsg.id  = sserRead(pDataIn, u8);
-    gSserMsg.len = sserRead(pDataIn, u16);
-
-    for (int i = 0; i < gSserMsg.len; ++i)
-    {
-        SSER_TX_BUF_DATA[i] = sserRead(pDataIn, u8);
-    }
-
-    _ = sserRead(pDataIn, u16);
-    UNUSED(_);
+void sserInitUsb(USBD_HandleTypeDef* pUsbDev) {
+    gSserUsbDev = pUsbDev;
 }
 
 void sserPrintf(const char *pFormat, ...) {
+    if (gSserBusy)
+    {
+        return;
+    }
+
+    gSserBusy = true;
+
     va_list args;
     va_start(args, format);
 
-    int len = vsprintf((str) SSER_TX_BUF_DATA, pFormat, args);
+    int len = vsprintf(gSserPrintfBuf, pFormat, args);
 
     va_end(args);
 
-    gSserMsg.id  = SSER_MSG_ID_CONSOLE;
-    gSserMsg.len = len;
-    sserSendMsg();
+    HAL_UART_Transmit_DMA(gSserUartDev, gSserPrintfBuf, len);
 }
 
+// pLen must be a multiple of HID audio size
 void sserSendAudio(u8 *pDataIn, u16 pLen) {
-    gSserMsg.id  = SSER_MSG_ID_AUDIO;
-    gSserMsg.len = pLen;
+    if (gSserBusy)
+    {
+        return;
+    }
 
-    memcpy(SSER_TX_BUF_DATA, pDataIn, gSserMsg.len);
+    gSserBusy = true;
 
-    sserSendMsg();
+    gSserHidAudioBuf       = pDataIn;
+    gSserHidAudioQueueSize = SSER_HID_AUDIO_SIZE / pLen;
+
+    gSserHidReportBuf[0] = SSER_HID_REPORT_ID_AUDIO;
+    memcpy(gSserHidReportBuf + 1, pDataIn, SSER_HID_AUDIO_SIZE);
+
+    USBD_HID_SendReport(gSserUsbDev, gSserHidReportBuf, SSER_HID_AUDIO_REPORT_SIZE);
 }
