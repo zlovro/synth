@@ -172,7 +172,7 @@ void muxWrite(mux *pMux, u8 pChan, bool pVal) {
 const rowColCoord gOgKeyMap[] = {{0, 0},};
 
 extern int __io_putchar(int ch) {
-    return ITM_SendChar(ch);
+    return HAL_UART_Transmit_DMA(&huart4, (u8*)&ch, 1);
 }
 
 /* USER CODE END 0 */

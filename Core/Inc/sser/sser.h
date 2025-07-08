@@ -37,7 +37,7 @@ extern bool gSserBusy;
 #define SSER_HID_AUDIO_REPORT_SIZE (SSER_HID_AUDIO_SIZE + 1)
 #define SSER_HID_MAX_REPORT_SIZE SSER_HID_AUDIO_REPORT_SIZE
 
-extern u8 gSserHidReportBuf[SSER_HID_MAX_REPORT_SIZE];
+extern u8 gSserBuf[];
 
 typedef enum : u16 {
     SSER_HID_USAGE_AUDIO = 0xE8,

@@ -11,14 +11,15 @@
 
 #include "main.h"
 #include "stm32h7xx_hal.h"
-#include "usbd_hid.h"
+#include "usbd_cdc_if.h"
+// #include "usbd_hid.h"
 // #include "usbd_cdc_if.h"
 
 u8*              gSserHidAudioBuf = NULL;
 UART_HandleTypeDef *gSserUartDev;
 USBD_HandleTypeDef *gSserUsbDev;
 bool                gSserBusy = false;
-u8                  gSserHidReportBuf[SSER_HID_MAX_REPORT_SIZE];
+u8                  gSserBuf[1024];
 u32                 gSserHidAudioQueueSize = 0;
 
 
@@ -52,11 +53,15 @@ void sserSendAudio(u8 *pDataIn, u16 pLen) {
 
     gSserBusy = true;
 
-    gSserHidAudioBuf       = pDataIn;
-    gSserHidAudioQueueSize = pLen / SSER_HID_AUDIO_SIZE;
+    // gSserHidAudioBuf       = pDataIn;
+    // gSserHidAudioQueueSize = pLen / SSER_HID_AUDIO_SIZE;
+    //
+    // gSserHidReportBuf[0] = SSER_HID_REPORT_ID_AUDIO;
+    // memcpy(gSserHidReportBuf + 1, pDataIn, SSER_HID_AUDIO_SIZE);
 
-    gSserHidReportBuf[0] = SSER_HID_REPORT_ID_AUDIO;
-    memcpy(gSserHidReportBuf + 1, pDataIn, SSER_HID_AUDIO_SIZE);
 
-    USBD_HID_SendReport(gSserUsbDev, gSserHidReportBuf, SSER_HID_AUDIO_REPORT_SIZE);
+    *(u16*)gSserBuf = 0xA0A0;
+    memcpy(gSserBuf + 2, pDataIn, 0x200);
+    CDC_Transmit_FS(gSserBuf, pLen + 2);
+    // USBD_HID_SendReport(gSserUsbDev, gSserHidReportBuf, SSER_HID_AUDIO_REPORT_SIZE);
 }
