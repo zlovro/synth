@@ -44,7 +44,7 @@ typedef enum : u16 {
 } sserHidUsage;
 
 typedef enum : u8 {
-    SSER_HID_REPORT_ID_AUDIO,
+    SSER_HID_REPORT_ID_AUDIO = 1,
 } sserHidReportId;
 
 void sserInitUart(UART_HandleTypeDef* pDev);
