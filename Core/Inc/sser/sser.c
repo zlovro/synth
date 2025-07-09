@@ -34,6 +34,11 @@ void sserInitUsb(USBD_HandleTypeDef* pUsbDev) {
 }
 
 void sserPrintf(const char *pFormat, ...) {
+    if (gSserUartDev->gState != HAL_UART_STATE_READY)
+    {
+        return;
+    }
+
     va_list args;
     va_start(args, format);
 

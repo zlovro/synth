@@ -7,8 +7,9 @@
 
 #include <types.h>
 
-typedef pstruct
-{
+#define SMIDI_TIMEDIV_MASK_FRAMES 0x8000
+
+typedef pstruct {
     u32 magic;
     u32 chunkSize;
     u16 format;
@@ -16,14 +17,12 @@ typedef pstruct
     u16 timeDivision;
 } smidiHeader;
 
-typedef pstruct
-{
+typedef pstruct {
     u32 magic;
     u32 chunkSize;
 } smidiTrackHeader;
 
-typedef enum
-{
+typedef enum {
     SMIDI_EVENT_CHANNEL = 1 << 8,
     SMIDI_EVENT_META    = 2 << 8,
     SMIDI_EVENT_SYSEX   = 3 << 8,
@@ -41,25 +40,36 @@ typedef enum
     SMIDI_META_EVENT_SET_TIME_SIGNATURE = SMIDI_EVENT_META | 88,
 } smidiEventType;
 
-typedef struct
-{
-    u32            deltaTime;
+typedef struct {
+    u16 ticksPerBeat;
+    u32 usPerTick;
+    u32 deltaTime;
+
     smidiEventType event;
     u8             channel;
-    u8             param1, param2;
-    u32            skip;
+
+    union {
+        u8 param1, note;
+    };
+
+    union {
+        u8 param2, velocity;
+    };
+
+    u32 skip;
 } smidiChannelEvent;
 
 extern smidiChannelEvent gSmidiCurrentEvent;
-extern const u8 gSmidiTestBuffer[];
+extern const u8          gSmidiTestBuffer[];
 
 #define SMIDI_TEST_BUFFER_SIZE 1131
 
-void smidiReadHeader(u8* pData, smidiHeader* pHdr);
-void smidiReadTrackHeader(u8* pData, smidiTrackHeader* pHdr);
-void smidiParseEvent(u8* pData, smidiChannelEvent* pOutEvent);
-u32  smidiVarRead(u8* pDat, u8* pOutLength);
+void smidiReadHeader(u8 *pData, smidiHeader *pHdr);
+void smidiReadTrackHeader(u8 *pData, smidiTrackHeader *pHdr);
+void smidiParseEvent(u8 *pData, smidiChannelEvent *pOutEvent);
+u32  smidiVarRead(u8 *pDat, u8 *pOutLength);
+void smidiTestReadEvent(u32 pIdx);
 
-void smidiParseData(u8* pData, u32 pLen, void (*pCallback)(int));
+void smidiParseData(u8 *pData, u32 pLen, void (*pCallback)(int));
 
 #endif //SMIDI_H

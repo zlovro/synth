@@ -67,6 +67,7 @@ typedef char* str;
 #define magic(a, b, c, d) ((u32)((d << 24) | (c << 16) | (b << 8) | a))
 
 #define bswap16(n) (((n&0xFF00)>>8)|((n&0x00FF)<<8))
+#define bswap24(n) ((n & 0xFF00) | ((n >> 16) & 0xFF) | ((n & 0xFF) << 16))
 #define bswap32(n) ((bswap16((n&0xFFFF0000)>>16))|((bswap16(n&0x0000FFFF))<<16))
 #define bswap64(n) ((bswap32((n&0xFFFFFFFF00000000)>>32))|((bswap32(n&0x00000000FFFFFFFF))<<32))
 

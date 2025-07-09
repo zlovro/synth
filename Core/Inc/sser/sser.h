@@ -31,6 +31,7 @@ extern u32 gSserHidAudioQueueSize;
 extern UART_HandleTypeDef* gSserUartDev;
 extern USBD_HandleTypeDef* gSserUsbDev;
 extern bool gSserBusy;
+extern char gSserPrintfBuf[512];
 
 #define SSER_TX_BUF_DATA (gSserTxBuf + 5)
 #define SSER_HID_AUDIO_SIZE 32

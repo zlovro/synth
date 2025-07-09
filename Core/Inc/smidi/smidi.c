@@ -36,8 +36,7 @@ const u8 gSmidiTestBuffer[] = {
     0x64, 0x00, 0xE1, 0x00, 0x40, 0x00, 0xC1, 0x00, 0x01, 0xB1, 0x65, 0x00, 0x00, 0xB1, 0x64, 0x00, 0x00, 0xB1, 0x06, 0x0C, 0x00, 0xB1, 0x0A, 0x40, 0x00, 0xB1, 0x07, 0x64, 0x00, 0xE1, 0x00, 0x40, 0x00, 0xC1, 0x00, 0x00, 0xFF, 0x2F, 0x00,
 };
 
-void smidiReadHeader(u8* pData, smidiHeader* pHdr)
-{
+void smidiReadHeader(u8 *pData, smidiHeader *pHdr) {
     pHdr->magic        = bswap32(*(u32*)(pData + 0));
     pHdr->chunkSize    = bswap32(*(u32*)(pData + 4));
     pHdr->format       = bswap16(*(u16*)(pData + 8));
@@ -45,15 +44,13 @@ void smidiReadHeader(u8* pData, smidiHeader* pHdr)
     pHdr->timeDivision = bswap16(*(u16*)(pData + 12));
 }
 
-void smidiReadTrackHeader(u8* pData, smidiTrackHeader* pHdr)
-{
+void smidiReadTrackHeader(u8 *pData, smidiTrackHeader *pHdr) {
     pHdr->magic     = bswap32(*(u32*)(pData + 0));
     pHdr->chunkSize = bswap32(*(u32*)(pData + 4));
 }
 
-void smidiParseEvent(u8* pData, smidiChannelEvent* pOutEvent)
-{
-    u8* ogData = pData;
+void smidiParseEvent(u8 *pData, smidiChannelEvent *pOutEvent) {
+    u8 *ogData = pData;
 
     u8  len;
     u32 deltaTime = smidiVarRead(pData, &len);
@@ -65,8 +62,18 @@ void smidiParseEvent(u8* pData, smidiChannelEvent* pOutEvent)
     if (meta == 0xFF)
     {
         pOutEvent->event = SMIDI_EVENT_META | *pData++;
-        pData += smidiVarRead(pData, &len);
+
+        u32 dataLen = smidiVarRead(pData, &len);
         pData += len;
+
+        if (pOutEvent->event == SMIDI_META_EVENT_SET_TEMPO)
+        {
+            u32 usPerQtNote = bswap24(*(u32*)pData);
+            u32 bpm = 60'000'000 / usPerQtNote;
+            pOutEvent->usPerTick = 60'000'000 / (bpm * pOutEvent->ticksPerBeat);
+        }
+
+        pData += dataLen;
     }
     else if (meta == 0xF0 || meta == 0xF7)
     {
@@ -92,8 +99,7 @@ void smidiParseEvent(u8* pData, smidiChannelEvent* pOutEvent)
     pOutEvent->skip = pData - ogData;
 }
 
-u32 smidiVarRead(u8* pData, u8* pOutLength)
-{
+u32 smidiVarRead(u8 *pData, u8 *pOutLength) {
     u8  len   = 0;
     u32 value = 0;
     u8  byte;
@@ -102,8 +108,7 @@ u32 smidiVarRead(u8* pData, u8* pOutLength)
         byte  = *(pData++);
         value = (value << 7) | (byte & 0x7F);
         len++;
-    }
-    while (byte & 0x80);
+    } while (byte & 0x80);
 
     *pOutLength = len;
 
@@ -112,27 +117,61 @@ u32 smidiVarRead(u8* pData, u8* pOutLength)
 
 smidiChannelEvent gSmidiCurrentEvent = {};
 
-void smidiParseData(u8* pData, u32 pLen, void (*pCallback)(int))
-{
+void smidiParseData(u8 *pData, u32 pLen, void (*pCallback)(int)) {
     int track = 0;
 
     smidiHeader header;
     smidiReadHeader(pData, &header);
 
-    u8* ptr = pData + sizeof(smidiHeader);
+    gSmidiCurrentEvent.ticksPerBeat = header.timeDivision;
+
+    u8 *ptr = pData + sizeof(smidiHeader);
     while (ptr < pData + pLen)
     {
         smidiTrackHeader trk;
         smidiReadTrackHeader(ptr, &trk);
 
         ptr += sizeof(smidiTrackHeader);
-        u8* pnt = ptr;
+        u8 *pnt = ptr;
 
         while (ptr - pnt < trk.chunkSize)
         {
             smidiParseEvent(ptr, &gSmidiCurrentEvent);
             pCallback(track);
             ptr += gSmidiCurrentEvent.skip;
+        }
+
+        track++;
+    }
+}
+
+void smidiTestReadEvent(u32 pIdx) {
+    int track = 0;
+    u32 idx = 0;
+
+    smidiHeader header;
+    smidiReadHeader(gSmidiTestBuffer, &header);
+
+    gSmidiCurrentEvent.ticksPerBeat = header.timeDivision;
+
+    u8 *ptr = gSmidiTestBuffer + sizeof(smidiHeader);
+    while (ptr < gSmidiTestBuffer + SMIDI_TEST_BUFFER_SIZE)
+    {
+        smidiTrackHeader trk;
+        smidiReadTrackHeader(ptr, &trk);
+
+        ptr += sizeof(smidiTrackHeader);
+        u8 *pnt = ptr;
+
+        while (ptr - pnt < trk.chunkSize)
+        {
+            smidiParseEvent(ptr, &gSmidiCurrentEvent);
+            if (pIdx == idx)
+            {
+                return;
+            }
+            ptr += gSmidiCurrentEvent.skip;
+            idx++;
         }
 
         track++;

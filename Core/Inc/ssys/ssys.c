@@ -28,9 +28,8 @@ sfsKeyProximityTable gSysProximityTable;
 s16            gSysAudioFrontBuf[SYS_AUDIO_BUFFER_SAMPLE_COUNT];
 s16            gSysAudioBackBuf[SYS_AUDIO_BUFFER_SAMPLE_COUNT];
 u16 DMA_BUFFER gSysDacBuf[SYS_DAC_SAMPLE_COUNT];
-u16 DMA_BUFFER gSysTriBuf[SYS_TRI_BUF_SIZE];
-sysTrack       gSysTrackInfo[SYS_TRACK_COUNT];
-sysTrack *     gSysTrackCurrent = gSysTrackInfo;
+sysTrack       gSysTrackInfo[SYS_TRACK_COUNT] = {};
+sysTrack *     gSysTrackCurrent               = gSysTrackInfo;
 s16            gSysPolyphonyData[SYS_POLYPHONY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
 u32            gSysPolyphonyProgress[SYS_POLYPHONY_COUNT] = {};
 u8             gSysTmpBlock[BLOCK_SIZE];
@@ -45,6 +44,8 @@ sysInputBitmap  gSysBtnMtx1State                          = {0};
 sysKeyTimestamp gSysKeyTimestamps[SFS_KEY_SEMITONE_RANGE] = {{0}};
 
 ADC_HandleTypeDef *gSysAdc;
+
+u32 gMidiEvent = 0;
 
 synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
     glcdSetOrigin(SYS_GUI_ORIGIN, SYS_GUI_ORIGIN);
@@ -66,22 +67,6 @@ synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
         return SERR_GENERIC_ERROR;
     }
 
-    for (int i = 0; i < SYS_TRI_BUF_HALF_SIZE; i++)
-    {
-        gSysTriBuf[i] = (f64) i / SYS_TRI_BUF_HALF_SIZE * 0xFFF;
-    }
-    gSysTriBuf[SYS_TRI_BUF_HALF_SIZE] = 0xFFF;
-    for (int i = 0; i < SYS_TRI_BUF_HALF_SIZE; i++)
-    {
-        gSysTriBuf[SYS_TRI_BUF_HALF_SIZE + i] = (f64) (SYS_TRI_BUF_HALF_SIZE - i) / SYS_TRI_BUF_HALF_SIZE * 0xFFF;
-    }
-
-    ret = HAL_DAC_Start_DMA(pDac, DAC_CHANNEL_2, (u32 *) gSysTriBuf, SYS_TRI_BUF_SIZE, DAC_ALIGN_12B_R);
-    if (ret != HAL_OK)
-    {
-        return SERR_GENERIC_ERROR;
-    }
-
     gSysAdc = pAdc;
     ret     = HAL_ADC_Start(pAdc);
     if (ret != HAL_OK)
@@ -89,10 +74,56 @@ synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
         return SERR_GENERIC_ERROR;
     }
 
+    for (;; gMidiEvent++)
+    {
+        smidiTestReadEvent(gMidiEvent);
+        if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_ON)
+        {
+            break;
+        }
+    }
+
+    sysGetMainTrack()->isActive                = true;
+    sysGetMainTrack()->instrument.instrumentId = 20; // jv
+
     return SERR_OK;
 }
 
 void sysReadInputs() {
+    if (TIM_US->CNT - sysGetMainTrack()->midiUs > gSmidiCurrentEvent.deltaTime * gSmidiCurrentEvent.usPerTick)
+    {
+        sysGetMainTrack()->midiUs = TIM_US->CNT;
+        if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_ON)
+        {
+            int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
+            u8   idx  = min(max(0, note), 60);
+            auto key  = sysGetMainTrack()->keys + idx;
+
+            char noteStr[16];
+            tone t = toneFromAbsoluteSemitoneOffset(note);
+            solfegeToneToStr(noteStr, &t, false);
+            sserPrintf("NOTE ON %s\n", noteStr);
+
+            key->state    = SYS_BTNSTATE_HELD;
+            key->velocity = 255;
+        }
+        else if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_OFF)
+        {
+            int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
+            u8   idx  = min(max(0, note), 60);
+            auto key  = (sysGetMainTrack()->keys) + idx;
+
+            char noteStr[16];
+            tone t = toneFromAbsoluteSemitoneOffset(note);
+            solfegeToneToStr(noteStr, &t, false);
+            sserPrintf("NOTE OFF %s\n", noteStr);
+
+            key->state = SYS_BTNSTATE_UP;
+        }
+
+        smidiTestReadEvent(++gMidiEvent);
+    }
+
     // gSysBtnMtx1State.lastState = gSysBtnMtx1State.currentState;
     // // button matrix 1
     // for (int row = 0; row < BTNMTX1_Size; ++row)
@@ -137,8 +168,9 @@ void sysSynthesizeAudio() {
 
             switch (keyData->state)
             {
-                case SYS_BTNSTATE_NULL:
+                case SYS_BTNSTATE_NULL: {
                     break;
+                }
 
                 case SYS_BTNSTATE_DOWN:
                 case SYS_BTNSTATE_HELD: {
@@ -188,9 +220,19 @@ void sysSynthesizeAudio() {
 
                     u32 current = gSysPolyphonyProgress[polyphonyCounter];
 
+                    if (base->soundType & SFS_SOUND_TYPE_LOOP)
+                    {
+                        if (current > sample->loopStart + sample->loopDuration)
+                        {
+                            current = sample->loopStart;
+                        }
+                    }
+
                     if (current >= sample->pcmDataLengthBlocks)
                     {
                         memset(gSysPolyphonyData + polyphonyCounter, 0, SYS_AUDIO_BUFFER_SIZE);
+                        gSysPolyphonyProgress[polyphonyCounter] = 0;
+                        keyData->state = SYS_BTNSTATE_NULL;
                         goto switchEnd;
                     }
 
@@ -208,18 +250,17 @@ void sysSynthesizeAudio() {
                     }
 
                     gSysPolyphonyProgress[polyphonyCounter]++;
-                    polyphonyCounter++;
 
+                    polyphonyCounter++;
                     break;
                 }
 
-                case SYS_BTNSTATE_UP:
+                case SYS_BTNSTATE_UP: {
+                    keyData->state = SYS_BTNSTATE_NULL;
                     break;
+                }
             }
         switchEnd:
-
-
-
         }
     }
 
@@ -248,7 +289,7 @@ loopEnd:
         gSysAudioFrontBuf[i] = (0x8000 + gSysAudioBackBuf[i]) / 16;
     }
 
-    sserSendAudio((u8*) gSysAudioFrontBuf, SYS_AUDIO_BUFFER_SIZE);
+    sserSendAudio((u8 *) gSysAudioFrontBuf, SYS_AUDIO_BUFFER_SIZE);
 }
 
 sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn) {
@@ -370,25 +411,7 @@ void sysHandleInputs() {
 void sysPoll() {
     if (gSysIsLoaded)
     {
-        auto track                     = gSysTrackInfo + 0;
-        track->isActive                = true;
-        track->instrument.instrumentId = 19;
-
-        auto octave = 24;
-
-        track->keys[TONE_OFFSET_B6 - SFS_FIRST_KEY - octave].state    = SYS_BTNSTATE_HELD;
-        track->keys[TONE_OFFSET_B6 - SFS_FIRST_KEY - octave].velocity = 255;
-
-        track->keys[TONE_OFFSET_D6 + 1 - SFS_FIRST_KEY - octave].state    = SYS_BTNSTATE_HELD;
-        track->keys[TONE_OFFSET_D6 + 1 - SFS_FIRST_KEY - octave].velocity = 255;
-
-        track->keys[TONE_OFFSET_F6 + 1 - SFS_FIRST_KEY - octave].state    = SYS_BTNSTATE_HELD;
-        track->keys[TONE_OFFSET_F6 + 1 - SFS_FIRST_KEY - octave].velocity = 255;
-
-        track->keys[TONE_OFFSET_A6 - SFS_FIRST_KEY - octave].state    = SYS_BTNSTATE_HELD;
-        track->keys[TONE_OFFSET_A6 - SFS_FIRST_KEY - octave].velocity = 255;
-
-        // sysReadInputs();
+        sysReadInputs();
         // sysHandleInputs();
         sysUpdateTrackData();
     }

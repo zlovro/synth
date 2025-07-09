@@ -10,6 +10,7 @@
 #include <sfs.h>
 #include <stm32h7xx_hal.h>
 #include <solfege/solfege.h>
+#include <sser/sser.h>
 
 #define SYS_GUI_OUTLINE_THICKNESS 1
 #define SYS_GUI_OUTLINE_MARGIN 4
@@ -34,10 +35,6 @@
 #define SYS_DAC_SAMPLE_COUNT (SYS_DAC_BUFFER_SIZE / sizeof(u16))
 #define SYS_DAC_HALF_BUFFER_SIZE (SYS_DAC_BUFFER_SIZE / 2)
 #define SYS_DAC_HALF_SAMPLE_COUNT (SYS_DAC_SAMPLE_COUNT / 2)
-
-#define SYS_TRI_FCLK (120000000 / (11 + 1))
-#define SYS_TRI_BUF_SIZE (SYS_TRI_FCLK / 400000)
-#define SYS_TRI_BUF_HALF_SIZE (SYS_TRI_BUF_SIZE / 2)
 
 #define SYS_POLL_RATE 10
 #define SYS_POLL_PERIOD_TICKS (1000 / SYS_POLL_RATE)
@@ -65,8 +62,8 @@ enum {
 typedef enum : u8 {
     SYS_BTNSTATE_NULL,
     SYS_BTNSTATE_DOWN, // just pressed
-    SYS_BTNSTATE_UP,   // just released
     SYS_BTNSTATE_HELD,
+    SYS_BTNSTATE_UP,   // just released
 } sysButtonState;
 
 typedef enum : u8 {
@@ -92,11 +89,16 @@ typedef struct {
 typedef struct {
     sysKeyData                 keys[SFS_KEY_COUNT];
     sysSingleInstrumentRuntime instrument;
+    u32                        midiUs;
     u16                        lastInstrumentId;
     u32                        currentBlock;
     bool                       isLoaded;
     bool                       isActive;
 } sysTrack;
+
+typedef struct {
+    u32 blockProgress;
+} sysPolyphony;
 
 typedef struct {
     u32 currentState;
@@ -119,7 +121,6 @@ extern u8                   gSysCurrentMenuId;
 extern u8                   gSysLastMenuId;
 extern f32                  gSysCurrentMenuTimer;
 extern DMA_BUFFER u16       gSysDacBuf[];
-extern DMA_BUFFER u16       gSysTriBuf[];
 extern s16                  gSysAudioFrontBuf[];
 extern s16                  gSysAudioBackBuf[];
 extern sfsKeyProximityTable gSysProximityTable;
@@ -143,32 +144,21 @@ extern ADC_HandleTypeDef *gSysAdc;
 #define sysGetTrackData(i) ((u16*)(gSysTrackData + i))
 
 synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc);
-
 void sysPoll();
-
 void sysUpdateTrackData();
-
 void sysRender();
-
 sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn);
-
 void sysHandleInputs();
-
 void sysReadInputs();
-
 void sysHandlePitchBend();
-
 void sysSynthesizeAudio();
-
 synthErrno sysDeinit();
-
 void sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-
 void sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-
 void sysError(synthErrno pCode);
 
 #define sysGetMainTrack() gSysTrackInfo
+#define sysPrintf(fmt, ...) printf("ssys: " fmt, ##__VA_ARGS__)
 
 
 #endif //SSYS_H
