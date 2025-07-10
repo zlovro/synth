@@ -27,7 +27,10 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#ifndef SYNTHWIN
 #include "stm32h7xx_hal.h"
+#endif
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -57,11 +60,14 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-void delayUs(TIM_TypeDef *pTim, volatile s32 pUs);
 
 typedef pstruct {
-    u16           pin;
+    u16 pin;
+    #ifndef SYNTHWIN
     GPIO_TypeDef *bank;
+    #else
+    void *bank;
+    #endif
 } gpioPin;
 
 typedef struct {
@@ -73,6 +79,7 @@ typedef struct {
     gpioPin pinSig;
     gpioPin pinsSelect[4];
 } muxMasterCfg;
+
 
 // typedef struct
 // {
@@ -156,9 +163,7 @@ void serialPrintf(const char *format, ...);
 #define TIM_US TIM5
 #define TIM_DELAY_US TIM4
 
-#define delayUsDefault(u) delayUs(TIM_DELAY_US, u)
-
-    extern char gPrintfBuf[];
+extern char gPrintfBuf[];
 
 extern const mux gMuxOgKeyRow;
 extern const mux gMuxOgKeyCol;

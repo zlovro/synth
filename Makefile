@@ -241,4 +241,41 @@ clean:
 #######################################
 -include $(wildcard $(BUILD_DIR)/*.d)
 
+TARGET_WIN = synth-win
+BUILD_WIN = winbuild
+
+CC_WIN = gcc
+AS_WIN = as
+SZ_WIN = size
+
+CSOURCES_WIN = Core/Src/main.c
+
+INCLUDES_WIN = \
+-ICore/Inc \
+-ICore/Inc/sinf
+
+CFLAGS_WIN = -DSYNTHWIN $(CSOURCES_WIN) $(INCLUDES_WIN)
+LDFLAGS_WIN = ""
+
+ifeq ($(DEBUG), 1)
+CFLAGS_WIN += -g -gdwarf-2
+endif
+
+OBJECTS_WIN = $(addprefix $(BUILD_WIN)/,$(notdir $(CSOURCES_WIN:.c=.o)))
+vpath %.c $(sort $(dir $(CSOURCES_WIN)))
+
+all-win: $(BUILD_WIN)/$(TARGET_WIN).exe
+
+$(BUILD_WIN)/%.o: $(CSOURCES_WIN)
+	$(CC_WIN) -c $(CFLAGS_WIN)
+
+#$(BUILD_WIN)/%.o: $(ASM_SOURCES)
+#	$(AS_WIN) -c $(CFLAGS_WIN) $< -o $@
+#$(BUILD_WIN)/%.o: $(ASMM_SOURCES)
+#	$(AS_WIN) -c $(CFLAGS_WIN) $< -o $@
+
+$(TARGET_FULL_WIN): $(OBJECTS_WIN) Makefile
+	$(CC_WIN) $(OBJECTS_WIN) $(LDFLAGS_WIN) -o $@
+	$(SZ_WIN) $@
+
 # *** EOF ***

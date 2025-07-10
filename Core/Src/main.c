@@ -18,7 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
+#ifndef SYNTHWIN
 #include "usb_device.h"
+#endif
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -47,7 +50,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#ifndef SYNTHWIN
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -72,8 +75,9 @@ TIM_HandleTypeDef htim15;
 UART_HandleTypeDef huart4;
 DMA_HandleTypeDef  hdma_uart4_tx;
 
-/* USER CODE BEGIN PV */
 
+/* USER CODE BEGIN PV */
+#endif
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,23 +105,9 @@ static void MX_UART4_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
-void delayUs(TIM_TypeDef *pTim, volatile s32 pUs) {
-    if (pUs <= 0)
-    {
-        return;
-    }
-
-    volatile int i = 0;
-    pTim->CNT      = 0;
-    while (pTim->CNT < pUs)
-    {
-        i++;
-    }
-}
-
 char gPrintfBuf[512];
 
+#ifndef SYNTHWIN
 const muxMasterCfg gMuxMasterCfg = {{MUX_SIG_Pin, MUX_SIG_GPIO_Port}, {{MUX_S0_Pin, MUX_S0_GPIO_Port}, {MUX_S1_Pin, MUX_S1_GPIO_Port}, {MUX_S2_Pin, MUX_S2_GPIO_Port}, {MUX_S3_Pin, MUX_S3_GPIO_Port},}};
 
 const mux gMuxOgKeyRow = {0, {MUX_EN_OG_KEY_ROW_Pin, MUX_EN_OG_KEY_ROW_GPIO_Port}};
@@ -169,17 +159,9 @@ void muxWrite(mux *pMux, u8 pChan, bool pVal) {
     gpioModeOutput(&gMuxMasterCfg.pinSig);
     gpioSet(&gMuxMasterCfg.pinSig, pVal);
 }
+#endif
 
 const rowColCoord gOgKeyMap[] = {{0, 0},};
-
-int _write(int file, char *ptr, int len) {
-    if (huart4.gState != HAL_UART_STATE_READY)
-    {
-        return -1;
-    }
-    memcpy(gSserPrintfBuf, ptr, len);
-    return HAL_UART_Transmit_DMA(&huart4, (u8 *) gSserPrintfBuf, len);
-}
 
 /* USER CODE END 0 */
 
@@ -980,8 +962,47 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
-synthErrno sfsReadBlocks(u8 *pData, u32 pBlkIdx, u32 pBlkCnt) {
-    HAL_StatusTypeDef ret = HAL_SD_ReadBlocks(&hsd1, pData, pBlkIdx, pBlkCnt, 1000);
+// pBlkCnt = 0 if (pByteOffset isn't 0 or pByteCount isn't BLOCK_SIZE) else pBlkCnt
+synthErrno sfsReadBlocks(u8 *pData, u32 pBlkIdx, u8 pBlkCnt, u16 pByteOffset, u16 pByteCount) {
+    HAL_StatusTypeDef ret = HAL_ERROR;
+    if (pByteOffset == 0 && pByteCount == BLOCK_SIZE)
+    {
+        ret = HAL_SD_ReadBlocks(&hsd1, pData, pBlkIdx, pBlkCnt, 1000);
+    }
+    else
+    {
+        ret = HAL_SD_ReadBlocks(&hsd1, gSfsTmpBlock, pBlkIdx, 1, 1000);
+        if (pByteOffset + pByteCount > BLOCK_SIZE)
+        {
+            u32 remaining = pByteCount;
+            u32 count     = BLOCK_SIZE - pByteOffset;
+            memcpy(pData, gSfsTmpBlock + pByteOffset, count);
+
+            pData += count;
+            remaining -= count;
+
+            u32 fullBlocksLeft = remaining / BLOCK_SIZE;
+            if (fullBlocksLeft > 0)
+            {
+                ret = HAL_SD_ReadBlocks(&hsd1, pData, ++pBlkIdx, fullBlocksLeft, 1000);
+
+                pBlkIdx += fullBlocksLeft;
+                pData += fullBlocksLeft * BLOCK_SIZE;
+                remaining -= fullBlocksLeft * BLOCK_SIZE;
+            }
+
+            if (remaining > 0)
+            {
+                ret = HAL_SD_ReadBlocks(&hsd1, gSfsTmpBlock, pBlkIdx, 1, 1000);
+                memcpy(pData, gSfsTmpBlock, remaining);
+            }
+        }
+        else
+        {
+            memcpy(pData, gSfsTmpBlock + pByteOffset, pByteCount);
+        }
+    }
+
     if (ret != HAL_OK)
     {
         sysError(SERR_SD_GENERIC_ERROR);

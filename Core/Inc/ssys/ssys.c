@@ -30,8 +30,8 @@ s16            gSysAudioBackBuf[SYS_AUDIO_BUFFER_SAMPLE_COUNT];
 u16 DMA_BUFFER gSysDacBuf[SYS_DAC_SAMPLE_COUNT];
 sysTrack       gSysTrackInfo[SYS_TRACK_COUNT] = {};
 sysTrack *     gSysTrackCurrent               = gSysTrackInfo;
-s16            gSysPolyphonyData[SYS_POLYPHONY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
-u32            gSysPolyphonyProgress[SYS_POLYPHONY_COUNT] = {};
+s16            gSysPolyphonyData[SYS_TRACK_COUNT][SFS_KEY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
+sysPolyphony   gSysPolyphonyInfo[SYS_TRACK_COUNT][SFS_KEY_COUNT] = {};
 u8             gSysTmpBlock[BLOCK_SIZE];
 
 u32 gSysDmaProgress     = 0;
@@ -84,7 +84,7 @@ synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
     }
 
     sysGetMainTrack()->isActive                = true;
-    sysGetMainTrack()->instrument.instrumentId = 20; // jv
+    sysGetMainTrack()->instrument.instrumentId = 16; // jv
 
     return SERR_OK;
 }
@@ -99,11 +99,6 @@ void sysReadInputs() {
             u8   idx  = min(max(0, note), 60);
             auto key  = sysGetMainTrack()->keys + idx;
 
-            char noteStr[16];
-            tone t = toneFromAbsoluteSemitoneOffset(note);
-            solfegeToneToStr(noteStr, &t, false);
-            sserPrintf("NOTE ON %s\n", noteStr);
-
             key->state    = SYS_BTNSTATE_HELD;
             key->velocity = 255;
         }
@@ -112,11 +107,6 @@ void sysReadInputs() {
             int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
             u8   idx  = min(max(0, note), 60);
             auto key  = (sysGetMainTrack()->keys) + idx;
-
-            char noteStr[16];
-            tone t = toneFromAbsoluteSemitoneOffset(note);
-            solfegeToneToStr(noteStr, &t, false);
-            sserPrintf("NOTE OFF %s\n", noteStr);
 
             key->state = SYS_BTNSTATE_UP;
         }
@@ -160,15 +150,17 @@ void sysSynthesizeAudio() {
             continue;
         }
 
-        sfsReadBlocks((u8 *) &gSysProximityTable, gSfsHeader->proximityTableBlockStart + SFS_PROXIMITY_TABLE_BLOCK_SIZE * runtimeInstrument->instrumentId, SFS_PROXIMITY_TABLE_BLOCK_SIZE);
+        sfsReadBlocksFull((u8 *) &gSysProximityTable, gSfsHeader->proximityTableBlockStart + SFS_PROXIMITY_TABLE_BLOCK_SIZE * runtimeInstrument->instrumentId, SFS_PROXIMITY_TABLE_BLOCK_SIZE);
 
         for (int key = 0; key < SFS_KEY_COUNT; ++key)
         {
-            sysKeyData *keyData = track->keys + key;
+            sysPolyphony *polyphony = &(gSysPolyphonyInfo[i][key]);
+            sysKeyData *  keyData   = track->keys + key;
 
             switch (keyData->state)
             {
                 case SYS_BTNSTATE_NULL: {
+                    polyphony->play = false;
                     break;
                 }
 
@@ -212,46 +204,164 @@ void sysSynthesizeAudio() {
                     u32 sampleIdx = gSysProximityTable.sampleIdxOrigin + best->sampleIdx;
                     u32 block     = (sampleIdx * sizeof(sfsInstrumentSample)) / BLOCK_SIZE;
 
-                    sfsReadBlocks(gSysTmpBlock, gSfsHeader->sampleInfoBlockStart + block, 1);
+                    sfsReadBlockFull(gSysTmpBlock, gSfsHeader->sampleInfoBlockStart + block);
                     sfsInstrumentSample *sample = ((sfsInstrumentSample *) gSysTmpBlock) + (sampleIdx % (BLOCK_SIZE / sizeof(sfsInstrumentSample)));
 
-                    UNUSED(sampleIdx);
-                    UNUSED(best);
+                    u32  current = polyphony->blockProgress;
+                    bool inLoop  = polyphony->inLoop;
 
-                    u32 current = gSysPolyphonyProgress[polyphonyCounter];
+                    if (sample != polyphony->sample)
+                    {
+                        *polyphony        = (sysPolyphony){};
+                        polyphony->sample = sample;
+                    }
+
+                    u8 *polyData = (u8 *) gSysPolyphonyData[i][key];
 
                     if (base->soundType & SFS_SOUND_TYPE_LOOP)
                     {
-                        if (current > sample->loopStart + sample->loopDuration)
+                        u32 loopStartSamples    = sample->loopStart;
+                        u32 loopStartBytes      = loopStartSamples * SAMPLE_SIZE;
+                        u32 loopStartBlock      = sample->pcmDataBlockOffset + loopStartBytes / BLOCK_SIZE;
+                        u32 loopStartOffset     = loopStartBytes % BLOCK_SIZE;
+                        u16 loopDurationSamples = sample->loopDuration - 1;
+                        u32 loopDurationBytes   = loopDurationSamples * SAMPLE_SIZE;
+
+                        u32 sampleOff      = SAMPLE_SIZE * (loopStartSamples + polyphony->loopProgressSamples);
+                        u32 sampleOffBlock = sampleOff / BLOCK_SIZE;
+                        u32 loopBlock      = sample->pcmDataBlockOffset + sampleOffBlock;
+                        u32 loopBlockOff   = sampleOff % BLOCK_SIZE;
+
+                        if (inLoop)
                         {
-                            current = sample->loopStart;
+                            if (loopDurationBytes > BLOCK_SIZE)
+                            {
+                                u32 remainingBytes = SAMPLE_SIZE * (loopDurationSamples - polyphony->loopProgressSamples);
+                                if (remainingBytes > BLOCK_SIZE)
+                                {
+                                    sfsReadBlocksFromOffsetPartial(polyData, loopBlock, loopBlockOff, BLOCK_SIZE);
+                                    polyphony->loopProgressSamples += SAMPLES_PER_BLOCK;
+                                }
+                                else
+                                {
+                                    u32 left = BLOCK_SIZE - remainingBytes;
+                                    u8 *ptr  = polyData;
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopBlock, loopBlockOff, remainingBytes);
+                                    ptr += remainingBytes;
+
+                                    if (left > 0)
+                                    {
+                                        sfsReadBlocksFromOffsetPartial(ptr, loopStartBlock, loopStartOffset, left);
+                                        polyphony->loopProgressSamples = left / SAMPLE_SIZE;
+                                    }
+                                    else
+                                    {
+                                        polyphony->loopProgressSamples = 0;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                u32 remaining = BLOCK_SIZE;
+                                u8 *ptr       = polyData;
+
+                                if (polyphony->loopProgressSamples > 0)
+                                {
+                                    u32 toRead = loopDurationBytes - polyphony->loopProgressSamples * SAMPLE_SIZE;
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopBlock, loopBlockOff, toRead);
+                                    remaining -= toRead;
+                                    ptr += toRead;
+                                }
+
+                                while (remaining >= loopDurationBytes)
+                                {
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopStartBlock, loopStartOffset, loopDurationBytes);
+                                    remaining -= loopDurationBytes;
+                                    ptr += loopDurationBytes;
+                                }
+
+                                if (remaining > 0)
+                                {
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopStartBlock, loopStartOffset, remaining);
+                                }
+
+                                polyphony->loopProgressSamples = remaining / SAMPLE_SIZE;
+                            }
+                        }
+
+                        else
+                        {
+                            if (current * SAMPLES_PER_BLOCK <= loopStartSamples)
+                            {
+                                sfsReadBlockFull(polyData, sample->pcmDataBlockOffset + polyphony->blockProgress);
+                                polyphony->blockProgress++;
+                            }
+                            else
+                            {
+                                u32 remaining = BLOCK_SIZE;
+                                u8 *ptr       = polyData;
+
+                                polyphony->loopProgressSamples = sample->loopStart % SAMPLES_PER_BLOCK;
+
+                                sampleOff      = SAMPLE_SIZE * (loopStartSamples + polyphony->loopProgressSamples);
+                                sampleOffBlock = sampleOff / BLOCK_SIZE;
+                                loopBlock      = sample->pcmDataBlockOffset + sampleOffBlock;
+                                loopBlockOff   = sampleOff % BLOCK_SIZE;
+
+                                if (polyphony->loopProgressSamples > 0)
+                                {
+                                    u32 toRead = loopDurationBytes - polyphony->loopProgressSamples * SAMPLE_SIZE;
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopBlock, loopBlockOff, toRead);
+                                    remaining -= toRead;
+                                    ptr += toRead;
+                                }
+
+                                while (remaining > loopDurationBytes)
+                                {
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopStartBlock, loopStartOffset, loopDurationBytes);
+                                    remaining -= loopDurationBytes;
+                                    ptr += loopDurationBytes;
+                                }
+
+                                if (remaining > 0)
+                                {
+                                    sfsReadBlocksFromOffsetPartial(ptr, loopStartBlock, loopStartOffset, remaining);
+                                }
+
+                                polyphony->loopProgressSamples = remaining / SAMPLE_SIZE;
+                                polyphony->inLoop              = true;
+                            }
                         }
                     }
-
-                    if (current >= sample->pcmDataLengthBlocks)
+                    else
                     {
-                        memset(gSysPolyphonyData + polyphonyCounter, 0, SYS_AUDIO_BUFFER_SIZE);
-                        gSysPolyphonyProgress[polyphonyCounter] = 0;
-                        keyData->state = SYS_BTNSTATE_NULL;
-                        goto switchEnd;
-                    }
+                        if (current >= sample->pcmDataBlockOffset + sample->pcmDataLengthBlocks)
+                        {
+                            memset(polyData, 0, SYS_AUDIO_BUFFER_SIZE);
+                            *polyphony     = (sysPolyphony){};
+                            // keyData->state = SYS_BTNSTATE_NULL;
+                            goto switchEnd;
+                        }
 
-                    sfsReadBlocks((u8 *) (gSysPolyphonyData + polyphonyCounter), sample->pcmDataBlockOffset + current, 1);
+                        sfsReadBlockFull(polyData, sample->pcmDataBlockOffset + current);
+
+                        polyphony->blockProgress++;
+                    }
 
                     if (keyData->velocity != best->velocity)
                     {
                         float velocityFix = 1 + (((int) keyData->velocity - best->velocity) / 255.0F);
 
                         int j = 0;
-                        for (s16 *s = (s16 *) (gSysPolyphonyData + polyphonyCounter); j < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++j, ++s)
+                        for (s16 *s = (s16 *) (polyData); j < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++j, ++s)
                         {
                             *s = (s16) (*s * velocityFix);
                         }
                     }
 
-                    gSysPolyphonyProgress[polyphonyCounter]++;
-
+                    polyphony->play = true;
                     polyphonyCounter++;
+
                     break;
                 }
 
@@ -261,27 +371,52 @@ void sysSynthesizeAudio() {
                 }
             }
         switchEnd:
+
+
+
         }
     }
 
 loopEnd:
 
-    if (polyphonyCounter == 0)
+    memset(gSysAudioBackBuf, 0, SYS_AUDIO_BUFFER_SIZE);
+
+    if (polyphonyCounter != 0)
     {
-        memset(gSysAudioBackBuf, 0, SYS_AUDIO_BUFFER_SIZE);
-    }
-    else
-    {
-        for (int sampleIdx = 0; sampleIdx < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++sampleIdx)
+        for (int i = 0; i < SYS_TRACK_COUNT; ++i)
         {
-            s16 sum = 0;
-            for (int i = 0; i < polyphonyCounter; ++i)
+            sysTrack *track = gSysTrackInfo + i;
+            if (!track->isActive)
             {
-                sum += gSysPolyphonyData[i][sampleIdx];
+                continue;
             }
 
-            gSysAudioBackBuf[sampleIdx] = sum;
+            sysPolyphony *arr  = gSysPolyphonyInfo[i];
+            auto          poly = gSysPolyphonyData[i];
+            for (int j = 0; j < SFS_KEY_COUNT; ++j)
+            {
+                if (!arr[j].play)
+                {
+                    continue;
+                }
+
+                s16 *data = poly[j];
+                for (int k = 0; k < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++k)
+                {
+                    gSysAudioBackBuf[k] += data[k];
+                }
+            }
         }
+        // for (int sampleIdx = 0; sampleIdx < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++sampleIdx)
+        // {
+        //     s16 sum = 0;
+        //     for (int i = 0; i < polyphonyCounter; ++i)
+        //     {
+        //         sum += gSysPolyphonyData[i][sampleIdx];
+        //     }
+        //
+        //     gSysAudioBackBuf[sampleIdx] = sum;
+        // }
     }
 
     for (int i = 0; i < SYS_AUDIO_BUFFER_SAMPLE_COUNT; ++i)
@@ -504,15 +639,15 @@ void sysUpdateTrackData() {
         if (!track->isLoaded)
         {
             u32 off = instrument->instrumentId * sizeof(sfsSingleInstrument);
-            sfsReadBlocks(gSysTmpBlock, gSfsHeader->instrumentInfoDataBlockStart + off / BLOCK_SIZE, 1);
+            sfsReadBlockFull(gSysTmpBlock, gSfsHeader->instrumentInfoDataBlockStart + off / BLOCK_SIZE);
 
             memcpy(instrument, gSysTmpBlock + off % BLOCK_SIZE, sizeof(sfsSingleInstrument)); // NOT a typo. instrument.base is always at offset 0x0
 
             u32 lutOffset = instrument->base.nameStrIndex * sizeof(u32);
-            sfsReadBlocks(gSysTmpBlock, gSfsHeader->stringLutBlockStart + lutOffset / BLOCK_SIZE, 1);
+            sfsReadBlockFull(gSysTmpBlock, gSfsHeader->stringLutBlockStart + lutOffset / BLOCK_SIZE);
 
             u32 stringOffset = *(u32 *) (gSysTmpBlock + (lutOffset % BLOCK_SIZE));
-            sfsReadBlocks(gSysTmpBlock, gSfsHeader->stringDataBlockStart + stringOffset / BLOCK_SIZE, 1);
+            sfsReadBlockFull(gSysTmpBlock, gSfsHeader->stringDataBlockStart + stringOffset / BLOCK_SIZE);
 
             strcpy(instrument->cachedName, (str) gSysTmpBlock + stringOffset);
 
@@ -530,6 +665,7 @@ void sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity) {
 }
 
 void sysError(synthErrno pCode) {
+    sysPrintf("error %d\n", (int) pCode);
     sprintf(gSysStrError, "Error - code %d", pCode);
     gSysCurrentMenuId = SYS_MENU_ERROR;
     sysRender();

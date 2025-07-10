@@ -63,7 +63,7 @@ typedef enum : u8 {
     SYS_BTNSTATE_NULL,
     SYS_BTNSTATE_DOWN, // just pressed
     SYS_BTNSTATE_HELD,
-    SYS_BTNSTATE_UP,   // just released
+    SYS_BTNSTATE_UP, // just released
 } sysButtonState;
 
 typedef enum : u8 {
@@ -97,7 +97,13 @@ typedef struct {
 } sysTrack;
 
 typedef struct {
-    u32 blockProgress;
+    sfsInstrumentSample *sample;
+    u32                  blockProgress;
+    u16                  loopProgressSamples;
+
+    bool play    : 1;
+    bool inLoop  : 1;
+    bool loopOver: 1;
 } sysPolyphony;
 
 typedef struct {
@@ -126,8 +132,8 @@ extern s16                  gSysAudioBackBuf[];
 extern sfsKeyProximityTable gSysProximityTable;
 extern sysTrack *           gSysTrackCurrent;
 extern sysTrack             gSysTrackInfo[];
-extern s16                  gSysPolyphonyData[SYS_POLYPHONY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
-extern u32                  gSysPolyphonyProgress[SYS_POLYPHONY_COUNT];
+extern s16                  gSysPolyphonyData[SYS_TRACK_COUNT][SFS_KEY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
+extern sysPolyphony         gSysPolyphonyInfo[SYS_TRACK_COUNT][SFS_KEY_COUNT];
 extern u8                   gSysTmpBlock[];
 extern u32                  gSysDmaProgress;
 extern u32                  gSysDataLoadCounter;
@@ -143,19 +149,19 @@ extern ADC_HandleTypeDef *gSysAdc;
 
 #define sysGetTrackData(i) ((u16*)(gSysTrackData + i))
 
-synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc);
-void sysPoll();
-void sysUpdateTrackData();
-void sysRender();
+synthErrno     sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc);
+void           sysPoll();
+void           sysUpdateTrackData();
+void           sysRender();
 sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn);
-void sysHandleInputs();
-void sysReadInputs();
-void sysHandlePitchBend();
-void sysSynthesizeAudio();
-synthErrno sysDeinit();
-void sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-void sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-void sysError(synthErrno pCode);
+void           sysHandleInputs();
+void           sysReadInputs();
+void           sysHandlePitchBend();
+void           sysSynthesizeAudio();
+synthErrno     sysDeinit();
+void           sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
+void           sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
+void           sysError(synthErrno pCode);
 
 #define sysGetMainTrack() gSysTrackInfo
 #define sysPrintf(fmt, ...) printf("ssys: " fmt, ##__VA_ARGS__)

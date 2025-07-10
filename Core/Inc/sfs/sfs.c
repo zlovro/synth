@@ -8,9 +8,10 @@
 #include <stdlib.h>
 
 u8 gSfsFirstBlockData[BLOCK_SIZE];
+u8 gSfsTmpBlock[BLOCK_SIZE];
 
 synthErrno sfsInit() {
-    synthErrno ret = sfsReadBlocks(gSfsFirstBlockData, 0, 1);
+    synthErrno ret = sfsReadBlockFull(gSfsFirstBlockData, 0);
     if (ret != SERR_OK)
     {
         return ret;
