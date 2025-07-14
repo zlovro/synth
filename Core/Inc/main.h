@@ -27,10 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#ifndef SYNTHWIN
 #include "stm32h7xx_hal.h"
-#endif
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -117,6 +114,7 @@ void serialPrintf(const char *format, ...);
 #define usage6 48khz dac
 #define usage5 us timer
 #define usage7 10khz timer
+#define usage17 rotary encoder
 #define LCD_CS_Pin GPIO_PIN_3
 #define LCD_CS_GPIO_Port GPIOE
 #define LCD_RESET_Pin GPIO_PIN_5
@@ -155,6 +153,14 @@ void serialPrintf(const char *format, ...);
 #define MUX_S2_GPIO_Port GPIOD
 #define MUX_S3_Pin GPIO_PIN_7
 #define MUX_S3_GPIO_Port GPIOD
+#define ROT_SW_Pin GPIO_PIN_3
+#define ROT_SW_GPIO_Port GPIOB
+#define ROT_B_Pin GPIO_PIN_4
+#define ROT_B_GPIO_Port GPIOB
+#define ROT_A_Pin GPIO_PIN_6
+#define ROT_A_GPIO_Port GPIOB
+#define BTN_DBG_Pin GPIO_PIN_7
+#define BTN_DBG_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
@@ -162,8 +168,6 @@ void serialPrintf(const char *format, ...);
 #define TIM_DAC TIM6
 #define TIM_US TIM5
 #define TIM_DELAY_US TIM4
-
-extern char gPrintfBuf[];
 
 extern const mux gMuxOgKeyRow;
 extern const mux gMuxOgKeyCol;

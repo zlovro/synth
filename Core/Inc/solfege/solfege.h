@@ -41,6 +41,7 @@ static_assert(sizeof(tone) == 8);
 #define TONE_OFFSET_C8 (12 * 8)
 
 #define TONE_OFFSET_B4 (TONE_OFFSET_C5 - 1)
+#define TONE_OFFSET_A5 (TONE_OFFSET_C5 - 3)
 #define TONE_OFFSET_B6 (TONE_OFFSET_C7 - 1)
 #define TONE_OFFSET_D6 (TONE_OFFSET_C6 + 2)
 #define TONE_OFFSET_E6 (TONE_OFFSET_C6 + 4)
@@ -60,7 +61,7 @@ extern char gOffsetToNoteNameTable[];
 
 void       solfegeInit();
 synthErrno solfegeParseNote(str pString, tone* pOutTone);
-synthErrno solfegeToneToStr(str pString, tone* pInTone, bool pPreferFlats);
+synthErrno solfegeSemitoneToStr(str pString, u8 pSemitones, bool pPreferFlats);
 synthErrno solfegeToneWithVelocityToStr(str pString, tone* pInTone, u8 pVelocity, bool pPreferFlats);
 bool         solfegeToneIsNatural(u8 pSemitoneOffset);
 

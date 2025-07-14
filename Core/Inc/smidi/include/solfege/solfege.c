@@ -82,13 +82,13 @@ synthErrno solfegeParseNote(str pString, tone* pOutTone)
     return SERR_OK;
 }
 
-synthErrno solfegeToneToStr(str pString, tone* pInTone, bool pPreferFlats)
+synthErrno solfegeSemitoneToStr(str pString, u8 pSemitones, bool pPreferFlats)
 {
-    u8 mod    = pInTone->semitoneOffset % 12;
-    u8 octave = pInTone->semitoneOffset / 12;
+    u8 mod    = pSemitones % 12;
+    u8 octave = pSemitones / 12;
 
     char noteNameBuf[8];
-    bool isNatural = solfegeToneIsNatural(pInTone->semitoneOffset);
+    bool isNatural = solfegeToneIsNatural(pSemitones);
     if (isNatural)
     {
         sprintf(noteNameBuf, "%c%d", gOffsetToNoteNameTable[mod], octave);
@@ -108,7 +108,7 @@ synthErrno solfegeToneToStr(str pString, tone* pInTone, bool pPreferFlats)
 synthErrno solfegeToneWithVelocityToStr(str pString, tone* pInTone, u8 pVelocity, bool pPreferFlats)
 {
     char buf[8];
-    solfegeToneToStr(buf, pInTone, pPreferFlats);
+    solfegeSemitoneToStr(buf, pInTone->semitoneOffset, pPreferFlats);
 
     sprintf(pString, "%s_%d", buf, pVelocity);
 

@@ -35,7 +35,11 @@ typedef double f64;
 
 typedef u32 sz;
 
-typedef char* str;
+typedef char *str;
+
+#define EDGE_INVALID 0
+#define EDGE_FALLING 1
+#define EDGE_RISING 2
 
 #define assertSize(obj, sz) static_assert(sizeof(obj) == sz)
 #define assertSizeAlignedTo(obj, tgt) static_assert(tgt % sizeof(obj) == 0)
@@ -70,5 +74,7 @@ typedef char* str;
 #define bswap24(n) ((n & 0xFF00) | ((n >> 16) & 0xFF) | ((n & 0xFF) << 16))
 #define bswap32(n) ((bswap16((n&0xFFFF0000)>>16))|((bswap16(n&0x0000FFFF))<<16))
 #define bswap64(n) ((bswap32((n&0xFFFFFFFF00000000)>>32))|((bswap32(n&0x00000000FFFFFFFF))<<32))
+
+#define halt(cond) { volatile u32 __halt_ctr = 0; while (cond) { __halt_ctr++; } }
 
 #endif //TYPES_H

@@ -12,15 +12,17 @@
 #include <stdarg.h>
 #include <ssys/ssys.h>
 
-SPI_HandleTypeDef *gGlcdSpi = NULL;
-BDMA_BUFFER u8     gGlcdDmaData[GLCD_SEND_QUEUE_MAX_DATA_LENGTH];
-u16                gGlcdDmaDataSize  = 0;
-u32                gGlcdFrameCounter = 0;
-u8                 gGlcdFrameBufBack[0x400];
-u8                 gGlcdFrameBufFront[0x400];
-GPIO_TypeDef *     gGlcdCsPort = NULL;
-sfsGlyph *         gGlyphs     = NULL;
-SD_HandleTypeDef * gGlcdSd     = NULL;
+#include "usbd_cdc_if.h"
+
+SPI_HandleTypeDef *gGlcdSpi                                      = NULL;
+BDMA_BUFFER u8     gGlcdDmaData[GLCD_SEND_QUEUE_MAX_DATA_LENGTH] = {};
+u16                gGlcdDmaDataSize                              = 0;
+u32                gGlcdFrameCounter                             = 0;
+u8                 gGlcdWrapX                                    = 128;
+u8                 gGlcdFrameBufBack[0x400]                      = {};
+u8                 gGlcdFrameBufFront[0x400]                     = {};
+GPIO_TypeDef *     gGlcdCsPort                                   = NULL;
+sfsGlyph           gGlyphs[SFS_GLYPH_COUNT]                      = {};
 
 bool gGlcdInitialized       = false;
 bool gGlcdFinishedRendering = true;
@@ -103,7 +105,7 @@ void glcdClsSoft() {
     memset(gGlcdFrameBufBack, 0, 0x400);
 }
 
-void glcdInit(SD_HandleTypeDef *pSd, SPI_HandleTypeDef *pSpi, GPIO_TypeDef *pCsPort, u16 pPin) {
+void glcdInit(SPI_HandleTypeDef *pSpi, GPIO_TypeDef *pCsPort, u16 pPin) {
     HAL_Delay(50);
     HAL_GPIO_WritePin(LCD_RESET_GPIO_Port, LCD_RESET_Pin, GPIO_PIN_RESET);
     HAL_Delay(50);
@@ -113,15 +115,10 @@ void glcdInit(SD_HandleTypeDef *pSd, SPI_HandleTypeDef *pSpi, GPIO_TypeDef *pCsP
     gGlcdCsPort = pCsPort;
     gGlcdCsPin  = pPin;
     gGlcdSpi    = pSpi;
-    gGlcdSd     = pSd;
-
-    memset(gGlcdFrameBufFront, 0, 0x400);
-    memset(gGlcdFrameBufBack, 0, 0x400);
 
     glcdClsSoft();
 
-    gGlyphs                  = malloc(SFS_FONT_SIZE_ALIGNED);
-    HAL_StatusTypeDef halRet = HAL_SD_ReadBlocks(gGlcdSd, (u8 *) gGlyphs, gSfsHeader->fontDataBlockStart, SFS_FONT_SIZE_BLOCKS, 1000);
+    HAL_StatusTypeDef halRet = sfsReadBlockFromOffsetPartial((u8 *) gGlyphs, gSfsHeader->fontDataBlockStart, 0, SFS_FONT_SIZE);
 
     if (halRet != HAL_OK)
     {
@@ -152,13 +149,13 @@ void glcdDrawChar(char pChar) {
 
     int glyphWidth = 1 + drawingEnd - drawingStart;
 
-    if (gGlcdCursorX + glyphWidth > 128)
+    if (gGlcdCursorX + glyphWidth > gGlcdWrapX)
     {
         gGlcdCursorX = gGlcdOriginX;
-        gGlcdCursorY += SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y;
+        gGlcdCursorY += SYS_LINE_HEIGHT;
     }
 
-    for (int localX = drawingStart, i = 0; i < glyphWidth && gGlcdCursorX < 128; gGlcdCursorX++, localX++, i++)
+    for (int localX = drawingStart, i = 0; i < glyphWidth && gGlcdCursorX < gGlcdWrapX; gGlcdCursorX++, localX++, i++)
     {
         u8 column = glyph->cols[localX];
 
@@ -186,7 +183,7 @@ void glcdDrawStringLen(char *pString, u8 pLen) {
         char c = *pString++;
         if (c == '\n')
         {
-            gGlcdCursorY += SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y;
+            gGlcdCursorY += SYS_LINE_HEIGHT;
             gGlcdCursorX = gGlcdOriginX;
             continue;
         }
@@ -238,7 +235,7 @@ void glcdDrawStringLenCenteredInRect(char *pString, u8 pLen, u8 pX0, u8 pY0, u8 
         {
             lineLengths[line++] = pixelLenCurrentLine;
             pixelLenCurrentLine = 0;
-            pixelHeight += SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y;
+            pixelHeight += SYS_LINE_HEIGHT;
         }
     }
 
@@ -257,7 +254,7 @@ void glcdDrawStringLenCenteredInRect(char *pString, u8 pLen, u8 pX0, u8 pY0, u8 
             f32 marginX = pHorizontally ? (pWidth - lineLengths[line]) / 2.0F : 0;
             f32 cursorX = marginX >= 0 ? pX0 + marginX : pX0;
 
-            // glcdDrawRectangle(pX0, gGlcdCursorY, marginX, SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y, 1);
+            // glcdDrawRectangle(pX0, gGlcdCursorY, marginX, SYS_LINE_HEIGHT, 1);
 
             gGlcdOriginX = cursorX;
             gGlcdCursorX = cursorX;
@@ -270,7 +267,7 @@ void glcdDrawStringLenCenteredInRect(char *pString, u8 pLen, u8 pX0, u8 pY0, u8 
         if (c == '\n')
         {
             line++;
-            gGlcdCursorY += SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y;
+            gGlcdCursorY += SYS_LINE_HEIGHT;
             continue;
         }
 
@@ -285,17 +282,19 @@ void glcdDrawStringCenteredInRect(char *pString, u8 pX0, u8 pY0, u8 pWidth, u8 p
     glcdDrawStringLenCenteredInRect(pString, strlen(pString), pX0, pY0, pWidth, pHeight, pVertically, pHorizontally);
 }
 
+char gGlcdPrintfBuf[256];
+
 void glcdPrintf(char *pFormat, ...) {
     va_list args;
     va_start(args, pFormat);
 
-    char buf[256];
-    vsprintf(buf, pFormat, args);
-
-    glcdDrawString(buf);
+    vsprintf(gGlcdPrintfBuf, pFormat, args);
+    glcdDrawString(gGlcdPrintfBuf);
 
     va_end(args);
 }
+
+u8 gGlcdDbg[1026] = {};
 
 void glcdFinalize() {
     if (!gGlcdInitialized || gGlcdSpi->State != HAL_SPI_STATE_READY)
@@ -309,6 +308,11 @@ void glcdFinalize() {
     }
 
     memcpy(gGlcdFrameBufFront, gGlcdFrameBufBack, 0x400);
+
+    gGlcdDbg[0] = 0xA0;
+    gGlcdDbg[1] = 0xA1;
+    memcpy(gGlcdDbg + 2, gGlcdFrameBufFront, 0x400);
+    CDC_Transmit_FS(gGlcdDbg, 0x402);
 
     glcdCsHigh();
     gGlcdDmaDataSize = 0;
@@ -447,5 +451,4 @@ void glcdDrawRectangle(u8 pX0, u8 pY0, u8 pWidth, u8 pHeight, u8 pThickness) {
 }
 
 void glcdDeinit() {
-    free(gGlyphs);
 }

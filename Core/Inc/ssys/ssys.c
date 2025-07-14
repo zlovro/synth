@@ -32,20 +32,23 @@ sysTrack       gSysTrackInfo[SYS_TRACK_COUNT] = {};
 sysTrack *     gSysTrackCurrent               = gSysTrackInfo;
 s16            gSysPolyphonyData[SYS_TRACK_COUNT][SFS_KEY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
 sysPolyphony   gSysPolyphonyInfo[SYS_TRACK_COUNT][SFS_KEY_COUNT] = {};
-u8             gSysTmpBlock[BLOCK_SIZE];
 
 u32 gSysDmaProgress     = 0;
 u32 gSysDataLoadCounter = 0;
 
 char gSysStrError[128];
 
-sysInputBitmap  gSysBtnKeyStates[SFS_KEYS_WORD_COUNT]     = {{0}};
-sysInputBitmap  gSysBtnMtx1State                          = {0};
-sysKeyTimestamp gSysKeyTimestamps[SFS_KEY_SEMITONE_RANGE] = {{0}};
+sysInputBitmap   gSysBtnKeyStates[SFS_KEYS_WORD_COUNT]     = {{0}};
+sysInputBitmap   gSysBtnMtx1State                          = {0};
+sysKeyTimestamp  gSysKeyTimestamps[SFS_KEY_SEMITONE_RANGE] = {{0}};
+sysRotaryEncoder gSysRotaryEncoder                         = {};
+sysDebugData     gSysDebugData                             = {};
 
 ADC_HandleTypeDef *gSysAdc;
 
 u32 gMidiEvent = 0;
+
+const bool DEBUG_MENU = true;
 
 synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
     glcdSetOrigin(SYS_GUI_ORIGIN, SYS_GUI_ORIGIN);
@@ -54,7 +57,7 @@ synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
     memset(gSysDacBuf, 0, SYS_DAC_BUFFER_SIZE);
     memset(gSysAudioBackBuf, 0, SYS_AUDIO_BUFFER_SIZE);
     memset(gSysAudioFrontBuf, 0, SYS_AUDIO_BUFFER_SIZE);
-    zmem(gSysTmpBlock, BLOCK_SIZE);
+    zmem(gSfsTmpBlock, BLOCK_SIZE);
 
     for (int i = 0; i < SYS_TRACK_COUNT; i++)
     {
@@ -84,35 +87,272 @@ synthErrno sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc) {
     }
 
     sysGetMainTrack()->isActive                = true;
-    sysGetMainTrack()->instrument.instrumentId = 16; // jv
+    sysGetMainTrack()->instrument.instrumentId = 20;
+    gSysDebugData.submenu                      = SYS_DEBUG_SUBMENU_INSTRUMENT_SELECT;
+    gSysDebugData.reloadSample                 = true;
 
     return SERR_OK;
 }
 
 void sysReadInputs() {
-    if (TIM_US->CNT - sysGetMainTrack()->midiUs > gSmidiCurrentEvent.deltaTime * gSmidiCurrentEvent.usPerTick)
+    gSysRotaryEncoder.outA              = HAL_GPIO_ReadPin(ROT_A_GPIO_Port, ROT_A_Pin);
+    gSysRotaryEncoder.outB              = HAL_GPIO_ReadPin(ROT_B_GPIO_Port, ROT_B_Pin);
+    gSysRotaryEncoder.sw                = !HAL_GPIO_ReadPin(ROT_SW_GPIO_Port, ROT_SW_Pin);
+    gSysDebugData.changeMenuButtonState = HAL_GPIO_ReadPin(BTN_DBG_GPIO_Port, BTN_DBG_Pin);
+
+    sysTrack *track = sysGetMainTrack();
+    if (!track->isLoaded)
     {
-        sysGetMainTrack()->midiUs = TIM_US->CNT;
-        if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_ON)
-        {
-            int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
-            u8   idx  = min(max(0, note), 60);
-            auto key  = sysGetMainTrack()->keys + idx;
-
-            key->state    = SYS_BTNSTATE_HELD;
-            key->velocity = 255;
-        }
-        else if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_OFF)
-        {
-            int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
-            u8   idx  = min(max(0, note), 60);
-            auto key  = (sysGetMainTrack()->keys) + idx;
-
-            key->state = SYS_BTNSTATE_UP;
-        }
-
-        smidiTestReadEvent(++gMidiEvent);
+        return;
     }
+    sysSingleInstrumentRuntime *instrument = &(track->instrument);
+
+    sfsInstrumentSample *sample = &gSysDebugData.sample;
+    if (gSysDebugData.reloadSample)
+    {
+        sfsReadBlocksFull((u8 *) &gSysProximityTable, gSfsHeader->proximityTableBlockStart + SFS_PROXIMITY_TABLE_BLOCK_SIZE * instrument->instrumentId, SFS_PROXIMITY_TABLE_BLOCK_SIZE);
+
+        sfsKeyProximityTableEntryVelocity *entry = gSysProximityTable.masterEntries[gSysDebugData.noteSelected].byVelocity;
+
+        for (int i = 0; i < SFS_MAX_VELOCITY_COUNT; ++i, entry++)
+        {
+            if (entry->velocity == SFS_INVALID_VELOCITY)
+            {
+                break;
+            }
+
+            if (entry->velocity == gSysDebugData.velocity)
+            {
+                break;
+            }
+
+            gSysDebugData.velocity = entry->velocity;
+        }
+
+        u32 idx   = gSysProximityTable.sampleIdxOrigin + entry->sampleIdx;
+        u32 block = idx / SAMPLE_INFOS_PER_BLOCK;
+        sfsReadBlockFromOffsetPartial((u8*)sample, gSfsHeader->sampleInfoBlockStart + block, (idx % SAMPLE_INFOS_PER_BLOCK) * sizeof(sfsInstrumentSample), sizeof(sfsInstrumentSample));
+
+        gSysDebugData.reloadSample = false;
+    }
+
+    // button up
+    if (!gSysRotaryEncoder.sw && gSysRotaryEncoder.lastSw)
+    {
+        gSysDebugData.submenu++;
+        if (gSysDebugData.submenu == SYS_DEBUG_SUBMENU_MAX)
+        {
+            gSysDebugData.submenu = 0;
+        }
+
+        if (gSysDebugData.submenu == SYS_DEBUG_SUBMENU_LOOP_CHANGE && sample->loopDuration == 0)
+        {
+            gSysDebugData.submenu--;
+        }
+    }
+
+    if (!gSysDebugData.changeMenuButtonState && gSysDebugData.lastChangeMenuButtonState)
+    {
+        gSysDebugData.loopButton++;
+        if (gSysDebugData.loopButton == SYS_DEBUG_LOOP_BUTTON_MAX)
+        {
+            gSysDebugData.loopButton = 0;
+        }
+    }
+
+    bool cw      = !gSysRotaryEncoder.outA && gSysRotaryEncoder.lastOutA && gSysRotaryEncoder.outB;
+    bool ccw     = !gSysRotaryEncoder.outB && gSysRotaryEncoder.lastOutB && gSysRotaryEncoder.outA;
+    bool rotated = cw || ccw;
+
+    if (rotated)
+    {
+        if (gSysDebugData.submenu == SYS_DEBUG_SUBMENU_INSTRUMENT_SELECT)
+        {
+            u16 lastId = gSfsHeader->instrumentCount - 1;
+            if (cw)
+            {
+                if (instrument->instrumentId == lastId)
+                {
+                    instrument->instrumentId = 0;
+                }
+                else
+                {
+                    instrument->instrumentId++;
+                }
+            }
+            else
+            {
+                if (instrument->instrumentId == 0)
+                {
+                    instrument->instrumentId = lastId;
+                }
+                else
+                {
+                    instrument->instrumentId--;
+                }
+            }
+
+            track->isLoaded            = false;
+            gSysDebugData.reloadSample = true;
+        }
+        if (gSysDebugData.submenu == SYS_DEBUG_SUBMENU_LOOP_CHANGE)
+        {
+            switch (gSysDebugData.loopButton)
+            {
+                case SYS_DEBUG_LOOP_BUTTON_START: {
+                    if (cw)
+                    {
+                        if (sample->loopStart + sample->loopDuration < sample->pcmDataLengthSamples)
+                        {
+                            sample->loopStart++;
+                        }
+                    }
+                    else
+                    {
+                        if (sample->loopStart > 0)
+                        {
+                            sample->loopStart--;
+                        }
+                    }
+                    break;
+                }
+
+                case SYS_DEBUG_LOOP_BUTTON_DURATION: {
+                    if (cw)
+                    {
+                        if (sample->loopStart + sample->loopDuration < sample->pcmDataLengthSamples)
+                        {
+                            sample->loopDuration++;
+                        }
+                    }
+                    else
+                    {
+                        if (sample->loopDuration > 0)
+                        {
+                            sample->loopDuration--;
+                        }
+                    }
+                    break;
+                }
+
+                case SYS_DEBUG_LOOP_BUTTON_NOTE_CHANGE: {
+                    if (cw)
+                    {
+                        if (gSysDebugData.noteSelected < SFS_KEY_COUNT - 1)
+                        {
+                            gSysDebugData.noteSelected++;
+                        }
+                    }
+                    else
+                    {
+                        if (gSysDebugData.noteSelected > 0)
+                        {
+                            gSysDebugData.noteSelected--;
+                        }
+                    }
+                    gSysDebugData.reloadSample = true;
+
+                    break;
+                }
+
+                case SYS_DEBUG_LOOP_BUTTON_VELOCITY_CHANGE: {
+                    u8 idx   = 0;
+                    u8 count = 0;
+
+                    sfsKeyProximityTableEntryVelocity *entry = gSysProximityTable.masterEntries[gSysDebugData.noteSelected].byVelocity;
+                    for (int i = 0; i < SFS_MAX_VELOCITY_COUNT; ++i, entry++)
+                    {
+                        if (entry->velocity == gSysDebugData.velocity)
+                        {
+                            idx = i;
+                        }
+
+                        if (entry->velocity == SFS_INVALID_VELOCITY)
+                        {
+                            count = i;
+                        }
+                    }
+
+                    idx++;
+                    if (idx == count)
+                    {
+                        idx = 0;
+                    }
+
+                    gSysDebugData.velocity     = (entry + idx)->velocity;
+                    gSysDebugData.reloadSample = true;
+
+                    break;
+                }
+
+                case SYS_DEBUG_LOOP_BUTTON_WRITE: {
+                    sfsKeyProximityTableEntryVelocity *entry = gSysProximityTable.masterEntries[gSysDebugData.noteSelected].byVelocity;
+
+                    for (int i = 0; i < SFS_MAX_VELOCITY_COUNT; ++i, entry++)
+                    {
+                        if (entry->velocity == SFS_INVALID_VELOCITY)
+                        {
+                            break;
+                        }
+
+                        if (entry->velocity == gSysDebugData.velocity)
+                        {
+                            break;
+                        }
+
+                        gSysDebugData.velocity = entry->velocity;
+                    }
+
+                    u32 idx   = gSysProximityTable.sampleIdxOrigin + entry->sampleIdx;
+                    u32 block = gSfsHeader->sampleInfoBlockStart + idx / SAMPLE_INFOS_PER_BLOCK;
+                    sfsReadBlockFull(gSfsTmpBlock, block);
+
+                    memcpy((sfsInstrumentSample *) gSfsTmpBlock + idx % SAMPLE_INFOS_PER_BLOCK, sample, sizeof(sfsInstrumentSample));
+                    sfsWriteBlockFull(gSfsTmpBlock, block);
+
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    for (int i = 0; i < SFS_KEY_COUNT; ++i)
+    {
+        sysKeyData *key = track->keys + i;
+        key->velocity   = 0;
+        key->state      = SYS_BTNSTATE_NULL;
+    }
+
+    track->keys[gSysDebugData.noteSelected].state    = SYS_BTNSTATE_HELD;
+    track->keys[gSysDebugData.noteSelected].velocity = gSysDebugData.velocity;
+
+
+    // if (TIM_US->CNT - sysGetMainTrack()->midiUs > gSmidiCurrentEvent.deltaTime * gSmidiCurrentEvent.usPerTick)
+    // {
+    //     sysGetMainTrack()->midiUs = TIM_US->CNT;
+    //     if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_ON)
+    //     {
+    //         int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
+    //         u8   idx  = min(max(0, note), 60);
+    //         auto key  = sysGetMainTrack()->keys + idx;
+    //
+    //         key->state    = SYS_BTNSTATE_HELD;
+    //         key->velocity = 255;
+    //     }
+    //     else if (gSmidiCurrentEvent.event == SMIDI_CHANNEL_EVENT_NOTE_OFF)
+    //     {
+    //         int  note = gSmidiCurrentEvent.note - 12 - SFS_FIRST_KEY;
+    //         u8   idx  = min(max(0, note), 60);
+    //         auto key  = (sysGetMainTrack()->keys) + idx;
+    //
+    //         key->state = SYS_BTNSTATE_NULL;
+    //     }
+    //
+    //     smidiTestReadEvent(++gMidiEvent);
+    // }
 
     // gSysBtnMtx1State.lastState = gSysBtnMtx1State.currentState;
     // // button matrix 1
@@ -204,11 +444,11 @@ void sysSynthesizeAudio() {
                     u32 sampleIdx = gSysProximityTable.sampleIdxOrigin + best->sampleIdx;
                     u32 block     = (sampleIdx * sizeof(sfsInstrumentSample)) / BLOCK_SIZE;
 
-                    sfsReadBlockFull(gSysTmpBlock, gSfsHeader->sampleInfoBlockStart + block);
-                    sfsInstrumentSample *sample = ((sfsInstrumentSample *) gSysTmpBlock) + (sampleIdx % (BLOCK_SIZE / sizeof(sfsInstrumentSample)));
+                    sfsReadBlockFull(gSfsTmpBlock, gSfsHeader->sampleInfoBlockStart + block);
+                    sfsInstrumentSample *sample = ((sfsInstrumentSample *) gSfsTmpBlock) + (sampleIdx % (BLOCK_SIZE / sizeof(sfsInstrumentSample)));
 
-                    u32  current = polyphony->blockProgress;
-                    bool inLoop  = polyphony->inLoop;
+                    u32  blockProgress = polyphony->blockProgress;
+                    bool inLoop        = polyphony->inLoop;
 
                     if (sample != polyphony->sample)
                     {
@@ -218,14 +458,18 @@ void sysSynthesizeAudio() {
 
                     u8 *polyData = (u8 *) gSysPolyphonyData[i][key];
 
+                    u32 sampleLengthSamples = sample->pcmDataLengthSamples;
+
                     if (base->soundType & SFS_SOUND_TYPE_LOOP)
                     {
                         u32 loopStartSamples    = sample->loopStart;
                         u32 loopStartBytes      = loopStartSamples * SAMPLE_SIZE;
                         u32 loopStartBlock      = sample->pcmDataBlockOffset + loopStartBytes / BLOCK_SIZE;
                         u32 loopStartOffset     = loopStartBytes % BLOCK_SIZE;
-                        u16 loopDurationSamples = sample->loopDuration - 1;
+                        u16 loopDurationSamples = sample->loopDuration;
                         u32 loopDurationBytes   = loopDurationSamples * SAMPLE_SIZE;
+                        u32 loopEndSample       = loopStartSamples + loopDurationSamples;
+                        UNUSED(loopEndSample);
 
                         u32 sampleOff      = SAMPLE_SIZE * (loopStartSamples + polyphony->loopProgressSamples);
                         u32 sampleOffBlock = sampleOff / BLOCK_SIZE;
@@ -288,10 +532,11 @@ void sysSynthesizeAudio() {
                                 polyphony->loopProgressSamples = remaining / SAMPLE_SIZE;
                             }
                         }
-
                         else
                         {
-                            if (current * SAMPLES_PER_BLOCK <= loopStartSamples)
+                            u32 blockProgressSamples = blockProgress * SAMPLES_PER_BLOCK;
+                            u32 blockProgressBytes   = SAMPLE_SIZE * blockProgressSamples;
+                            if (blockProgressSamples < loopStartSamples)
                             {
                                 sfsReadBlockFull(polyData, sample->pcmDataBlockOffset + polyphony->blockProgress);
                                 polyphony->blockProgress++;
@@ -300,17 +545,30 @@ void sysSynthesizeAudio() {
                             {
                                 u32 remaining = BLOCK_SIZE;
                                 u8 *ptr       = polyData;
+                                u32 loopProgress_Stack;
 
-                                polyphony->loopProgressSamples = sample->loopStart % SAMPLES_PER_BLOCK;
+                                u32 readLoopSamples = blockProgressSamples - loopStartSamples;
+                                if (readLoopSamples > loopDurationSamples)
+                                {
+                                    // make sure to overwrite
+                                    u32 a = loopStartBytes - (blockProgressBytes - BLOCK_SIZE);
+                                    ptr += a + loopDurationBytes;
+                                    remaining          = BLOCK_SIZE - (ptr - polyData);
+                                    loopProgress_Stack = 0;
+                                }
+                                else
+                                {
+                                    loopProgress_Stack = readLoopSamples;
+                                }
 
-                                sampleOff      = SAMPLE_SIZE * (loopStartSamples + polyphony->loopProgressSamples);
+                                sampleOff      = SAMPLE_SIZE * (loopStartSamples + loopProgress_Stack);
                                 sampleOffBlock = sampleOff / BLOCK_SIZE;
                                 loopBlock      = sample->pcmDataBlockOffset + sampleOffBlock;
                                 loopBlockOff   = sampleOff % BLOCK_SIZE;
 
-                                if (polyphony->loopProgressSamples > 0)
+                                if (loopProgress_Stack > 0)
                                 {
-                                    u32 toRead = loopDurationBytes - polyphony->loopProgressSamples * SAMPLE_SIZE;
+                                    u32 toRead = loopDurationBytes - loopProgress_Stack * SAMPLE_SIZE;
                                     sfsReadBlocksFromOffsetPartial(ptr, loopBlock, loopBlockOff, toRead);
                                     remaining -= toRead;
                                     ptr += toRead;
@@ -335,15 +593,15 @@ void sysSynthesizeAudio() {
                     }
                     else
                     {
-                        if (current >= sample->pcmDataBlockOffset + sample->pcmDataLengthBlocks)
+                        if (blockProgress >= sampleLengthSamples / BLOCK_SIZE)
                         {
                             memset(polyData, 0, SYS_AUDIO_BUFFER_SIZE);
-                            *polyphony     = (sysPolyphony){};
+                            *polyphony = (sysPolyphony){};
                             // keyData->state = SYS_BTNSTATE_NULL;
                             goto switchEnd;
                         }
 
-                        sfsReadBlockFull(polyData, sample->pcmDataBlockOffset + current);
+                        sfsReadBlockFull(polyData, sample->pcmDataBlockOffset + blockProgress);
 
                         polyphony->blockProgress++;
                     }
@@ -361,6 +619,8 @@ void sysSynthesizeAudio() {
 
                     polyphony->play = true;
                     polyphonyCounter++;
+
+                    sserSendAudio(polyData, SYS_AUDIO_BUFFER_SIZE);
 
                     break;
                 }
@@ -424,7 +684,7 @@ loopEnd:
         gSysAudioFrontBuf[i] = (0x8000 + gSysAudioBackBuf[i]) / 16;
     }
 
-    sserSendAudio((u8 *) gSysAudioFrontBuf, SYS_AUDIO_BUFFER_SIZE);
+    // sserSendAudio((u8 *) gSysAudioFrontBuf, SYS_AUDIO_BUFFER_SIZE);
 }
 
 sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn) {
@@ -451,12 +711,11 @@ int sysPitchBendCalculateArr(float pSysFreq, int pPrescaler, float pOutFreq) {
     return (int) (pSysFreq / (pOutFreq * pPrescaler + pOutFreq) - 1);
 }
 
-float bend = 0;
-
 void sysHandlePitchBend() {
     const float sysFreq = 120e6;
 
-    bend          = gSysSettings.pitchBendRangeSemitones * ((HAL_ADC_GetValue(gSysAdc) / 32767.5F) - 1);
+    // 16 bit ADC. aj dobro
+    float bend    = gSysSettings.pitchBendRangeSemitones * ((HAL_ADC_GetValue(gSysAdc) / 32767.5F) - 1);
     float newFreq = toneAddSemitone(sysFreq, bend);
 
     TIM_DAC->ARR = sysPitchBendCalculateArr(sysFreq, TIM_DAC->ARR, newFreq);
@@ -551,6 +810,11 @@ void sysPoll() {
         sysUpdateTrackData();
     }
     sysRender();
+
+    gSysRotaryEncoder.lastOutA              = gSysRotaryEncoder.outA;
+    gSysRotaryEncoder.lastOutB              = gSysRotaryEncoder.outB;
+    gSysRotaryEncoder.lastSw                = gSysRotaryEncoder.sw;
+    gSysDebugData.lastChangeMenuButtonState = gSysDebugData.changeMenuButtonState;
 }
 
 void sysRender() {
@@ -565,13 +829,17 @@ void sysRender() {
 
     // if (gSysDeltaTime > 0)
     // {
-    //     glcdSeek(SYS_GUI_ORIGIN, 64 - (SYS_GUI_ORIGIN + 3 * (SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y)));
+    //     glcdSeek(SYS_GUI_ORIGIN, 64 - (SYS_GUI_ORIGIN + 3 * (SYS_LINE_HEIGHT)));
     //     char fps[64];
     //     sprintf(fps, "TPS: %04ld (%6.2f ms)\nFrame counter: %ld\n", (s32) (1 / gSysDeltaTime), gSysDeltaTime * 1000, gGlcdFrameCounter);
     //     glcdDrawString(fps);
     // }
 
     sysGlcdSeekOrigin();
+    gGlcdWrapX = 128;
+
+    sysSingleInstrumentRuntime *mainTrackInstrument = &sysGetMainTrack()->instrument;
+
     switch (gSysCurrentMenuId)
     {
         case SYS_MENU_ERROR: {
@@ -580,7 +848,7 @@ void sysRender() {
             break;
         }
         case SYS_MENU_LOADING: {
-            if (gSysCurrentMenuTimer > 0)
+            if (gSysCurrentMenuTimer > 2)
             {
                 gSysCurrentMenuId = SYS_MENU_LOADING_DONE;
                 break;
@@ -592,10 +860,10 @@ void sysRender() {
         }
         case SYS_MENU_LOADING_DONE: {
             s32 timerY = max(0, (gSysCurrentMenuTimer - 2.0F) * 70);
-            if (true || timerY > 0)
+            if (timerY > 64)
             {
                 gSysIsLoaded      = true;
-                gSysCurrentMenuId = SYS_MENU_DEFAULT;
+                gSysCurrentMenuId = DEBUG_MENU ? SYS_MENU_DEBUG : SYS_MENU_DEFAULT;
                 break;
             }
 
@@ -604,10 +872,78 @@ void sysRender() {
             break;
         }
         case SYS_MENU_DEFAULT: {
-            char buf[32];
-            sprintf(buf, "%05d\n", sysGetMainTrack()->instrument.instrumentId);
-            glcdDrawString(buf);
-            glcdDrawString(sysGetMainTrack()->instrument.cachedName);
+            glcdPrintf("%05d\n", mainTrackInstrument->instrumentId);
+            glcdDrawString(mainTrackInstrument->cachedName);
+
+            break;
+        }
+
+        case SYS_MENU_DEBUG: {
+            glcdSeek(SYS_GUI_ORIGIN + SYS_GUI_DOT_STRIDE, SYS_GUI_ORIGIN);
+            glcdSetOrigin(SYS_GUI_ORIGIN + SYS_GUI_DOT_STRIDE, SYS_GUI_ORIGIN);
+
+            gGlcdWrapX = SYS_GUI_DEBUG_LOOP_PANE_X - 2;
+
+            glcdPrintf("%05d\n", mainTrackInstrument->instrumentId);
+            glcdDrawString(mainTrackInstrument->cachedName);
+            glcdDrawString("\n");
+
+            gGlcdWrapX = 128;
+
+            glcdDrawLineVertical(SYS_GUI_DEBUG_LOOP_PANE_X - 2, 0, 64);
+
+            u8 writeBtnWidth = 0;
+            u8 writeBtnY     = 0;
+            u8 writeBtnX     = 0;
+            if (gSysDebugData.sample.loopDuration > 0)
+            {
+                glcdSeek(SYS_GUI_ORIGIN + SYS_GUI_DEBUG_LOOP_PANE_X, SYS_GUI_ORIGIN);
+                glcdSetOrigin(SYS_GUI_ORIGIN + SYS_GUI_DEBUG_LOOP_PANE_X, SYS_GUI_ORIGIN);
+
+                char note[4];
+                solfegeSemitoneToStr(note, gSysDebugData.noteSelected + SFS_FIRST_KEY, false);
+                glcdPrintf("note: %s\nvel: %03d\nlpst: %d\nlpdur: %d\n", note, gSysDebugData.velocity, gSysDebugData.sample.loopStart, gSysDebugData.sample.loopDuration);
+
+                gGlcdCursorY = 50;
+                writeBtnY = gGlcdCursorY - 2;
+                writeBtnX = gGlcdCursorX - 2;
+                u8 begin = gGlcdCursorX;
+                glcdPrintf("WRITE");
+                writeBtnWidth = 4 + gGlcdCursorX - begin;
+            }
+
+            switch (gSysDebugData.submenu)
+            {
+                case SYS_DEBUG_SUBMENU_INSTRUMENT_SELECT: {
+                    glcdSeek(SYS_GUI_ORIGIN, SYS_GUI_ORIGIN);
+                    glcdSetOrigin(SYS_GUI_ORIGIN, SYS_GUI_ORIGIN);
+
+                    glcdDrawRectangle(SYS_GUI_ORIGIN, SYS_GUI_ORIGIN, SYS_GUI_DOT_SIZE, SYS_GUI_DOT_SIZE, 1);
+
+                    break;
+                }
+
+                case SYS_DEBUG_SUBMENU_LOOP_CHANGE: {
+                    glcdSeek(SYS_GUI_ORIGIN + SYS_GUI_DEBUG_LOOP_PANE_X, SYS_GUI_ORIGIN);
+                    glcdSetOrigin(SYS_GUI_ORIGIN + SYS_GUI_DEBUG_LOOP_PANE_X, SYS_GUI_ORIGIN);
+
+                    u8 dotX = 1 + SYS_GUI_DEBUG_LOOP_PANE_X;
+                    if (gSysDebugData.loopButton != SYS_DEBUG_LOOP_BUTTON_WRITE)
+                    {
+                        glcdDrawRectangle(dotX, SYS_GUI_ORIGIN + gSysDebugData.loopButton * SYS_LINE_HEIGHT + SYS_LINE_HEIGHT / 2, SYS_GUI_DOT_SIZE, SYS_GUI_DOT_SIZE, 1);
+                    }
+                    else
+                    {
+                        glcdDrawRectangle(writeBtnX, writeBtnY, writeBtnWidth, SYS_LINE_HEIGHT + 3, 1);
+                    }
+
+                    break;
+                }
+
+                default: {
+                    break;
+                }
+            }
 
             break;
         }
@@ -639,17 +975,17 @@ void sysUpdateTrackData() {
         if (!track->isLoaded)
         {
             u32 off = instrument->instrumentId * sizeof(sfsSingleInstrument);
-            sfsReadBlockFull(gSysTmpBlock, gSfsHeader->instrumentInfoDataBlockStart + off / BLOCK_SIZE);
+            sfsReadBlockFull(gSfsTmpBlock, gSfsHeader->instrumentInfoDataBlockStart + off / BLOCK_SIZE);
 
-            memcpy(instrument, gSysTmpBlock + off % BLOCK_SIZE, sizeof(sfsSingleInstrument)); // NOT a typo. instrument.base is always at offset 0x0
+            memcpy(instrument, gSfsTmpBlock + off % BLOCK_SIZE, sizeof(sfsSingleInstrument)); // NOT a typo. instrument.base is always at offset 0x0
 
             u32 lutOffset = instrument->base.nameStrIndex * sizeof(u32);
-            sfsReadBlockFull(gSysTmpBlock, gSfsHeader->stringLutBlockStart + lutOffset / BLOCK_SIZE);
+            sfsReadBlockFull(gSfsTmpBlock, gSfsHeader->stringLutBlockStart + lutOffset / BLOCK_SIZE);
 
-            u32 stringOffset = *(u32 *) (gSysTmpBlock + (lutOffset % BLOCK_SIZE));
-            sfsReadBlockFull(gSysTmpBlock, gSfsHeader->stringDataBlockStart + stringOffset / BLOCK_SIZE);
+            u32 stringOffset = *(u32 *) (gSfsTmpBlock + (lutOffset % BLOCK_SIZE));
+            sfsReadBlockFull(gSfsTmpBlock, gSfsHeader->stringDataBlockStart + stringOffset / BLOCK_SIZE);
 
-            strcpy(instrument->cachedName, (str) gSysTmpBlock + stringOffset);
+            strcpy(instrument->cachedName, (str) gSfsTmpBlock + stringOffset);
 
             track->isLoaded = true;
         }

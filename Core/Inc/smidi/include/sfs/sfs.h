@@ -41,7 +41,7 @@ typedef pstruct {
 #define SFS_MAGIC magic('S', 'Y', 'L', 'Z')
 
 typedef pstruct {
-    u16 pcmDataLengthBlocks;
+    u16 pcmDataLengthSamples;
     u32 pcmDataBlockOffset;
     u32 loopStart;
 
@@ -55,6 +55,7 @@ typedef pstruct {
 } sfsInstrumentSample;
 
 assertSizeAlignedTo(sfsInstrumentSample, 0x200);
+#define SAMPLE_INFOS_PER_BLOCK (BLOCK_SIZE / sizeof(sfsInstrumentSample))
 
 #define SFS_INVALID_SAMPLE_IDX 0xFFFF_FFFF
 
@@ -158,11 +159,14 @@ extern u8 gSfsTmpBlock[];
 extern synthErrno sfsInit();
 extern synthErrno sfsDeinit();
 extern synthErrno sfsReadBlocks(u8 *pData, u32 pBlkIdx, u8 pBlkCnt, u16 pByteOffset, u16 pByteCount);
+extern synthErrno sfsWriteBlocks(u8 *pData, u32 pBlkIdx, u8 pBlkCnt, u16 pByteOffset, u16 pByteCount);
 
 #define sfsReadBlockFull(dat, blk) sfsReadBlocks(dat, blk, 1, 0, BLOCK_SIZE)
 #define sfsReadBlocksFull(dat, blk, cnt) sfsReadBlocks(dat, blk, cnt, 0, BLOCK_SIZE)
 #define sfsReadBlockFromOffsetToEnd(dat, blk, off) sfsReadBlocks(dat, blk, 1, off, BLOCK_SIZE - off)
 #define sfsReadBlockFromOffsetPartial(dat, blk, off, count) sfsReadBlocks(dat, blk, 1, off, count)
 #define sfsReadBlocksFromOffsetPartial(dat, blk, off, count) sfsReadBlocks(dat, blk, 1, off, count)
+
+#define sfsWriteBlockFull(dat, blk) sfsWriteBlocks(dat, blk, 1, 0, BLOCK_SIZE)
 
 #endif //SYNTH_FS_H
