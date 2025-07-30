@@ -22,7 +22,6 @@ u8                 gGlcdWrapX                                    = 128;
 u8                 gGlcdFrameBufBack[0x400]                      = {};
 u8                 gGlcdFrameBufFront[0x400]                     = {};
 GPIO_TypeDef *     gGlcdCsPort                                   = NULL;
-sfsGlyph           gGlyphs[SFS_GLYPH_COUNT]                      = {};
 
 bool gGlcdInitialized       = false;
 bool gGlcdFinishedRendering = true;
@@ -117,13 +116,6 @@ void glcdInit(SPI_HandleTypeDef *pSpi, GPIO_TypeDef *pCsPort, u16 pPin) {
     gGlcdSpi    = pSpi;
 
     glcdClsSoft();
-
-    HAL_StatusTypeDef halRet = sfsReadBlockFromOffsetPartial((u8 *) gGlyphs, gSfsHeader->fontDataBlockStart, 0, SFS_FONT_SIZE);
-
-    if (halRet != HAL_OK)
-    {
-        return;
-    }
 
     glcdCmd(0, 0, 0b00110000);
     glcdCmd(0, 0, 0b00110000);
@@ -294,8 +286,6 @@ void glcdPrintf(char *pFormat, ...) {
     va_end(args);
 }
 
-u8 gGlcdDbg[1026] = {};
-
 void glcdFinalize() {
     if (!gGlcdInitialized || gGlcdSpi->State != HAL_SPI_STATE_READY)
     {
@@ -308,11 +298,6 @@ void glcdFinalize() {
     }
 
     memcpy(gGlcdFrameBufFront, gGlcdFrameBufBack, 0x400);
-
-    gGlcdDbg[0] = 0xA0;
-    gGlcdDbg[1] = 0xA1;
-    memcpy(gGlcdDbg + 2, gGlcdFrameBufFront, 0x400);
-    CDC_Transmit_FS(gGlcdDbg, 0x402);
 
     glcdCsHigh();
     gGlcdDmaDataSize = 0;

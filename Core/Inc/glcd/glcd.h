@@ -8,6 +8,7 @@
 #include <types.h>
 #include <stm32h7xx_hal.h>
 #include <sfs.h>
+#include <glcd/glcd_font.h>
 
 #define GLCD_SEND_QUEUE_MAX_DATA_LENGTH 0x1000
 
@@ -17,7 +18,6 @@ extern GPIO_TypeDef *     gGlcdCsPort;
 extern u16                gGlcdCsPin;
 extern u8                 gGlcdFrameBufBack[0x400];
 extern u8                 gGlcdFrameBufFront[0x400];
-extern sfsGlyph           gGlyphs[];
 extern u8                 gGlcdCursorX, gGlcdCursorY;
 extern u8                 gGlcdOriginX, gGlcdOriginY;
 extern bool               gGlcdInitialized;
@@ -26,6 +26,9 @@ extern BDMA_BUFFER u8     gGlcdDmaData[];
 extern u16                gGlcdDmaDataSize;
 extern u32                gGlcdFrameCounter;
 extern u8                 gGlcdWrapX;
+
+// ReSharper disable once CppInconsistentNaming
+#define gGlyphs ((sfsGlyph*) gGlcdFont)
 
 #define glcdCsLow() HAL_GPIO_WritePin(gGlcdCsPort, gGlcdCsPin, GPIO_PIN_RESET)
 #define glcdCsHigh() HAL_GPIO_WritePin(gGlcdCsPort, gGlcdCsPin, GPIO_PIN_SET)

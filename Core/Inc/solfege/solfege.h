@@ -42,6 +42,7 @@ static_assert(sizeof(tone) == 8);
 
 #define TONE_OFFSET_B4 (TONE_OFFSET_C5 - 1)
 #define TONE_OFFSET_A5 (TONE_OFFSET_C5 - 3)
+#define TONE_OFFSET_A4 (TONE_OFFSET_C4 - 3)
 #define TONE_OFFSET_B6 (TONE_OFFSET_C7 - 1)
 #define TONE_OFFSET_D6 (TONE_OFFSET_C6 + 2)
 #define TONE_OFFSET_E6 (TONE_OFFSET_C6 + 4)

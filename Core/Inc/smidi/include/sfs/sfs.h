@@ -23,7 +23,6 @@
 typedef pstruct {
     u32 magic; // SYLZ
 
-    u32 fontDataBlockStart;
     u32 holdBehaviorDataStart;
     u32 pcmDataBlockStart;
     u32 stringLutBlockStart;          // string lut - offsets into stringDataBlock
@@ -41,17 +40,16 @@ typedef pstruct {
 #define SFS_MAGIC magic('S', 'Y', 'L', 'Z')
 
 typedef pstruct {
-    u16 pcmDataLengthSamples;
+    u32 pcmDataLengthSamples;
     u32 pcmDataBlockOffset;
     u32 loopStart;
-
-    u16 loopDuration;
+    u32 loopDuration;
 
     u8 velocity;
     u8 pitchSemitones;
 
     u16 startAverageAmplitude, endAverageAmplitude;
-    u8  padding[14];
+    u8  padding[10];
 } sfsInstrumentSample;
 
 assertSizeAlignedTo(sfsInstrumentSample, 0x200);
@@ -67,7 +65,6 @@ typedef enum : u8 {
 enumAsFlag(sfsSoundType)typedef pstruct {
     u16 nameStrIndex;
 
-    f32 fadeTimeDefault;
     f32 fadeTimeForced;
     u8  noteRangeStart;
     u8  noteRangeEnd;
@@ -75,7 +72,7 @@ enumAsFlag(sfsSoundType)typedef pstruct {
 
     sfsSoundType soundType;
 
-    u8 padding[18];
+    u8 padding[22];
 } sfsSingleInstrument;
 
 assertSizeAlignedTo(sfsSingleInstrument, 0x200);
@@ -153,6 +150,14 @@ assertSize(sfsGlyph, 9);
 
 extern u8 gSfsFirstBlockData[];
 extern u8 gSfsTmpBlock[];
+
+#ifdef DESKTOP
+
+#include <stdio.h>
+
+extern FILE* gSfsFile;
+
+#endif
 
 #define gSfsHeader ((sfsHeader*)gSfsFirstBlockData)
 

@@ -1,5 +1,5 @@
 //
-// Created by Made on 19/05/2025.
+// Created by lovro on 19/05/2025.
 //
 
 #ifndef SSYS_H
@@ -7,10 +7,19 @@
 
 #include <types.h>
 #include <serrno.h>
-#include <sfs.h>
-#include <stm32h7xx_hal.h>
+#include <sfs/sfs.h>
 #include <solfege/solfege.h>
+#include <freeverb/freeverb.h>
+
+#ifdef STM32H743xx
 #include <sser/sser.h>
+#include <stm32h7xx_hal.h>
+#else
+typedef void DAC_HandleTypeDef;
+typedef void ADC_HandleTypeDef;
+
+#define sserSendAudio(_0, _1)
+#endif
 
 #define SYS_GUI_OUTLINE_THICKNESS 1
 #define SYS_GUI_OUTLINE_MARGIN 4
@@ -28,22 +37,8 @@
 #define SYS_LINE_HEIGHT (SYS_FONT_HEIGHT + SYS_FONT_SPACING_Y)
 
 #define SYS_MAX_AVAILABLE_RAM (512 * 1024)
-#define SYS_TRACK_COUNT 8
-#define SYS_TRACK_BUFFER_SIZE (BLOCK_SIZE * 2)
-#define SYS_TRACK_BUFFER_SAMPLE_COUNT (SYS_TRACK_BUFFER_SIZE / 2)
-#define SYS_POLYPHONY_COUNT (SYS_MAX_AVAILABLE_RAM / SYS_TRACK_BUFFER_SIZE)
 
-#define SYS_AUDIO_BUFFER_SIZE BLOCK_SIZE
-#define SYS_AUDIO_BUFFER_SAMPLE_COUNT (BLOCK_SIZE / 2)
-
-#define SYS_DAC_BUFFER_SIZE (SYS_AUDIO_BUFFER_SIZE * 2)
-#define SYS_DAC_SAMPLE_COUNT (SYS_DAC_BUFFER_SIZE / sizeof(u16))
-#define SYS_DAC_HALF_BUFFER_SIZE (SYS_DAC_BUFFER_SIZE / 2)
-#define SYS_DAC_HALF_SAMPLE_COUNT (SYS_DAC_SAMPLE_COUNT / 2)
-
-#define SYS_POLL_RATE 187
-#define SYS_POLL_PERIOD_TICKS (1000 / SYS_POLL_RATE)
-#define SYS_POLL_PERIOD_US (1e6 / SYS_POLL_RATE)
+#define SYS_DELTA_TIME (SPLR_DAC_HALF_SAMPLE_COUNT / SFS_SAMPLERATE_F32)
 
 enum {
     SYS_BTNMTX1_BUTTON_0_MASK = 1 << 0,
@@ -65,11 +60,12 @@ enum {
 };
 
 typedef enum : u8 {
-    SYS_BTNSTATE_NULL,
-    SYS_BTNSTATE_DOWN, // just pressed
-    SYS_BTNSTATE_HELD,
-    SYS_BTNSTATE_UP, // just released
-} sysButtonState;
+    SYS_KEYSTATE_NULL,
+    SYS_KEYSTATE_DOWN, // just pressed
+    SYS_KEYSTATE_HELD,
+    SYS_KEYSTATE_UP, // just released
+    SYS_KEYSTATE_FADING,
+} sysKeyState;
 
 typedef enum : u8 {
     SYS_MENU_ERROR,
@@ -88,8 +84,8 @@ typedef struct {
 } sysSingleInstrumentRuntime;
 
 typedef struct {
-    sysButtonState state;
-    u8             velocity;
+    sysKeyState state;
+    u8          velocity;
 } sysKeyData;
 
 typedef struct {
@@ -103,12 +99,15 @@ typedef struct {
 } sysTrack;
 
 typedef struct {
-    sfsInstrumentSample *sample;
-    u32                  blockProgress;
-    u16                  loopProgressSamples;
+    sfsInstrumentSample sample;
+    u32                 blockProgress;
+    u16                 loopProgressSamples;
+    u32                 fadeProgressSamples;
+    u32                 fadeDurationSamples;
 
     bool play    : 1;
     bool inLoop  : 1;
+    bool fading  : 1;
     bool loopOver: 1;
 } sysPolyphony;
 
@@ -122,7 +121,9 @@ typedef struct {
 } sysKeyTimestamp;
 
 typedef struct {
-    u8 pitchBendRangeSemitones;
+    u8                pitchBendRangeSemitones;
+    bool              reverbEnabled;
+    fv_ReverbSettings reverbSettings;
 } sysSettings;
 
 typedef struct {
@@ -162,26 +163,18 @@ typedef struct {
     bool                changeMenuButtonState;
 } sysDebugData;
 
-extern sysSettings          gSysSettings;
-extern bool                 gSysIsLoaded;
-extern u32                  gSysTickCounter;
-extern f32                  gSysDeltaTime;
-extern u8                   gSysCurrentMenuId;
-extern u8                   gSysLastMenuId;
-extern f32                  gSysCurrentMenuTimer;
-extern DMA_BUFFER u16       gSysDacBuf[];
-extern s16                  gSysAudioFrontBuf[];
-extern s16                  gSysAudioBackBuf[];
-extern sfsKeyProximityTable gSysProximityTable;
-extern sysTrack *           gSysTrackCurrent;
-extern sysTrack             gSysTrackInfo[];
-extern s16                  gSysPolyphonyData[SYS_TRACK_COUNT][SFS_KEY_COUNT][SYS_AUDIO_BUFFER_SAMPLE_COUNT];
-extern sysPolyphony         gSysPolyphonyInfo[SYS_TRACK_COUNT][SFS_KEY_COUNT];
-extern u32                  gSysDmaProgress;
-extern u32                  gSysDataLoadCounter;
-extern char                 gSysStrError[];
-extern sysRotaryEncoder     gSysRotaryEncoder;
-extern sysDebugData         gSysDebugData;
+extern sysSettings      gSysSettings;
+extern bool             gSysIsLoaded;
+extern bool             gSysIsBusy;
+extern u32              gSysSkippedPasses;
+extern u8               gSysCurrentMenuId;
+extern u8               gSysLastMenuId;
+extern f32              gSysCurrentMenuTimer;
+extern DMA_BUFFER u16   gSysDacBuf[];
+extern u32              gSysDataLoadCounter;
+extern char             gSysStrError[];
+extern sysRotaryEncoder gSysRotaryEncoder;
+extern sysDebugData     gSysDebugData;
 
 extern sysInputBitmap  gSysBtnMtx1State;
 extern sysInputBitmap  gSysBtnKeyStates[SFS_KEYS_WORD_COUNT];
@@ -193,21 +186,18 @@ extern ADC_HandleTypeDef *gSysAdc;
 
 #define sysGetTrackData(i) ((u16*)(gSysTrackData + i))
 
-synthErrno     sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc);
-void           sysPoll();
-void           sysUpdateTrackData();
-void           sysRender();
-sysButtonState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn);
-void           sysHandleInputs();
-void           sysReadInputs();
-void           sysHandlePitchBend();
-void           sysSynthesizeAudio();
-synthErrno     sysDeinit();
-void           sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-void           sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
-void           sysError(synthErrno pCode);
+synthErrno  sysInit(DAC_HandleTypeDef *pDac, ADC_HandleTypeDef *pAdc);
+void        sysPoll();
+void        sysRender();
+sysKeyState sysGetButtonState(sysInputBitmap *pMap, u32 pBtn);
+void        sysHandleInputs();
+void        sysReadInputs();
+void        sysHandlePitchBend();
+synthErrno  sysDeinit();
+void        sysNoteOn(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
+void        sysNoteOff(u8 pTrack, u16 pNoteSemitones, u8 pVelocity);
 
-#define sysGetMainTrack() gSysTrackInfo
+void sysError(synthErrno pCode);
 #define sysPrintf(fmt, ...) printf("ssys: " fmt, ##__VA_ARGS__)
 
 

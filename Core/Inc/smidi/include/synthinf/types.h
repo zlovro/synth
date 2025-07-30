@@ -5,6 +5,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#define DEBUG
+
 #include <assert.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -37,6 +39,10 @@ typedef u32 sz;
 
 typedef char *str;
 
+#define clamp(x, a, b) max(a, min(b, x))
+#define clamp01(x) clamp(x, 0, 1)
+#define clamp11(x) clamp(x, -1, 1)
+
 #define EDGE_INVALID 0
 #define EDGE_FALLING 1
 #define EDGE_RISING 2
@@ -47,10 +53,17 @@ typedef char *str;
 
 #define zmem(m, s) memset(m, 0, s)
 
+#ifndef STM32H743xx
+#define DESKTOP
+#define UNUSED(x) (void)(x)
+#endif
+
 #ifdef __GNUC__
 #define pstruct struct __attribute__((packed))
 #define DMA_BUFFER __attribute__((section(".dma_buffer")))
+#define RAM_D2_BUFFER DMA_BUFFER
 #define BDMA_BUFFER __attribute__((section(".bdma_buffer")))
+#define RAM_D3_BUFFER BDMA_BUFFER
 #else
 #define _ALLOW_KEYWORD_MACROS
 #define pstruct struct
